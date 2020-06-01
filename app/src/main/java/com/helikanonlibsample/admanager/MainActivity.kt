@@ -64,10 +64,7 @@ class MainActivity : AppCompatActivity() {
                         rewardedPlacementId = "YOUR_PLACEMENT_ID"
                         mrecPlacementId = "YOUR_PLACEMENT_ID"
                     },
-                    true,
-                    true,
-                    true,
-                    true
+                    true,true,true,true
                 ),
                 /*AdPlatformModel(
                     AdmobAdWrapper("test", this@MainActivity, applicationContext).apply {
@@ -85,10 +82,7 @@ class MainActivity : AppCompatActivity() {
                     StartAppAdWrapper("207754325", this@MainActivity, applicationContext).apply {
 
                     },
-                    true,
-                    true,
-                    true,
-                    true
+                    true,true,true,true
                 ),
                 AdPlatformModel(
                     IronSourceAdWrapper("a1a67f75", this@MainActivity, applicationContext).apply {
@@ -97,10 +91,7 @@ class MainActivity : AppCompatActivity() {
                         rewardedPlacementId = "DefaultRewardedVideo"
                         mrecPlacementId = "MREC_BANNER"
                     },
-                    true,
-                    true,
-                    true,
-                    true
+                    true,true,true,true
                 ),
                 AdPlatformModel(
                     MopubAdWrapper("207754325", this@MainActivity, applicationContext).apply {
@@ -109,10 +100,7 @@ class MainActivity : AppCompatActivity() {
                         rewardedPlacementId = "7c13c6edc67a4fcab83e3cb45bd46597"
                         mrecPlacementId = "b311abd32a8944f4b6c6bba7fdb1f9e0"
                     },
-                    true,
-                    true,
-                    true,
-                    true
+                    true,true,true,true
                 )
             )
         }
