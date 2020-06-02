@@ -62,7 +62,7 @@ val adManager = AdManager().apply {
     interstitialMinElapsedSecondsToNextShow = 60 // seconds
     adPlatforms = mutableListOf<AdPlatformModel>(
         AdPlatformModel(
-            FacebookAdWrapper("", this@MainActivity, applicationContext).apply {
+            FacebookAdWrapper("your_app_id", this@MainActivity, applicationContext).apply {
                 interstitialPlacementId = "YOUR_PLACEMENT_ID"
                 bannerPlacementId = "YOUR_PLACEMENT_ID"
                 rewardedPlacementId = "YOUR_PLACEMENT_ID"
@@ -71,7 +71,7 @@ val adManager = AdManager().apply {
             true,true,true,true
         ),
         AdPlatformModel(
-            AdmobAdWrapper("test", this@MainActivity, applicationContext).apply {
+            AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713", this@MainActivity, applicationContext).apply {
                 interstitialPlacementId = "ca-app-pub-3940256099942544/1033173712"
                 bannerPlacementId = "ca-app-pub-3940256099942544/6300978111"
                 rewardedPlacementId = "ca-app-pub-3940256099942544/5224354917"
