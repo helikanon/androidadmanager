@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
                     true,true,true,true
                 ),
                 /*AdPlatformModel(
-                    AdmobAdWrapper("test", this@MainActivity, applicationContext).apply {
+                    AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713", this@MainActivity, applicationContext).apply {
                         interstitialPlacementId = "ca-app-pub-3940256099942544/1033173712"
                         bannerPlacementId = "ca-app-pub-3940256099942544/6300978111"
                         rewardedPlacementId = "ca-app-pub-3940256099942544/5224354917"
