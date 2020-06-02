@@ -1,39 +1,55 @@
+
 # androidadmanager
 
 ## Install
 
-    implementation project(path: ':admanager')
+Put in "allprojects/repositories"
+```java
+maven { url "https://dl.bintray.com/ironsource-mobile/android-sdk" } // ironsource
+maven {
+	url "https://s3.amazonaws.com/moat-sdk-builds"
+
+	// below line for fix = when using onesignal gradle sync erro
+	content {  
+		includeGroupByRegex "com\\.moat.*"  
+	}
+}
+```
+
+Put in "buildscript/dependencies" (for admob)
+```java
+classpath 'com.google.gms:google-services:4.3.3'
+```
+
+Put in app gradle
+```java
+implementation 'com.github.helikanon:androidadmanager:v1.0'
+```
 
 ## Settings
-### Root Gradle
 
-Put in "buildscript/dependencies"
-
-    classpath 'com.google.gms:google-services:4.3.3'
-
-Put in "allprojects/repositories"
-
-    maven { url "https://dl.bintray.com/ironsource-mobile/android-sdk" } // ironsource  
-    maven {  
-      url "https://s3.amazonaws.com/moat-sdk-builds"  
-      // aşağıdaki content satırını mopub ve onesignal aynı projede olduğunda hata verdiği için koyduk. çözdü  
-     // https://github.com/mopub/mopub-android-sdk/issues/290#issuecomment-521563964  content {  
-      includeGroupByRegex "com\\.moat.*"  
-      }  
-    } // mopub
 
 
 ### Manifest
+```xml
+<!-- Startapp -->  
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />  
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />  
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />  
+<uses-permission android:name="android.permission.BLUETOOTH" />  
+<!-- Startapp -->
+```
 
-    <!-- Startapp -->  
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />  
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />  
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />  
-    <uses-permission android:name="android.permission.BLUETOOTH" />  
-    <!-- Startapp -->
+## Supported Ad Platforms
+* [Facebook Audience](https://developers.facebook.com/docs/audience-network/get-started/android/)
+* [Admob](https://developers.google.com/admob/android/quick-start)
+* [Startapp](https://support.startapp.com/hc/en-us/articles/360002411114-Android-Standard-)
+* [Ironsource](https://developers.ironsrc.com/ironsource-mobile/android/android-sdk/)
+* [Mopub](https://developers.mopub.com/publishers/android/integrate/)
 
 ## Usage
 
+Initialize and load for next show
 ```kotlin
 val adManager = AdManager().apply {
     activity = this@MainActivity
@@ -107,4 +123,22 @@ adManager.loadRewarded(object : AdPlatformLoadListener() {
         super.onLoaded()
     }
 })
+```
+
+Show Ads
+```kotlin
+adManager.showBanner(bannerContainer) // bannerContainer is relativelayout
+adManager.showMrec(mrecContainer) // mrecContainer is relativelayout
+
+btnShowInterstitial.setOnClickListener {  
+  adManager.showInterstitial()  
+}  
+  
+btnShowRewarded.setOnClickListener {  
+  adManager.showRewarded()  
+}  
+  
+btnShowInterstitialForTimeStrategy.setOnClickListener {  
+  adManager.showInterstitialForTimeStrategy()  
+}
 ```
