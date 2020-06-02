@@ -1,5 +1,6 @@
 
 # androidadmanager
+[![](https://jitpack.io/v/helikanon/androidadmanager.svg)](https://jitpack.io/#helikanon/androidadmanager)
 
 ## Install
 
