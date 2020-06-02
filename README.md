@@ -41,6 +41,14 @@ implementation 'com.github.helikanon:androidadmanager:v1.0'
 <!-- Startapp -->
 ```
 
+### Gradle
+Put in android/defaultConfig
+```java
+manifestPlaceholders = [
+                admobAppId                     : 'your_admob_app_id'
+        ]
+```
+
 ## Supported Ad Platforms
 * [Facebook Audience](https://developers.facebook.com/docs/audience-network/get-started/android/)
 * [Admob](https://developers.google.com/admob/android/quick-start)
