@@ -5,10 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.helikanonlib.admanager.AdManager
 import com.helikanonlib.admanager.AdPlatformLoadListener
 import com.helikanonlib.admanager.AdPlatformModel
-import com.helikanonlib.admanager.adplatforms.FacebookAdWrapper
-import com.helikanonlib.admanager.adplatforms.IronSourceAdWrapper
-import com.helikanonlib.admanager.adplatforms.MopubAdWrapper
-import com.helikanonlib.admanager.adplatforms.StartAppAdWrapper
+import com.helikanonlib.admanager.adplatforms.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -58,31 +55,35 @@ class MainActivity : AppCompatActivity() {
             interstitialMinElapsedSecondsToNextShow = 60 // seconds
             adPlatforms = mutableListOf<AdPlatformModel>(
                 AdPlatformModel(
-                    FacebookAdWrapper("", this@MainActivity, applicationContext).apply {
+                    FacebookAdWrapper("your_app_id", this@MainActivity, applicationContext).apply {
                         interstitialPlacementId = "YOUR_PLACEMENT_ID"
                         bannerPlacementId = "YOUR_PLACEMENT_ID"
                         rewardedPlacementId = "YOUR_PLACEMENT_ID"
                         mrecPlacementId = "YOUR_PLACEMENT_ID"
                     },
-                    true,true,true,true
+                    true, true, true, true
                 ),
-                /*AdPlatformModel(
-                    AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713", this@MainActivity, applicationContext).apply {
+                AdPlatformModel(
+                    AdmobAdWrapper(
+                        "ca-app-pub-3940256099942544~3347511713",
+                        this@MainActivity,
+                        applicationContext
+                    ).apply {
                         interstitialPlacementId = "ca-app-pub-3940256099942544/1033173712"
                         bannerPlacementId = "ca-app-pub-3940256099942544/6300978111"
                         rewardedPlacementId = "ca-app-pub-3940256099942544/5224354917"
                         mrecPlacementId = "ca-app-pub-3940256099942544/6300978111"
                     },
+                    true,
                     false,
-                    false,
-                    false,
-                    false
-                ),*/
+                    true,
+                    true
+                ),
                 AdPlatformModel(
                     StartAppAdWrapper("207754325", this@MainActivity, applicationContext).apply {
 
                     },
-                    true,true,true,true
+                    true, true, true, true
                 ),
                 AdPlatformModel(
                     IronSourceAdWrapper("a1a67f75", this@MainActivity, applicationContext).apply {
@@ -91,7 +92,7 @@ class MainActivity : AppCompatActivity() {
                         rewardedPlacementId = "DefaultRewardedVideo"
                         mrecPlacementId = "MREC_BANNER"
                     },
-                    true,true,true,true
+                    true, true, true, true
                 ),
                 AdPlatformModel(
                     MopubAdWrapper("207754325", this@MainActivity, applicationContext).apply {
@@ -100,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                         rewardedPlacementId = "7c13c6edc67a4fcab83e3cb45bd46597"
                         mrecPlacementId = "b311abd32a8944f4b6c6bba7fdb1f9e0"
                     },
-                    true,true,true,true
+                    true, true, true, true
                 )
             )
         }
