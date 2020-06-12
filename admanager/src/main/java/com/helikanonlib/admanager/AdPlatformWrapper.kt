@@ -21,12 +21,14 @@ abstract class AdPlatformWrapper(open var appId: String, open var activity: Acti
     abstract fun showInterstitial(listener: AdPlatformShowListener? = null)
     abstract fun isInterstitialLoaded(): Boolean
 
+    abstract fun isBannerLoaded(): Boolean
     abstract fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener? = null)
 
     abstract fun loadRewarded(listener: AdPlatformLoadListener? = null)
     abstract fun showRewarded(listener: AdPlatformShowListener? = null)
     abstract fun isRewardedLoaded(): Boolean
 
+    abstract fun isMrecLoaded(): Boolean
     abstract fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener? = null)
 
     abstract fun destroy()
@@ -38,12 +40,12 @@ abstract class AdPlatformWrapper(open var appId: String, open var activity: Acti
     abstract fun onResume()
 
 
-    fun isBannerLoaded(bannerAdView: ViewGroup?): Boolean {
+    protected fun _isBannerLoaded(bannerAdView: ViewGroup?): Boolean {
         return bannerAdView != null && bannerAdView.parent != null
     }
 
-    fun removeBannerViewIfExists(bannerAdView: ViewGroup?): Boolean {
-        if (isBannerLoaded(bannerAdView)) {
+    protected fun _removeBannerViewIfExists(bannerAdView: ViewGroup?): Boolean {
+        if (_isBannerLoaded(bannerAdView)) {
             (bannerAdView?.parent as ViewGroup).removeView(bannerAdView)
             return true
         }

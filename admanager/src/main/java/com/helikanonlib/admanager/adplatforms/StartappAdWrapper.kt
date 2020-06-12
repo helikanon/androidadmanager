@@ -66,7 +66,7 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
 
         startAppAd?.loadAd(object : AdEventListener {
             override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorMessage ?: ""}")
             }
 
             override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
@@ -88,7 +88,7 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
             }
 
             override fun adNotDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorMessage ?: ""}")
             }
 
             override fun adClicked(p0: com.startapp.sdk.adsbase.Ad?) {
@@ -101,19 +101,25 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
         return startAppAd?.isReady ?: false
     }
 
+    override fun isBannerLoaded(): Boolean {
+        return _isBannerLoaded(bannerAdView)
+    }
+
     override fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
 
-        val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
-            addRule(RelativeLayout.CENTER_HORIZONTAL)
-        }
+        val lp =
+            RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+                .apply {
+                    addRule(RelativeLayout.CENTER_HORIZONTAL)
+                }
 
-        if (isBannerLoaded(bannerAdView)) {
+        if (_isBannerLoaded(bannerAdView)) {
             try {
-                removeBannerViewIfExists(bannerAdView)
+                _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed()
             } catch (e: Exception) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded")
             }
             return
         }
@@ -124,11 +130,11 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
             }
 
             override fun onFailedToReceiveAd(p0: View?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> failedtoreceivead")
             }
 
             override fun onReceiveAd(p0: View?) {
-                removeBannerViewIfExists(bannerAdView)
+                _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed()
             }
@@ -148,7 +154,7 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
 
         startAppAdRewarded?.loadAd(StartAppAd.AdMode.REWARDED_VIDEO, object : AdEventListener {
             override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}")
             }
 
             override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
@@ -159,7 +165,7 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
 
     override fun showRewarded(listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError()
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded")
             return
         }
 
@@ -178,7 +184,7 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
             }
 
             override fun adNotDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}")
             }
 
             override fun adClicked(p0: com.startapp.sdk.adsbase.Ad?) {
@@ -191,18 +197,23 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
         return startAppAdRewarded?.isReady ?: false
     }
 
+    override fun isMrecLoaded(): Boolean {
+        return _isBannerLoaded(mrecAdView)
+    }
     override fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
-        val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
-            addRule(RelativeLayout.CENTER_HORIZONTAL)
-        }
+        val lp =
+            RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+                .apply {
+                    addRule(RelativeLayout.CENTER_HORIZONTAL)
+                }
 
-        if (isBannerLoaded(mrecAdView)) {
+        if (_isBannerLoaded(mrecAdView)) {
             try {
-                removeBannerViewIfExists(mrecAdView)
+                _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
                 listener?.onDisplayed()
             } catch (e: Exception) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded")
             }
             return
         }
@@ -213,11 +224,11 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
             }
 
             override fun onFailedToReceiveAd(p0: View?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> failedtoreceivead")
             }
 
             override fun onReceiveAd(p0: View?) {
-                removeBannerViewIfExists(mrecAdView)
+                _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
 
                 listener?.onDisplayed()

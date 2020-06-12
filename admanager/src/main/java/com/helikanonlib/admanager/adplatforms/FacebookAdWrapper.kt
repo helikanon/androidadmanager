@@ -3,13 +3,9 @@ package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
 import android.content.Context
-import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.facebook.ads.*
-import com.helikanonlib.admanager.AdPlatformLoadListener
-import com.helikanonlib.admanager.AdPlatformShowListener
-import com.helikanonlib.admanager.AdPlatformTypeEnum
-import com.helikanonlib.admanager.AdPlatformWrapper
+import com.helikanonlib.admanager.*
 
 
 /**
@@ -64,7 +60,7 @@ class FacebookAdWrapper(override var appId: String, override var activity: Activ
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p1?.errorMessage ?: ""}")
             }
 
             override fun onAdLoaded(p0: Ad?) {
@@ -82,7 +78,7 @@ class FacebookAdWrapper(override var appId: String, override var activity: Activ
 
     override fun showInterstitial(listener: AdPlatformShowListener?) {
         if (!isInterstitialLoaded()) {
-            listener?.onError()
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded")
             return
         }
 
@@ -101,7 +97,7 @@ class FacebookAdWrapper(override var appId: String, override var activity: Activ
                 }
 
                 override fun onError(p0: Ad?, p1: AdError?) {
-                    listener?.onError()
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} >> ${p1?.errorMessage ?: ""}")
                 }
 
                 override fun onAdLoaded(p0: Ad?) {
@@ -121,26 +117,31 @@ class FacebookAdWrapper(override var appId: String, override var activity: Activ
         return interstitialAd != null && interstitialAd!!.isAdLoaded && !interstitialAd!!.isAdInvalidated
     }
 
+    override fun isBannerLoaded(): Boolean {
+        return _isBannerLoaded(bannerAdView)
+    }
+
     override fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
-        if (isBannerLoaded(bannerAdView)) {
+        if (_isBannerLoaded(bannerAdView)) {
             try {
-                removeBannerViewIfExists(bannerAdView)
+                _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView)
                 listener?.onDisplayed()
             } catch (e: Exception) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded error")
             }
             return
         }
 
         bannerAdView = AdView(context, bannerPlacementId, AdSize.BANNER_HEIGHT_50)
         bannerAdView?.setAdListener(object : AdListener {
+
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> ${p1?.errorMessage ?: ""}")
             }
 
             override fun onAdLoaded(p0: Ad?) {
-                removeBannerViewIfExists(bannerAdView)
+                _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView)
                 listener?.onDisplayed()
             }
@@ -178,7 +179,7 @@ class FacebookAdWrapper(override var appId: String, override var activity: Activ
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p1?.errorMessage ?: ""}")
             }
 
             override fun onAdLoaded(p0: Ad?) {
@@ -195,7 +196,7 @@ class FacebookAdWrapper(override var appId: String, override var activity: Activ
 
     override fun showRewarded(listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError()
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noads loaded")
             return
         }
 
@@ -213,7 +214,7 @@ class FacebookAdWrapper(override var appId: String, override var activity: Activ
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p1?.errorMessage ?: ""}")
             }
 
             override fun onAdLoaded(p0: Ad?) {
@@ -234,26 +235,30 @@ class FacebookAdWrapper(override var appId: String, override var activity: Activ
     }
 
 
+    override fun isMrecLoaded(): Boolean {
+        return _isBannerLoaded(mrecAdView)
+    }
     override fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
-        if (isBannerLoaded(mrecAdView)) {
+        if (_isBannerLoaded(mrecAdView)) {
             try {
-                removeBannerViewIfExists(mrecAdView)
+                _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView)
                 listener?.onDisplayed()
             } catch (e: Exception) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded error")
             }
             return
         }
 
         mrecAdView = AdView(context, mrecPlacementId, AdSize.RECTANGLE_HEIGHT_250)
         mrecAdView?.setAdListener(object : AdListener {
+
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ${p1?.errorMessage ?: ""}")
             }
 
             override fun onAdLoaded(p0: Ad?) {
-                removeBannerViewIfExists(mrecAdView)
+                _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView)
                 listener?.onDisplayed()
             }
@@ -285,8 +290,8 @@ class FacebookAdWrapper(override var appId: String, override var activity: Activ
         mrecAdView = null
     }
 
-    override fun onPause(){}
-    override fun onStop(){}
-    override fun onResume(){}
+    override fun onPause() {}
+    override fun onStop() {}
+    override fun onResume() {}
 }
 

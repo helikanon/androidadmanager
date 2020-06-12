@@ -1,6 +1,12 @@
 package com.helikanonlib.admanager
 
 
+enum class AdErrorMode {
+    MANAGER,
+    PLATFORM
+
+}
+
 
 enum class AdPlatformTypeEnum {
     FACEBOOK,

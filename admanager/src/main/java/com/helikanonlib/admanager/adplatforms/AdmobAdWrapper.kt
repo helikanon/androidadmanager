@@ -8,10 +8,7 @@ import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdCallback
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.helikanonlib.admanager.AdPlatformLoadListener
-import com.helikanonlib.admanager.AdPlatformShowListener
-import com.helikanonlib.admanager.AdPlatformTypeEnum
-import com.helikanonlib.admanager.AdPlatformWrapper
+import com.helikanonlib.admanager.*
 
 
 /**
@@ -64,7 +61,7 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
 
             override fun onAdFailedToLoad(p0: Int) {
                 super.onAdFailedToLoad(p0)
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> errorcode = $p0")
             }
 
             override fun onAdLoaded() {
@@ -77,7 +74,7 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
 
     override fun showInterstitial(listener: AdPlatformShowListener?) {
         if (!isInterstitialLoaded()) {
-            listener?.onError()
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded")
             return
         }
 
@@ -107,18 +104,23 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
         return interstitial?.isLoaded ?: false
     }
 
-    override fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
-        val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
-            addRule(RelativeLayout.CENTER_HORIZONTAL)
-        }
+    override fun isBannerLoaded(): Boolean {
+        return _isBannerLoaded(bannerAdView)
+    }
 
-        if (isBannerLoaded(bannerAdView)) {
+    override fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
+        val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+            .apply {
+                addRule(RelativeLayout.CENTER_HORIZONTAL)
+            }
+
+        if (_isBannerLoaded(bannerAdView)) {
             try {
-                removeBannerViewIfExists(bannerAdView)
+                _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed()
             } catch (e: Exception) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded")
             }
             return
         }
@@ -129,12 +131,12 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
         bannerAdView?.adListener = object : AdListener() {
             override fun onAdFailedToLoad(p0: Int) {
                 super.onAdFailedToLoad(p0)
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=$p0")
             }
 
             override fun onAdLoaded() {
                 super.onAdLoaded()
-                removeBannerViewIfExists(bannerAdView)
+                _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed()
             }
@@ -160,7 +162,7 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
             }
 
             override fun onRewardedAdFailedToLoad(errorCode: Int) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$errorCode")
             }
         }
         rewardedAd?.loadAd(AdRequest.Builder().build(), adLoadCallback)
@@ -168,7 +170,7 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
 
     override fun showRewarded(listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError()
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded")
             return
         }
 
@@ -176,7 +178,7 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
 
             override fun onRewardedAdFailedToShow(p0: Int) {
                 super.onRewardedAdFailedToShow(p0)
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$p0")
             }
 
             override fun onRewardedAdClosed() {
@@ -200,19 +202,24 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
         return rewardedAd?.isLoaded ?: false
     }
 
+    override fun isMrecLoaded(): Boolean {
+        return _isBannerLoaded(mrecAdView)
+    }
     override fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
 
-        val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
-            addRule(RelativeLayout.CENTER_HORIZONTAL)
-        }
+        val lp =
+            RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+                .apply {
+                    addRule(RelativeLayout.CENTER_HORIZONTAL)
+                }
 
-        if (isBannerLoaded(mrecAdView)) {
+        if (_isBannerLoaded(mrecAdView)) {
             try {
-                removeBannerViewIfExists(mrecAdView)
+                _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
                 listener?.onDisplayed()
             } catch (e: Exception) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded")
             }
             return
         }
@@ -223,12 +230,12 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
         mrecAdView?.adListener = object : AdListener() {
             override fun onAdFailedToLoad(p0: Int) {
                 super.onAdFailedToLoad(p0)
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> errorcode=$p0")
             }
 
             override fun onAdLoaded() {
                 super.onAdLoaded()
-                removeBannerViewIfExists(mrecAdView)
+                _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
 
                 listener?.onDisplayed()

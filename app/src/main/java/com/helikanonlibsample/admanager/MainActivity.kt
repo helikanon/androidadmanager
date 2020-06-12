@@ -1,27 +1,47 @@
 package com.helikanonlibsample.admanager
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.helikanonlib.admanager.AdManager
-import com.helikanonlib.admanager.AdPlatformLoadListener
-import com.helikanonlib.admanager.AdPlatformModel
+import androidx.multidex.BuildConfig
+import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.adplatforms.*
 import kotlinx.android.synthetic.main.activity_main.*
 
+
+// TODO add java sample
 class MainActivity : AppCompatActivity() {
 
-    lateinit var adManager: AdManager
+
+    companion object {
+        lateinit var adManager: AdManager
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         initAdManager()
-
         initViews()
-        adManager.showBanner(bannerContainer)
-        adManager.showMrec(mrecContainer)
 
+
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+
+        adManager.showBanner(bannerContainer, object : AdPlatformShowListener() {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+                Log.d("adManager", "showBanner>> $errorMode $errorMessage")
+            }
+        })
+        adManager.showMrec(mrecContainer, object : AdPlatformShowListener() {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+                Log.d("adManager", "showMrec>> $errorMode $errorMessage")
+            }
+        })
     }
 
     fun initViews() {
@@ -35,6 +55,10 @@ class MainActivity : AppCompatActivity() {
 
         btnShowInterstitialForTimeStrategy.setOnClickListener {
             adManager.showInterstitialForTimeStrategy()
+        }
+
+        btnOpenEmptyActivity.setOnClickListener {
+            startActivity(Intent(this, EmptyActivity::class.java))
         }
     }
 
@@ -106,14 +130,73 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+                if (errorMode == AdErrorMode.MANAGER) {
+                    Log.d("adManager", "AdErrorMode.MANAGER globalInterstitialLoadListener > $errorMessage")
+                } else {
+                    Log.d("adManager", "AdErrorMode.PLATFORM globalInterstitialLoadListener > $errorMessage")
+                }
+            }
+        }
+        adManager.globalRewardedLoadListener = object : AdPlatformLoadListener() {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+                if (errorMode == AdErrorMode.MANAGER) {
+                    Log.d("adManager", "AdErrorMode.MANAGER globalRewardedLoadListener > $errorMessage")
+                } else {
+                    Log.d("adManager", "AdErrorMode.PLATFORM globalRewardedLoadListener > $errorMessage")
+                }
+            }
+        }
+
+        adManager.globalInterstitialShowListener = object : AdPlatformShowListener() {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+                if (errorMode == AdErrorMode.MANAGER) {
+                    Log.d("adManager", "AdErrorMode.MANAGER globalInterstitialShowListener > $errorMessage")
+                } else {
+                    Log.d("adManager", "AdErrorMode.PLATFORM globalInterstitialShowListener > $errorMessage")
+                }
+            }
+        }
+
+        adManager.globalRewardedShowListener = object : AdPlatformShowListener() {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+                // AdErrorMode.MANAGER >> it means . We tried to load in all platforms but no one load interstitial
+                if (errorMode == AdErrorMode.MANAGER) {
+                    Log.d("adManager", "AdErrorMode.MANAGER globalRewardedShowListener > $errorMessage")
+                } else {
+                    Log.d("adManager", "AdErrorMode.PLATFORM globalRewardedShowListener > $errorMessage")
+                }
+
+            }
+        }
+
+        adManager.initialize()
+        // OR
+        /*
         adManager.initializePlatforms()
+        adManager.start()
+         */
+
+        // OR
+        /*
+        adManager.initializePlatforms()
+        adManager.loadInterstitial(object:AdPlatformLoadListener(){
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            }
+        })
+        adManager.loadRewarded(object:AdPlatformLoadListener(){
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            }
+        })
+        */
 
         if (BuildConfig.DEBUG) {
             adManager.enableTestMode("47088e48-5195-4757-90b2-0da94116befd") // send device id, it is necessary for test facebook audience networks ad
         }
 
-        // adManager.start() // start to load interstitial and rewarded video for next show
-        adManager.loadInterstitial(object : AdPlatformLoadListener() {
+
+        /*adManager.loadInterstitial(object : AdPlatformLoadListener() {
             override fun onLoaded() {
                 super.onLoaded()
             }
@@ -123,6 +206,6 @@ class MainActivity : AppCompatActivity() {
             override fun onLoaded() {
                 super.onLoaded()
             }
-        })
+        })*/
     }
 }

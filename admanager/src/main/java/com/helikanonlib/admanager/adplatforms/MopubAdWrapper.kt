@@ -3,16 +3,14 @@ package com.helikanonlib.admanager.adplatforms
 import android.app.Activity
 import android.content.Context
 import android.widget.RelativeLayout
-import com.helikanonlib.admanager.AdPlatformLoadListener
-import com.helikanonlib.admanager.AdPlatformShowListener
-import com.helikanonlib.admanager.AdPlatformTypeEnum
-import com.helikanonlib.admanager.AdPlatformWrapper
+import com.helikanonlib.admanager.*
 import com.mopub.common.MoPub
 import com.mopub.common.MoPubReward
 import com.mopub.common.SdkConfiguration
 import com.mopub.common.SdkInitializationListener
 import com.mopub.common.logging.MoPubLog
 import com.mopub.mobileads.*
+import com.mopub.mobileads.BuildConfig
 
 class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPlatformWrapper(appId, activity, context) {
     override val platform: AdPlatformTypeEnum = AdPlatformTypeEnum.MOPUB
@@ -60,7 +58,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
 
     override fun loadInterstitial(listener: AdPlatformLoadListener?) {
         if (interstitialPlacementId == null) {
-            listener?.onError()
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> null placement id ")
             return
         }
 
@@ -81,7 +79,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
             }
 
             override fun onInterstitialFailed(interstitial: MoPubInterstitial?, errorCode: MoPubErrorCode?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> $errorCode")
             }
 
             override fun onInterstitialDismissed(interstitial: MoPubInterstitial?) {
@@ -98,7 +96,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
 
     override fun showInterstitial(listener: AdPlatformShowListener?) {
         if (!isInterstitialLoaded()) {
-            listener?.onError()
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noadsloaded")
             return
         }
 
@@ -110,7 +108,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
             }
 
             override fun onInterstitialFailed(interstitial: MoPubInterstitial?, errorCode: MoPubErrorCode?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> $errorCode")
             }
 
             override fun onInterstitialDismissed(interstitial: MoPubInterstitial?) {
@@ -130,18 +128,24 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
 
     }
 
-    override fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
-        val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
-            addRule(RelativeLayout.CENTER_HORIZONTAL)
-        }
+    override fun isBannerLoaded(): Boolean {
+        return _isBannerLoaded(bannerAdView)
+    }
 
-        if (isBannerLoaded(bannerAdView)) {
+    override fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
+        val lp =
+            RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+                .apply {
+                    addRule(RelativeLayout.CENTER_HORIZONTAL)
+                }
+
+        if (_isBannerLoaded(bannerAdView)) {
             try {
-                removeBannerViewIfExists(bannerAdView)
+                _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed()
             } catch (e: Exception) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded")
             }
             return
         }
@@ -156,7 +160,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
             }
 
             override fun onBannerLoaded(banner: MoPubView) {
-                removeBannerViewIfExists(bannerAdView)
+                _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed()
             }
@@ -166,7 +170,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
             }
 
             override fun onBannerFailed(banner: MoPubView?, errorCode: MoPubErrorCode?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> $errorCode")
             }
 
             override fun onBannerClicked(banner: MoPubView?) {
@@ -181,7 +185,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
     override fun loadRewarded(listener: AdPlatformLoadListener?) {
 
         if (rewardedPlacementId == null) {
-            listener?.onError()
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> null placementid")
             return
         }
 
@@ -199,7 +203,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
             override fun onRewardedVideoPlaybackError(adUnitId: String, errorCode: MoPubErrorCode) {}
 
             override fun onRewardedVideoLoadFailure(adUnitId: String, errorCode: MoPubErrorCode) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> $errorCode")
             }
 
             override fun onRewardedVideoClicked(adUnitId: String) {}
@@ -215,7 +219,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
 
     override fun showRewarded(listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError()
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded")
             return
         }
 
@@ -231,7 +235,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
             override fun onRewardedVideoPlaybackError(adUnitId: String, errorCode: MoPubErrorCode) {}
 
             override fun onRewardedVideoLoadFailure(adUnitId: String, errorCode: MoPubErrorCode) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> $errorCode")
             }
 
             override fun onRewardedVideoClicked(adUnitId: String) {
@@ -251,18 +255,23 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         return MoPubRewardedVideos.hasRewardedVideo(rewardedPlacementId!!)
     }
 
+    override fun isMrecLoaded(): Boolean {
+        return _isBannerLoaded(mrecAdView)
+    }
     override fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
-        val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT).apply {
-            addRule(RelativeLayout.CENTER_HORIZONTAL)
-        }
+        val lp =
+            RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+                .apply {
+                    addRule(RelativeLayout.CENTER_HORIZONTAL)
+                }
 
-        if (isBannerLoaded(mrecAdView)) {
+        if (_isBannerLoaded(mrecAdView)) {
             try {
-                removeBannerViewIfExists(mrecAdView)
+                _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
                 listener?.onDisplayed()
             } catch (e: Exception) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded")
             }
             return
         }
@@ -277,7 +286,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
             }
 
             override fun onBannerLoaded(banner: MoPubView) {
-                removeBannerViewIfExists(mrecAdView)
+                _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
                 listener?.onDisplayed()
             }
@@ -287,7 +296,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
             }
 
             override fun onBannerFailed(banner: MoPubView?, errorCode: MoPubErrorCode?) {
-                listener?.onError()
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> $errorCode")
             }
 
             override fun onBannerClicked(banner: MoPubView?) {
