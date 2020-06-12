@@ -120,16 +120,34 @@ if (BuildConfig.DEBUG) {
     adManager.enableTestMode("47088e48-5195-4757-90b2-0da94116befd") // send device id, it is necessary for test facebook audience networks ad
 }
 
-// adManager.start() // start to load interstitial and rewarded video for next show
+// adManager.start() // OR below manually start to load
 adManager.loadInterstitial(object : AdPlatformLoadListener() {
     override fun onLoaded() {
-        super.onLoaded()
     }
+    
+    override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+    	if(AdErrorMode.MANAGER){
+	    // after tried all platforms to load 
+	    // this if run just one time after tried all platform and if not load any platform ad
+	}else if(AdErrorMode.PLATFORM){
+	    // after each platform throw error
+	    // for example : if you 3 ad platform, here will run each platform error throw
+	}
+    }
+    
 })
 
 adManager.loadRewarded(object : AdPlatformLoadListener() {
     override fun onLoaded() {
-        super.onLoaded()
+    }
+    override fun onError(errorMode: AdErrorMode?, errorMessage: String?) { 
+    	if(AdErrorMode.MANAGER){
+	    // after tried all platforms to load 
+	    // this if run just one time after tried all platform and if not load any platform ad
+	}else if(AdErrorMode.PLATFORM){
+	    // after each platform throw error
+	    // for example : if you 3 ad platform, here will run each platform error throw
+	}
     }
 })
 ```
