@@ -66,7 +66,6 @@ class AdManager {
         }
     }
 
-
     fun initialize() {
         if (!showAds) return
 
@@ -106,7 +105,6 @@ class AdManager {
             }
         }
     }
-
 
     fun loadInterstitial(listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null) {
         if (!showAds) return
@@ -153,7 +151,6 @@ class AdManager {
 
                 globalInterstitialLoadListener?.onError(AdErrorMode.MANAGER, errorMessage)
                 listener?.onError(AdErrorMode.MANAGER, errorMessage)
-
             }
 
             override fun onLoaded() {
@@ -166,26 +163,7 @@ class AdManager {
         platform.instance.loadInterstitial(_listener)
     }
 
-    fun showInterstitialForTimeStrategy(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
-        if (!showAds) return
-
-        var isAvailableToShow = true
-        var lastShowDate = lastShowDateByAdFormat.get(AdFormatEnum.INTERSTITIAL)
-
-        if (lastShowDate != null) {
-            val now = Date()
-            val elapsedSeconds = (now.time - lastShowDate.time) / 1000
-            val requiredElapsedTime =
-                randInt(0, randomInterval) + interstitialMinElapsedSecondsToNextShow
-            isAvailableToShow = elapsedSeconds > requiredElapsedTime
-        }
-
-        if (isAvailableToShow) {
-            showInterstitial(listener, platform)
-        }
-    }
-
-    fun showInterstitial(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
+    private fun _showInterstitial(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
         if (!showAds) return
 
         val interstitialAdPlatforms = adPlatforms.filter { it.showInterstitial }
@@ -217,8 +195,8 @@ class AdManager {
 
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
                 globalInterstitialShowListener?.onError(errorMode, errorMessage)
-                listener?.onError(errorMode, errorMessage)
-                listener?.onError(AdErrorMode.MANAGER, errorMessage)
+                listener?.onError(errorMode, errorMessage) // call for adplatform
+                listener?.onError(AdErrorMode.MANAGER, errorMessage) // call for manager
             }
         }
 
@@ -250,6 +228,60 @@ class AdManager {
             if (autoLoad) {
                 _autoloadInterstitialByHandler(null, platform)
             }
+        }
+    }
+
+    fun loadAndShowInterstitial(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
+
+        /*
+        call _showInterstitial(listener, platform) in onLoaded and onError because of
+        we wants call listener?.onError by _showInterstitial
+         */
+        val loadListener: AdPlatformLoadListener = object : AdPlatformLoadListener() {
+            override fun onLoaded() {
+                // this listener will trigger just one time after firt load any platform
+                _showInterstitial(listener, platform)
+            }
+
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+                // it will come here for each ad platforms, so we wants only call _showInterstitial
+                // after try all platforms
+                // _showInterstitial will trigger user listener
+                if (errorMode == AdErrorMode.MANAGER) {
+                    _showInterstitial(listener, platform)
+                }
+
+            }
+        }
+        loadInterstitial(loadListener, platform)
+    }
+
+    fun showInterstitial(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
+        if (!showAds) return
+
+        if (autoLoad) {
+            _showInterstitial(listener, platform)
+        } else {
+            loadAndShowInterstitial(listener, platform)
+        }
+    }
+
+    fun showInterstitialForTimeStrategy(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
+        if (!showAds) return
+
+        var isAvailableToShow = true
+        var lastShowDate = lastShowDateByAdFormat.get(AdFormatEnum.INTERSTITIAL)
+
+        if (lastShowDate != null) {
+            val now = Date()
+            val elapsedSeconds = (now.time - lastShowDate.time) / 1000
+            val requiredElapsedTime =
+                randInt(0, randomInterval) + interstitialMinElapsedSecondsToNextShow
+            isAvailableToShow = elapsedSeconds > requiredElapsedTime
+        }
+
+        if (isAvailableToShow) {
+            showInterstitial(listener, platform)
         }
     }
 
@@ -346,6 +378,25 @@ class AdManager {
         }
     }
 
+    private fun _loadRewarded(listener: AdPlatformLoadListener? = null, platform: AdPlatformModel) {
+        val _listener = object : AdPlatformLoadListener() {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+                globalRewardedLoadListener?.onError(errorMode, errorMessage)
+                listener?.onError(errorMode, errorMessage)
+
+                globalRewardedLoadListener?.onError(AdErrorMode.MANAGER, errorMessage)
+                listener?.onError(AdErrorMode.MANAGER, errorMessage)
+            }
+
+            override fun onLoaded() {
+                globalRewardedLoadListener?.onLoaded()
+                listener?.onLoaded()
+            }
+
+        }
+        platform.instance.loadRewarded(_listener)
+    }
+
     private fun _loadRewardedFromFirstAvailable(listener: AdPlatformLoadListener? = null, index: Int = 0) {
 
         val rewardedAdPlatforms = adPlatforms.filter { it.showRewarded }
@@ -378,26 +429,7 @@ class AdManager {
         platform.instance.loadRewarded(_listener)
     }
 
-    private fun _loadRewarded(listener: AdPlatformLoadListener? = null, platform: AdPlatformModel) {
-        val _listener = object : AdPlatformLoadListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                globalRewardedLoadListener?.onError(errorMode, errorMessage)
-                listener?.onError(errorMode, errorMessage)
-
-                globalRewardedLoadListener?.onError(AdErrorMode.MANAGER, errorMessage)
-                listener?.onError(AdErrorMode.MANAGER, errorMessage)
-            }
-
-            override fun onLoaded() {
-                globalRewardedLoadListener?.onLoaded()
-                listener?.onLoaded()
-            }
-
-        }
-        platform.instance.loadRewarded(_listener)
-    }
-
-    fun showRewarded(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
+    fun _showRewarded(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
         if (!showAds) return
 
         val rewardedAdPlatforms = adPlatforms.filter { it.showRewarded }
@@ -466,6 +498,35 @@ class AdManager {
 
     }
 
+    fun loadAndShowRewarded(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
+        /*
+        call _showRewarded(listener, platform) in onLoaded and onError because of
+        we wants call listener?.onError by _showRewarded
+         */
+        val loadListener: AdPlatformLoadListener = object : AdPlatformLoadListener() {
+            override fun onLoaded() {
+                _showRewarded(listener, platform)
+            }
+
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+                if (errorMode == AdErrorMode.MANAGER) {
+                    _showRewarded(listener, platform)
+                }
+            }
+        }
+        loadRewarded(loadListener, platform)
+    }
+
+    fun showRewarded(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
+        if (!showAds) return
+
+        if (autoLoad) {
+            _showRewarded(listener, platform)
+        } else {
+            loadAndShowRewarded(listener, platform)
+        }
+    }
+
     fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
         if (!showAds) return
 
@@ -529,7 +590,6 @@ class AdManager {
             }
         })
     }
-
 
     private fun _autoloadRewardedByHandler(listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null) {
         // load new if there is no ads

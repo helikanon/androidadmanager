@@ -207,11 +207,19 @@ class IronSourceAdWrapper(override var appId: String, override var activity: Act
             }
 
             // TODO debug this method
+            /**
+             * Invoked when there is a change in the ad availability status.
+             *
+             * @param - available - value will change to true when rewarded videos are *available.
+             *          You can then show the video by calling showRewardedVideo().
+             *          Value will change to false when no videos are available.
+             */
+            // call this after video close
             override fun onRewardedVideoAvailabilityChanged(available: Boolean) {
                 if (available) {
-                    //listener?.onLoaded()
+
                 } else {
-                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> availablity changed to false")
+
                 }
             }
 
@@ -234,6 +242,7 @@ class IronSourceAdWrapper(override var appId: String, override var activity: Act
     override fun isMrecLoaded(): Boolean {
         return _isBannerLoaded(mrecAdView)
     }
+
     override fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
         if (bannerAdView != null) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> allow only one banner in app. Already a banner created before") // ironsource allow only one banner at time

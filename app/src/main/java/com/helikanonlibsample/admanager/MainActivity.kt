@@ -24,8 +24,6 @@ class MainActivity : AppCompatActivity() {
 
         initAdManager()
         initViews()
-
-
     }
 
 
@@ -46,11 +44,11 @@ class MainActivity : AppCompatActivity() {
 
     fun initViews() {
         btnShowInterstitial.setOnClickListener {
-            adManager.showInterstitial()
+            adManager.showInterstitial() // if autoload mode is false it will load and show
         }
 
         btnShowRewarded.setOnClickListener {
-            adManager.showRewarded()
+            adManager.showRewarded() // if autoload mode is false it will load and show
         }
 
         btnShowInterstitialForTimeStrategy.setOnClickListener {
@@ -59,6 +57,14 @@ class MainActivity : AppCompatActivity() {
 
         btnOpenEmptyActivity.setOnClickListener {
             startActivity(Intent(this, EmptyActivity::class.java))
+        }
+
+        btnLoadAndShowInterstitial.setOnClickListener {
+            adManager.loadAndShowInterstitial()
+        }
+
+        btnLoadAndShowRewarded.setOnClickListener {
+            adManager.loadAndShowRewarded()
         }
     }
 
@@ -75,8 +81,8 @@ class MainActivity : AppCompatActivity() {
             showAds = true
             autoLoad = true
             autoLoadDelay = 15 // seconds
-            randomInterval = 30 // seconds
             interstitialMinElapsedSecondsToNextShow = 60 // seconds
+            randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
             adPlatforms = mutableListOf<AdPlatformModel>(
                 AdPlatformModel(
                     FacebookAdWrapper("your_app_id", this@MainActivity, applicationContext).apply {
