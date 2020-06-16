@@ -18,8 +18,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".EmptyActivity"></activity>
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".JavaSampleActivity"
+            android:label="Java Samples"></activity>
+        <activity
+            android:name=".EmptyActivity"
+            android:label="Empty Activity" />
+        <activity
+            android:name=".MainActivity"
+            android:label="Ad Manager">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

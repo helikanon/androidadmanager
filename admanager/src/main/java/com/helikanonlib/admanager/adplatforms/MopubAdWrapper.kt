@@ -151,7 +151,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         }
 
         bannerAdView = MoPubView(context)
-        bannerAdView?.adUnitId = bannerPlacementId
+        bannerAdView?.setAdUnitId(bannerPlacementId!!)
         bannerAdView?.adSize = MoPubView.MoPubAdSize.HEIGHT_50
 
         bannerAdView?.bannerAdListener = object : MoPubView.BannerAdListener {
@@ -258,6 +258,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
     override fun isMrecLoaded(): Boolean {
         return _isBannerLoaded(mrecAdView)
     }
+
     override fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
         val lp =
             RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
@@ -277,7 +278,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         }
 
         mrecAdView = MoPubView(context)
-        mrecAdView?.adUnitId = mrecPlacementId
+        mrecAdView?.setAdUnitId(mrecPlacementId!!)
         mrecAdView?.adSize = MoPubView.MoPubAdSize.HEIGHT_250
 
         mrecAdView?.bannerAdListener = object : MoPubView.BannerAdListener {

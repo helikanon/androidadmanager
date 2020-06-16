@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.multidex.BuildConfig
 import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.adplatforms.*
 import kotlinx.android.synthetic.main.activity_main.*
@@ -29,6 +28,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        adManager.switchActivity(this)
 
         adManager.showBanner(bannerContainer, object : AdPlatformShowListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
@@ -56,7 +56,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnOpenEmptyActivity.setOnClickListener {
-            startActivity(Intent(this, EmptyActivity::class.java))
+            //startActivity(Intent(this, EmptyActivity::class.java))
+            startActivity(Intent(this, JavaSampleActivity::class.java))
         }
 
         btnLoadAndShowInterstitial.setOnClickListener {
@@ -83,6 +84,8 @@ class MainActivity : AppCompatActivity() {
             autoLoadDelay = 15 // seconds
             interstitialMinElapsedSecondsToNextShow = 60 // seconds
             randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
+            testMode = true
+            deviceId = "47088e48-5195-4757-90b2-0da94116befd" // necessary if testmode enabled
             adPlatforms = mutableListOf<AdPlatformModel>(
                 AdPlatformModel(
                     FacebookAdWrapper("your_app_id", this@MainActivity, applicationContext).apply {
@@ -94,11 +97,7 @@ class MainActivity : AppCompatActivity() {
                     true, true, true, true
                 ),
                 AdPlatformModel(
-                    AdmobAdWrapper(
-                        "ca-app-pub-3940256099942544~3347511713",
-                        this@MainActivity,
-                        applicationContext
-                    ).apply {
+                    AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713", this@MainActivity, applicationContext).apply {
                         interstitialPlacementId = "ca-app-pub-3940256099942544/1033173712"
                         bannerPlacementId = "ca-app-pub-3940256099942544/6300978111"
                         rewardedPlacementId = "ca-app-pub-3940256099942544/5224354917"
@@ -110,9 +109,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 ),
                 AdPlatformModel(
-                    StartAppAdWrapper("207754325", this@MainActivity, applicationContext).apply {
-
-                    },
+                    StartAppAdWrapper("207754325", this@MainActivity, applicationContext).apply {},
                     true, true, true, true
                 ),
                 AdPlatformModel(
@@ -181,6 +178,11 @@ class MainActivity : AppCompatActivity() {
         // OR
         /*
         adManager.initializePlatforms()
+
+        if (BuildConfig.DEBUG) {
+            adManager.enableTestMode("47088e48-5195-4757-90b2-0da94116befd") // send device id, it is necessary for test facebook audience networks ad
+        }
+
         adManager.start()
          */
 
@@ -196,10 +198,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
         */
-
-        if (BuildConfig.DEBUG) {
-            adManager.enableTestMode("47088e48-5195-4757-90b2-0da94116befd") // send device id, it is necessary for test facebook audience networks ad
-        }
 
 
         /*adManager.loadInterstitial(object : AdPlatformLoadListener() {

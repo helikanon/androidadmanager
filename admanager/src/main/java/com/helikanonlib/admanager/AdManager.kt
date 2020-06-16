@@ -231,6 +231,7 @@ class AdManager {
         }
     }
 
+    @JvmOverloads
     fun loadAndShowInterstitial(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
 
         /*
@@ -256,6 +257,7 @@ class AdManager {
         loadInterstitial(loadListener, platform)
     }
 
+    @JvmOverloads
     fun showInterstitial(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
         if (!showAds) return
 
@@ -301,6 +303,7 @@ class AdManager {
         }, autoLoadDelay * 1000)
     }
 
+    @JvmOverloads
     fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
         if (!showAds) return
 
@@ -498,6 +501,7 @@ class AdManager {
 
     }
 
+    @JvmOverloads
     fun loadAndShowRewarded(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
         /*
         call _showRewarded(listener, platform) in onLoaded and onError because of
@@ -517,6 +521,7 @@ class AdManager {
         loadRewarded(loadListener, platform)
     }
 
+    @JvmOverloads
     fun showRewarded(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
         if (!showAds) return
 
@@ -527,6 +532,7 @@ class AdManager {
         }
     }
 
+    @JvmOverloads
     fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
         if (!showAds) return
 
@@ -633,7 +639,7 @@ class AdManager {
         return Random().nextInt((max - min) + 1) + min
     }
 
-    data class Builder(
+    data class Builder @JvmOverloads constructor(
         var activity: AppCompatActivity,
         var context: Context,
 
@@ -651,13 +657,7 @@ class AdManager {
     ) {
         fun activity(activity: AppCompatActivity) = apply { this.activity = activity }
         fun context(context: Context) = apply { this.context = context }
-
-        fun enableTestMode(deviceId: String) = apply {
-            this.testMode = true
-            this.deviceId = deviceId
-        }
-
-        fun disableTestMode() = apply { this.testMode = false }
+        fun testMode(enabled: Boolean) = apply { this.testMode = enabled }
         fun deviceId(deviceId: String) = apply { this.deviceId = deviceId }
         fun showAds(showAds: Boolean) = apply { this.showAds = showAds }
         fun autoLoad(autoLoad: Boolean) = apply { this.autoLoad = autoLoad }

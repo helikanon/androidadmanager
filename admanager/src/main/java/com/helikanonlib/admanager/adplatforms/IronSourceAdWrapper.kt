@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.widget.RelativeLayout
 import com.helikanonlib.admanager.*
+import com.ironsource.adapters.supersonicads.SupersonicConfig
 import com.ironsource.mediationsdk.ISBannerSize
 import com.ironsource.mediationsdk.IronSource
 import com.ironsource.mediationsdk.IronSourceBannerLayout
@@ -216,11 +217,7 @@ class IronSourceAdWrapper(override var appId: String, override var activity: Act
              */
             // call this after video close
             override fun onRewardedVideoAvailabilityChanged(available: Boolean) {
-                if (available) {
 
-                } else {
-
-                }
             }
 
             override fun onRewardedVideoAdEnded() {
