@@ -39,8 +39,7 @@ class AdManager {
     private var hasWorkingAutoloadRewardedHandler = false
 
     // TODO add option = dont show until date for interstitial
-
-    constructor() {}
+    constructor()
     private constructor(builder: AdManager.Builder) {
         this.activity = builder.activity
         this.context = builder.context
@@ -636,7 +635,7 @@ class AdManager {
 
 
     fun randInt(min: Int, max: Int): Int {
-        return Random().nextInt((max - min) + 1) + min
+        return Random().nextInt(max - min + 1) + min
     }
 
     data class Builder @JvmOverloads constructor(

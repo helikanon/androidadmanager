@@ -8,10 +8,7 @@ import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.adplatforms.*
 import kotlinx.android.synthetic.main.activity_main.*
 
-
-// TODO add java sample
 class MainActivity : AppCompatActivity() {
-
 
     companion object {
         lateinit var adManager: AdManager
@@ -24,7 +21,6 @@ class MainActivity : AppCompatActivity() {
         initAdManager()
         initViews()
     }
-
 
     override fun onResume() {
         super.onResume()

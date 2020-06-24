@@ -34,7 +34,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         }
 
         if (unitId.isNullOrEmpty()) {
-            throw Exception("Mopub ")
+            throw Exception("Mopub Initialize Error")
         }
 
         val sdkConfiguration = SdkConfiguration.Builder(unitId)
@@ -133,11 +133,10 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
     }
 
     override fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
-        val lp =
-            RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
-                .apply {
-                    addRule(RelativeLayout.CENTER_HORIZONTAL)
-                }
+        val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
+            .apply {
+                addRule(RelativeLayout.CENTER_HORIZONTAL)
+            }
 
         if (_isBannerLoaded(bannerAdView)) {
             try {
