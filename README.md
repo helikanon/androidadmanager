@@ -2,6 +2,14 @@
 # Android Ad Manager
 [![](https://jitpack.io/v/helikanon/androidadmanager.svg)](https://jitpack.io/#helikanon/androidadmanager)
 [![API](https://img.shields.io/badge/API-19%2B-orange.svg?style=flat)](https://android-arsenal.com/api?level=19)
+
+## Supported Ad Platforms
+* [Facebook Audience](https://developers.facebook.com/docs/audience-network/get-started/android/)
+* [Admob](https://developers.google.com/admob/android/quick-start)
+* [Startapp](https://support.startapp.com/hc/en-us/articles/360002411114-Android-Standard-)
+* [Ironsource](https://developers.ironsrc.com/ironsource-mobile/android/android-sdk/)
+* [Mopub](https://developers.mopub.com/publishers/android/integrate/)
+
 ## Install
 
 Put in "allprojects/repositories"
@@ -24,7 +32,7 @@ classpath 'com.google.gms:google-services:4.3.3'
 
 Put in app gradle
 ```java
-implementation 'com.github.helikanon:androidadmanager:v1.0'
+implementation 'com.github.helikanon:androidadmanager:v1.3'
 ```
 
 ## Settings
@@ -49,13 +57,6 @@ manifestPlaceholders = [
         ]
 ```
 
-## Supported Ad Platforms
-* [Facebook Audience](https://developers.facebook.com/docs/audience-network/get-started/android/)
-* [Admob](https://developers.google.com/admob/android/quick-start)
-* [Startapp](https://support.startapp.com/hc/en-us/articles/360002411114-Android-Standard-)
-* [Ironsource](https://developers.ironsrc.com/ironsource-mobile/android/android-sdk/)
-* [Mopub](https://developers.mopub.com/publishers/android/integrate/)
-
 ## Usage
 
 Initialize and load for next show
@@ -66,8 +67,10 @@ val adManager = AdManager().apply {
     showAds = true
     autoLoad = true
     autoLoadDelay = 15 // seconds
-    randomInterval = 30 // seconds
     interstitialMinElapsedSecondsToNextShow = 60 // seconds
+    randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
+    testMode = if (BuildConfig.DEBUG) true else false
+    deviceId = "47088e48-5195-4757-90b2-0da94116befd" // necessary if testmode enabled
     adPlatforms = mutableListOf<AdPlatformModel>(
         AdPlatformModel(
             FacebookAdWrapper("your_app_id", this@MainActivity, applicationContext).apply {
@@ -101,18 +104,26 @@ val adManager = AdManager().apply {
                 mrecPlacementId = "MREC_BANNER"
             },
             true,true,true,true
-        ),
-        AdPlatformModel(
-            MopubAdWrapper("207754325", this@MainActivity, applicationContext).apply {
-                interstitialPlacementId = "b75290feb5a74c79b2e7bf027a02f268"
-                bannerPlacementId = "1ac121edbb324cbf989df50731f69eae"
-                rewardedPlacementId = "7c13c6edc67a4fcab83e3cb45bd46597"
-                mrecPlacementId = "b311abd32a8944f4b6c6bba7fdb1f9e0"
-            },
-            true,true,true,false
         )
     )
 }
+adManager.initialize() // init platorms + load interstitial and rewarded for next show 
+
+```
+
+### Manually initialize
+```kotlin
+adManager.addAdPlatform(
+            AdPlatformModel(
+                MopubAdWrapper("207754325", this@MainActivity, applicationContext).apply {
+                    interstitialPlacementId = "b75290feb5a74c79b2e7bf027a02f268"
+                    bannerPlacementId = "1ac121edbb324cbf989df50731f69eae"
+                    rewardedPlacementId = "7c13c6edc67a4fcab83e3cb45bd46597"
+                    mrecPlacementId = "b311abd32a8944f4b6c6bba7fdb1f9e0"
+                },
+                true, true, true, true
+            )
+        )
 
 adManager.initializePlatforms()
 
@@ -127,12 +138,12 @@ adManager.loadInterstitial(object : AdPlatformLoadListener() {
     
     override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
     	if(AdErrorMode.MANAGER){
-	    // after tried all platforms to load 
-	    // this if run just one time after tried all platform and if not load any platform ad
-	}else if(AdErrorMode.PLATFORM){
-	    // after each platform throw error
-	    // for example : if you 3 ad platform, here will run each platform error throw
-	}
+            // after tried all platforms to load 
+            // this if run just one time after tried all platform and if not load any platform ad
+        }else if(AdErrorMode.PLATFORM){
+            // after each platform throw error
+            // for example : if you 3 ad platform, here will run each platform error throw
+        }
     }
     
 })
@@ -142,15 +153,18 @@ adManager.loadRewarded(object : AdPlatformLoadListener() {
     }
     override fun onError(errorMode: AdErrorMode?, errorMessage: String?) { 
     	if(AdErrorMode.MANAGER){
-	    // after tried all platforms to load 
-	    // this if run just one time after tried all platform and if not load any platform ad
-	}else if(AdErrorMode.PLATFORM){
-	    // after each platform throw error
-	    // for example : if you 3 ad platform, here will run each platform error throw
-	}
+            // after tried all platforms to load 
+            // this if run just one time after tried all platform and if not load any platform ad
+        }else if(AdErrorMode.PLATFORM){
+            // after each platform throw error
+            // for example : if you 3 ad platform, here will run each platform error throw
+        }
     }
 })
 ```
+
+
+
 
 Show Ads
 ```kotlin

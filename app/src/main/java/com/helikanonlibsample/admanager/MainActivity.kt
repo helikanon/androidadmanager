@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             autoLoadDelay = 15 // seconds
             interstitialMinElapsedSecondsToNextShow = 60 // seconds
             randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
-            testMode = true
+            testMode = if (BuildConfig.DEBUG) true else false
             deviceId = "47088e48-5195-4757-90b2-0da94116befd" // necessary if testmode enabled
             adPlatforms = mutableListOf<AdPlatformModel>(
                 AdPlatformModel(
@@ -116,18 +116,21 @@ class MainActivity : AppCompatActivity() {
                         mrecPlacementId = "MREC_BANNER"
                     },
                     true, true, true, true
-                ),
-                AdPlatformModel(
-                    MopubAdWrapper("207754325", this@MainActivity, applicationContext).apply {
-                        interstitialPlacementId = "b75290feb5a74c79b2e7bf027a02f268"
-                        bannerPlacementId = "1ac121edbb324cbf989df50731f69eae"
-                        rewardedPlacementId = "7c13c6edc67a4fcab83e3cb45bd46597"
-                        mrecPlacementId = "b311abd32a8944f4b6c6bba7fdb1f9e0"
-                    },
-                    true, true, true, true
                 )
             )
         }
+
+        adManager.addAdPlatform(
+            AdPlatformModel(
+                MopubAdWrapper("207754325", this@MainActivity, applicationContext).apply {
+                    interstitialPlacementId = "b75290feb5a74c79b2e7bf027a02f268"
+                    bannerPlacementId = "1ac121edbb324cbf989df50731f69eae"
+                    rewardedPlacementId = "7c13c6edc67a4fcab83e3cb45bd46597"
+                    mrecPlacementId = "b311abd32a8944f4b6c6bba7fdb1f9e0"
+                },
+                true, true, true, true
+            )
+        )
 
         adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {

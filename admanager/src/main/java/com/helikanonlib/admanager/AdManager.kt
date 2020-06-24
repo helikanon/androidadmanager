@@ -91,6 +91,8 @@ class AdManager {
         }
     }
 
+    fun addAdPlatform(adPlatform: AdPlatformModel) = apply { this.adPlatforms.add(adPlatform) }
+
     fun enableTestMode(deviceId: String) {
 
         this.testMode = true
