@@ -3,7 +3,7 @@ package com.helikanonlib.admanager
 
 import android.content.Context
 import android.os.Handler
-import android.os.Looper
+import android.os.HandlerThread
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
@@ -35,8 +35,9 @@ class AdManager {
     var lastShowDateByAdFormat = mutableMapOf<AdFormatEnum, Date>()
 
     // handlers
-    val autoloadInterstitialHandler: Handler = Handler(Looper.getMainLooper())
-    val autoloadRewardedHandler: Handler = Handler(Looper.getMainLooper())
+    var handlerThread = HandlerThread("admanager-bg-thread");
+    lateinit var autoloadInterstitialHandler: Handler
+    lateinit var autoloadRewardedHandler: Handler
     private var hasWorkingAutoloadInterstitialHandler = false
     private var hasWorkingAutoloadRewardedHandler = false
 
@@ -55,6 +56,10 @@ class AdManager {
         this.interstitialMinElapsedSecondsToNextShow = builder.interstitialMinSeconds
         this.rewardedMinElapsedSecondsToNextShow = builder.rewardedMinSeconds
         this.adPlatforms = builder.adPlatforms
+
+        handlerThread.start()
+        autoloadInterstitialHandler = Handler(handlerThread.looper)
+        autoloadRewardedHandler = Handler(handlerThread.looper)
     }
 
     fun switchActivity(activity: AppCompatActivity) {
@@ -636,6 +641,7 @@ class AdManager {
 
         stopAutoloadInterstitialHandler()
         stopAutoloadRewardedHandler()
+        handlerThread.quitSafely()
     }
 
 
