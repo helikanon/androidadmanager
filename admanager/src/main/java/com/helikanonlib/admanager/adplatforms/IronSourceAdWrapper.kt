@@ -129,7 +129,10 @@ class IronSourceAdWrapper(override var appId: String, override var activity: Act
                     addRule(RelativeLayout.CENTER_HORIZONTAL)
                 }
 
-        if (_isBannerLoaded(bannerAdView)) {
+        // TODO isdestroyed check
+        // bannerAdView.isDestroyed
+
+        if (_isBannerLoaded(bannerAdView) && bannerAdView!!.isDestroyed) {
             try {
                 _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)

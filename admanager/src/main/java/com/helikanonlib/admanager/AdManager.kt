@@ -7,6 +7,7 @@ import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
 
+// TODO ADD AD LOADING WARNING LAYOUT >> var a = (activity.findViewById<ViewGroup>(R.id.content)).getChildAt(0) as ViewGroup
 // TODO FUTURE = add native ads support
 // TODO FUTURE = support sort by ad format >> interstitial=facebook,admob,startapp | banner = admob,ironsource,facebook
 class AdManager {
@@ -269,6 +270,7 @@ class AdManager {
         }
     }
 
+    @JvmOverloads
     fun showInterstitialForTimeStrategy(listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
         if (!showAds) return
 
