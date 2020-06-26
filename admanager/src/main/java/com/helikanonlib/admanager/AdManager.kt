@@ -3,6 +3,7 @@ package com.helikanonlib.admanager
 
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
 import java.util.*
@@ -34,8 +35,8 @@ class AdManager {
     var lastShowDateByAdFormat = mutableMapOf<AdFormatEnum, Date>()
 
     // handlers
-    val autoloadInterstitialHandler: Handler = Handler()
-    val autoloadRewardedHandler: Handler = Handler()
+    val autoloadInterstitialHandler: Handler = Handler(Looper.getMainLooper())
+    val autoloadRewardedHandler: Handler = Handler(Looper.getMainLooper())
     private var hasWorkingAutoloadInterstitialHandler = false
     private var hasWorkingAutoloadRewardedHandler = false
 

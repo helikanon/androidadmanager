@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.widget.RelativeLayout
 import com.helikanonlib.admanager.*
-import com.ironsource.adapters.supersonicads.SupersonicConfig
 import com.ironsource.mediationsdk.ISBannerSize
 import com.ironsource.mediationsdk.IronSource
 import com.ironsource.mediationsdk.IronSourceBannerLayout
@@ -129,9 +128,6 @@ class IronSourceAdWrapper(override var appId: String, override var activity: Act
                     addRule(RelativeLayout.CENTER_HORIZONTAL)
                 }
 
-        // TODO isdestroyed check
-        // bannerAdView.isDestroyed
-
         if (_isBannerLoaded(bannerAdView) && bannerAdView!!.isDestroyed) {
             try {
                 _removeBannerViewIfExists(bannerAdView)
@@ -255,7 +251,7 @@ class IronSourceAdWrapper(override var appId: String, override var activity: Act
                     addRule(RelativeLayout.CENTER_HORIZONTAL)
                 }
 
-        if (_isBannerLoaded(mrecAdView)) {
+        if (_isBannerLoaded(mrecAdView) && mrecAdView!!.isDestroyed) {
             try {
                 _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
