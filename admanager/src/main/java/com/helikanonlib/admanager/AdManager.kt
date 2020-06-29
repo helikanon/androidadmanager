@@ -730,6 +730,12 @@ class AdManager {
     }
 
 
+    fun onCreate(activity: Activity) {
+        adPlatforms.forEach forEach@{ platform ->
+            platform.platformInstance.onCreate(activity)
+        }
+    }
+
     fun onResume(activity: Activity) {
         if (!showAds) return
 

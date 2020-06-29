@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
                 true, true, true, true
             )
         )
-        adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,mopub,admob,facebook")
+        adManager.setAdPlatformSortByAdFormatStr("interstitial", "mopub,ironsource,mopub,admob,facebook")
         adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,facebook,admob,startapp,mopub")
         adManager.setAdPlatformSortByAdFormatStr("rewarded", "mopub,ironsource,admob,startapp,facebook")
         adManager.setAdPlatformSortByAdFormatStr("mrec", "facebook,admob,startapp,mopub,ironsource")

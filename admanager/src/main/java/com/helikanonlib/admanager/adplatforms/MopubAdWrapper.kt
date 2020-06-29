@@ -42,10 +42,11 @@ class MopubAdWrapper(appId: String) : AdPlatformWrapper(appId) {
         } else {
             sdkConfiguration.withLogLevel(MoPubLog.LogLevel.INFO);
         }
-        MoPub.initializeSdk(activity.applicationContext, sdkConfiguration.build(), object : SdkInitializationListener {
+        MoPub.initializeSdk(activity, sdkConfiguration.build(), object : SdkInitializationListener {
             override fun onInitializationFinished() {
             }
         })
+
     }
 
     override fun enableTestMode(deviceId: String?) {
