@@ -17,8 +17,7 @@ import com.helikanonlib.admanager.*
  * *************************************************************************************************
  */
 
-class AdmobAdWrapper(override var appId: String, override var activity: Activity, override var context: Context) :
-    AdPlatformWrapper(appId, activity, context) {
+class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override var platform = AdPlatformTypeEnum.ADMOB
     /*override var interstitialPlacementId: String? = null
@@ -35,10 +34,10 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
         var isInitialized = false
     }
 
-    override fun initialize() {
+    override fun initialize(activity: Activity) {
         if (isInitialized) return
 
-        MobileAds.initialize(context)
+        MobileAds.initialize(activity.applicationContext)
         isInitialized = true
     }
 
@@ -49,13 +48,13 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
         mrecPlacementId = "ca-app-pub-3940256099942544/6300978111"
     }
 
-    override fun loadInterstitial(listener: AdPlatformLoadListener?) {
+    override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isInterstitialLoaded()) {
             listener?.onLoaded()
             return
         }
 
-        interstitial = InterstitialAd(context)
+        interstitial = InterstitialAd(activity.applicationContext)
         interstitial?.adUnitId = interstitialPlacementId
         interstitial?.adListener = object : AdListener() {
 
@@ -72,7 +71,7 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
         interstitial?.loadAd(AdRequest.Builder().build())
     }
 
-    override fun showInterstitial(listener: AdPlatformShowListener?) {
+    override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isInterstitialLoaded()) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded")
             return
@@ -108,7 +107,7 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
         return _isBannerLoaded(bannerAdView)
     }
 
-    override fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
+    override fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?) {
         val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
             .apply {
                 addRule(RelativeLayout.CENTER_HORIZONTAL)
@@ -125,7 +124,7 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
             return
         }
 
-        bannerAdView = AdView(context)
+        bannerAdView = AdView(activity.applicationContext)
         bannerAdView?.adSize = AdSize.BANNER
         bannerAdView?.adUnitId = bannerPlacementId
         bannerAdView?.adListener = object : AdListener() {
@@ -149,13 +148,13 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
 
     }
 
-    override fun loadRewarded(listener: AdPlatformLoadListener?) {
+    override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isRewardedLoaded()) {
             listener?.onLoaded()
             return
         }
 
-        rewardedAd = RewardedAd(context, rewardedPlacementId)
+        rewardedAd = RewardedAd(activity.applicationContext, rewardedPlacementId)
         val adLoadCallback = object : RewardedAdLoadCallback() {
             override fun onRewardedAdLoaded() {
                 listener?.onLoaded()
@@ -168,7 +167,7 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
         rewardedAd?.loadAd(AdRequest.Builder().build(), adLoadCallback)
     }
 
-    override fun showRewarded(listener: AdPlatformShowListener?) {
+    override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded")
             return
@@ -205,7 +204,8 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
     override fun isMrecLoaded(): Boolean {
         return _isBannerLoaded(mrecAdView)
     }
-    override fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
+
+    override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?) {
 
         val lp =
             RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
@@ -224,7 +224,7 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
             return
         }
 
-        mrecAdView = AdView(context)
+        mrecAdView = AdView(activity.applicationContext)
         mrecAdView?.adSize = AdSize.MEDIUM_RECTANGLE
         mrecAdView?.adUnitId = mrecPlacementId
         mrecAdView?.adListener = object : AdListener() {
@@ -249,15 +249,43 @@ class AdmobAdWrapper(override var appId: String, override var activity: Activity
 
     }
 
-    override fun destroy() {
+    override fun destroy(activity: Activity) {
         interstitial = null
-        bannerAdView = null
+        destroyBanner(activity)
         rewardedAd = null
+        mrecAdView = null
     }
 
-    override fun onPause() {}
-    override fun onStop() {}
-    override fun onResume() {}
+    override fun destroyBanner(activity: Activity) {
+        if (_isBannerLoaded(bannerAdView)) {
+            try {
+                _removeBannerViewIfExists(bannerAdView)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        bannerAdView?.destroy()
+        bannerAdView = null
+    }
+
+
+    override fun destroyMrec(activity: Activity) {
+        if (_isBannerLoaded(mrecAdView)) {
+            try {
+                _removeBannerViewIfExists(mrecAdView)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        mrecAdView?.destroy()
+        mrecAdView = null
+    }
+
+    override fun onPause(activity: Activity) {}
+    override fun onStop(activity: Activity) {}
+    override fun onResume(activity: Activity) {}
 
 }
 

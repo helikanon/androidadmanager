@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.helikanonlib.admanager.AdManager;
 import com.helikanonlib.admanager.AdPlatformModel;
 import com.helikanonlib.admanager.AdPlatformShowListener;
+import com.helikanonlib.admanager.AdPlatformTypeEnum;
 import com.helikanonlib.admanager.AdPlatformWrapper;
 import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper;
 import com.helikanonlib.admanager.adplatforms.FacebookAdWrapper;
@@ -32,12 +33,15 @@ public class JavaSampleActivity extends AppCompatActivity {
     Button btnLoadAndShowInterstitial;
     Button btnLoadAndShowRewarded;
 
+    String oldBannerPlacementId = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_java_sample_activity);
 
         adManager = MainActivity.adManager;
+        //adManager.destroyBannersAndMrecs(this);
 
         // initAdManager(); // already inited in MainActivity
         initViews();
@@ -47,10 +51,22 @@ public class JavaSampleActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        adManager.switchActivity(this);
+        /*AdPlatformWrapper ironsrc = adManager.getAdPlatformByType(AdPlatformTypeEnum.IRONSOURCE).getPlatformInstance();
+        oldBannerPlacementId = ironsrc.getBannerPlacementId();
+        ironsrc.setBannerPlacementId("new_placementId");*/
 
-        adManager.showBanner(bannerContainer);
-        adManager.showMrec(mrecContainer);
+        adManager.showBanner(this, bannerContainer);
+        adManager.showMrec(this, mrecContainer);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void initViews() {
@@ -66,14 +82,14 @@ public class JavaSampleActivity extends AppCompatActivity {
         btnShowInterstitial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.showInterstitial();
+                adManager.showInterstitial(JavaSampleActivity.this);
             }
         });
 
         btnShowRewarded.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.showRewarded(new AdPlatformShowListener() {
+                adManager.showRewarded(JavaSampleActivity.this, new AdPlatformShowListener() {
                     @Override
                     public void onRewarded(@Nullable String type, @Nullable Integer amount) {
                         Toast.makeText(JavaSampleActivity.this, "Rewarded!", Toast.LENGTH_LONG).show();
@@ -85,7 +101,7 @@ public class JavaSampleActivity extends AppCompatActivity {
         btnShowInterstitialForTimeStrategy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.showInterstitial();
+                adManager.showInterstitial(JavaSampleActivity.this);
             }
         });
 
@@ -93,35 +109,35 @@ public class JavaSampleActivity extends AppCompatActivity {
         btnLoadAndShowInterstitial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.loadAndShowInterstitial();
+                adManager.loadAndShowInterstitial(JavaSampleActivity.this);
             }
         });
 
         btnLoadAndShowRewarded.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.loadAndShowRewarded();
+                adManager.loadAndShowRewarded(JavaSampleActivity.this);
             }
         });
     }
 
     private void initAdManager() {
-        AdPlatformWrapper facebookAdWrapper = new FacebookAdWrapper("your_app_id", JavaSampleActivity.this, getApplicationContext());
+        AdPlatformWrapper facebookAdWrapper = new FacebookAdWrapper("your_app_id");
         facebookAdWrapper.setInterstitialPlacementId("YOUR_PLACEMENT_ID");
         facebookAdWrapper.setBannerPlacementId("YOUR_PLACEMENT_ID");
         facebookAdWrapper.setRewardedPlacementId("YOUR_PLACEMENT_ID");
         facebookAdWrapper.setRewardedPlacementId("YOUR_PLACEMENT_ID");
 
 
-        AdPlatformWrapper admobAdWrapper = new AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713", JavaSampleActivity.this, getApplicationContext());
+        AdPlatformWrapper admobAdWrapper = new AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713");
         admobAdWrapper.setInterstitialPlacementId("ca-app-pub-3940256099942544/1033173712");
         admobAdWrapper.setBannerPlacementId("ca-app-pub-3940256099942544/6300978111");
         admobAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/5224354917");
         facebookAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/6300978111");
 
-        AdPlatformWrapper startappAdWrapper = new StartAppAdWrapper("207754325", JavaSampleActivity.this, getApplicationContext());
+        AdPlatformWrapper startappAdWrapper = new StartAppAdWrapper("207754325");
 
-        AdPlatformWrapper ironsourceAdWrapper = new IronSourceAdWrapper("a1a67f75", JavaSampleActivity.this, getApplicationContext());
+        AdPlatformWrapper ironsourceAdWrapper = new IronSourceAdWrapper("a1a67f75");
         ironsourceAdWrapper.setInterstitialPlacementId("DefaultInterstitial");
         ironsourceAdWrapper.setBannerPlacementId("DefaultBanner");
         ironsourceAdWrapper.setRewardedPlacementId("DefaultRewardedVideo");
@@ -129,13 +145,13 @@ public class JavaSampleActivity extends AppCompatActivity {
 
 
         adManager = new AdManager
-                .Builder(this, getApplicationContext())
+                .Builder()
                 .autoLoad(true)
                 .autoLoadDelay(20)
                 .interstitialMinElapsedSecondsToNextShow(60)
                 .randomInterval(30)
                 .showAds(true)
-                .testMode(BuildConfig.DEBUG ? true : false)
+                .testMode(BuildConfig.DEBUG)
                 .deviceId("47088e48-5195-4757-90b2-0da94116befd") // necessary if test mode enabled
                 .addAdPlatforms(
                         new AdPlatformModel(facebookAdWrapper, true, true, true, true),
@@ -152,6 +168,6 @@ public class JavaSampleActivity extends AppCompatActivity {
             }
         });
 
-        adManager.initialize();
+        adManager.initialize(this);
     }
 }

@@ -12,7 +12,7 @@ import com.mopub.common.logging.MoPubLog
 import com.mopub.mobileads.*
 import com.mopub.mobileads.BuildConfig
 
-class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPlatformWrapper(appId, activity, context) {
+class MopubAdWrapper(appId: String) : AdPlatformWrapper(appId) {
     override val platform: AdPlatformTypeEnum = AdPlatformTypeEnum.MOPUB
 
     var bannerAdView: MoPubView? = null
@@ -23,8 +23,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         var isInitialized = false
     }
 
-
-    override fun initialize() {
+    override fun initialize(activity: Activity) {
         var unitId: String? = when {
             !interstitialPlacementId.isNullOrEmpty() -> interstitialPlacementId
             !bannerPlacementId.isNullOrEmpty() -> bannerPlacementId
@@ -43,10 +42,11 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         } else {
             sdkConfiguration.withLogLevel(MoPubLog.LogLevel.INFO);
         }
-        MoPub.initializeSdk(context, sdkConfiguration.build(), object : SdkInitializationListener {
+        MoPub.initializeSdk(activity, sdkConfiguration.build(), object : SdkInitializationListener {
             override fun onInitializationFinished() {
             }
         })
+
     }
 
     override fun enableTestMode(deviceId: String?) {
@@ -56,7 +56,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         mrecPlacementId = "252412d5e9364a05ab77d9396346d73d"
     }
 
-    override fun loadInterstitial(listener: AdPlatformLoadListener?) {
+    override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?) {
         if (interstitialPlacementId == null) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> null placement id ")
             return
@@ -94,7 +94,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         interstitial?.load()
     }
 
-    override fun showInterstitial(listener: AdPlatformShowListener?) {
+    override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isInterstitialLoaded()) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noadsloaded")
             return
@@ -132,7 +132,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         return _isBannerLoaded(bannerAdView)
     }
 
-    override fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
+    override fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?) {
         val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
             .apply {
                 addRule(RelativeLayout.CENTER_HORIZONTAL)
@@ -149,7 +149,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
             return
         }
 
-        bannerAdView = MoPubView(context)
+        bannerAdView = MoPubView(activity.applicationContext)
         bannerAdView?.setAdUnitId(bannerPlacementId!!)
         bannerAdView?.adSize = MoPubView.MoPubAdSize.HEIGHT_50
 
@@ -181,7 +181,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         bannerAdView?.loadAd()
     }
 
-    override fun loadRewarded(listener: AdPlatformLoadListener?) {
+    override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?) {
 
         if (rewardedPlacementId == null) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> null placementid")
@@ -216,7 +216,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         MoPubRewardedVideos.loadRewardedVideo(rewardedPlacementId!!)
     }
 
-    override fun showRewarded(listener: AdPlatformShowListener?) {
+    override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded")
             return
@@ -258,7 +258,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         return _isBannerLoaded(mrecAdView)
     }
 
-    override fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
+    override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?) {
         val lp =
             RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
                 .apply {
@@ -276,7 +276,7 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
             return
         }
 
-        mrecAdView = MoPubView(context)
+        mrecAdView = MoPubView(activity.applicationContext)
         mrecAdView?.setAdUnitId(mrecPlacementId!!)
         mrecAdView?.adSize = MoPubView.MoPubAdSize.HEIGHT_250
 
@@ -308,25 +308,55 @@ class MopubAdWrapper(appId: String, activity: Activity, context: Context) : AdPl
         mrecAdView?.loadAd()
     }
 
-    override fun destroy() {
+    override fun destroy(activity: Activity) {
         interstitial?.destroy()
-        bannerAdView?.destroy()
+
+        destroyBanner(activity)
+
         mrecAdView?.destroy()
+        mrecAdView = null
     }
 
-    override fun onCreate() {
+    override fun destroyBanner(activity: Activity) {
+        if (_isBannerLoaded(bannerAdView)) {
+            try {
+                _removeBannerViewIfExists(bannerAdView)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        bannerAdView?.destroy()
+        bannerAdView = null
+    }
+
+    override fun destroyMrec(activity: Activity) {
+        if (_isBannerLoaded(mrecAdView)) {
+            try {
+                _removeBannerViewIfExists(mrecAdView)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        mrecAdView?.destroy()
+        mrecAdView = null
+    }
+
+
+    override fun onCreate(activity: Activity) {
         MoPub.onCreate(activity)
     }
 
-    override fun onPause() {
+    override fun onPause(activity: Activity) {
         MoPub.onPause(activity)
     }
 
-    override fun onStop() {
+    override fun onStop(activity: Activity) {
         MoPub.onStop(activity)
     }
 
-    override fun onResume() {
+    override fun onResume(activity: Activity) {
         MoPub.onResume(activity)
     }
 }

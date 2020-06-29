@@ -1,11 +1,10 @@
 package com.helikanonlib.admanager
 
 import android.app.Activity
-import android.content.Context
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 
-abstract class AdPlatformWrapper(open var appId: String, open var activity: Activity, open var context: Context) {
+abstract class AdPlatformWrapper(open var appId: String) {
 
     abstract val platform: AdPlatformTypeEnum
 
@@ -14,30 +13,32 @@ abstract class AdPlatformWrapper(open var appId: String, open var activity: Acti
     var rewardedPlacementId: String? = null
     var mrecPlacementId: String? = null
 
-    abstract fun initialize()
+    abstract fun initialize(activity: Activity)
     abstract fun enableTestMode(deviceId: String? = null)
 
-    abstract fun loadInterstitial(listener: AdPlatformLoadListener? = null)
-    abstract fun showInterstitial(listener: AdPlatformShowListener? = null)
+    abstract fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null)
+    abstract fun showInterstitial(activity: Activity, listener: AdPlatformShowListener? = null)
     abstract fun isInterstitialLoaded(): Boolean
 
     abstract fun isBannerLoaded(): Boolean
-    abstract fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener? = null)
+    abstract fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null)
 
-    abstract fun loadRewarded(listener: AdPlatformLoadListener? = null)
-    abstract fun showRewarded(listener: AdPlatformShowListener? = null)
+    abstract fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener? = null)
+    abstract fun showRewarded(activity: Activity, listener: AdPlatformShowListener? = null)
     abstract fun isRewardedLoaded(): Boolean
 
     abstract fun isMrecLoaded(): Boolean
-    abstract fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener? = null)
+    abstract fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null)
 
-    abstract fun destroy()
+    abstract fun destroy(activity: Activity)
+    abstract fun destroyBanner(activity: Activity)
+    abstract fun destroyMrec(activity: Activity)
 
 
-    public open fun onCreate() {}
-    abstract fun onPause()
-    abstract fun onStop()
-    abstract fun onResume()
+    public open fun onCreate(activity: Activity) {}
+    public open fun onPause(activity: Activity) {}
+    public open fun onStop(activity: Activity) {}
+    public open fun onResume(activity: Activity) {}
 
 
     protected fun _isBannerLoaded(bannerAdView: ViewGroup?): Boolean {

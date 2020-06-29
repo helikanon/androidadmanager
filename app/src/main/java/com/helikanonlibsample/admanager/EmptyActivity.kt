@@ -15,7 +15,7 @@ class EmptyActivity : AppCompatActivity() {
 
 
 
-        MainActivity.adManager.showBanner(bannerContainer, object : AdPlatformShowListener() {
+        MainActivity.adManager.showBanner(this,bannerContainer, object : AdPlatformShowListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
                 Log.d("adManager", "showBanner>> $errorMode $errorMessage")
             }

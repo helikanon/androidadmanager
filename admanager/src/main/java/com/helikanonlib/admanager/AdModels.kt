@@ -4,7 +4,6 @@ package com.helikanonlib.admanager
 enum class AdErrorMode {
     MANAGER,
     PLATFORM
-
 }
 
 
@@ -27,10 +26,9 @@ enum class AdFormatEnum {
 
 
 data class AdPlatformModel @JvmOverloads constructor(
-    var instance: AdPlatformWrapper,
+    var platformInstance: AdPlatformWrapper,
     var showInterstitial: Boolean = false,
     var showBanner: Boolean = false,
     var showRewarded: Boolean = false,
     var showMrec: Boolean = false
-
 )
