@@ -21,8 +21,7 @@ import com.startapp.sdk.adsbase.adlisteners.AdEventListener
  * STARTAPP ADS HELPER
  * *************************************************************************************************
  */
-class StartAppAdWrapper(override var appId: String, override var activity: Activity, override var context: Context) :
-    AdPlatformWrapper(appId, activity, context) {
+class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override val platform = AdPlatformTypeEnum.STARTAPP
 
     var startAppAd: StartAppAd? = null
@@ -35,11 +34,12 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
         var isInitialized = false
     }
 
-    override fun initialize() {
+    override fun initialize(activity: Activity) {
         if (isInitialized) return
 
-        StartAppSDK.init(context, appId, false);
+        StartAppSDK.init(activity.applicationContext, appId, false);
         StartAppAd.disableSplash();
+        StartAppAd.disableAutoInterstitial()
 
         /*StartAppSDK.setUserConsent(
             context,
@@ -48,17 +48,17 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
             true
         );*/
 
-        startAppAd = StartAppAd(context)
-        startAppAdRewarded = StartAppAd(context)
+        startAppAd = StartAppAd(activity.applicationContext)
+        startAppAdRewarded = StartAppAd(activity.applicationContext)
 
         isInitialized = true
     }
 
     override fun enableTestMode(deviceId: String?) {
-        StartAppSDK.setTestAdsEnabled(BuildConfig.DEBUG);
+        StartAppSDK.setTestAdsEnabled(true);
     }
 
-    override fun loadInterstitial(listener: AdPlatformLoadListener?) {
+    override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isInterstitialLoaded()) {
             listener?.onLoaded()
             return
@@ -75,7 +75,7 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
         })
     }
 
-    override fun showInterstitial(listener: AdPlatformShowListener?) {
+    override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isInterstitialLoaded()) return
 
         startAppAd?.showAd(object : AdDisplayListener {
@@ -105,7 +105,7 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
         return _isBannerLoaded(bannerAdView)
     }
 
-    override fun showBanner(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
+    override fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?) {
 
         val lp =
             RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
@@ -146,7 +146,7 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
     }
 
 
-    override fun loadRewarded(listener: AdPlatformLoadListener?) {
+    override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isRewardedLoaded()) {
             listener?.onLoaded()
             return
@@ -163,7 +163,7 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
         })
     }
 
-    override fun showRewarded(listener: AdPlatformShowListener?) {
+    override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded")
             return
@@ -200,7 +200,8 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
     override fun isMrecLoaded(): Boolean {
         return _isBannerLoaded(mrecAdView)
     }
-    override fun showMrec(containerView: RelativeLayout, listener: AdPlatformShowListener?) {
+
+    override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?) {
         val lp =
             RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
                 .apply {
@@ -241,15 +242,38 @@ class StartAppAdWrapper(override var appId: String, override var activity: Activ
     }
 
 
-    override fun destroy() {
+    override fun destroy(activity: Activity) {
         startAppAd = null
         startAppAdRewarded = null
+        destroyBanner(activity)
+        mrecAdView = null
+    }
+
+    override fun destroyBanner(activity: Activity) {
+        if (_isBannerLoaded(bannerAdView)) {
+            try {
+                _removeBannerViewIfExists(bannerAdView)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
         bannerAdView = null
     }
 
-    override fun onPause() {}
-    override fun onStop() {}
-    override fun onResume() {}
+    override fun destroyMrec(activity: Activity) {
+        if (_isBannerLoaded(mrecAdView)) {
+            try {
+                _removeBannerViewIfExists(mrecAdView)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        mrecAdView = null
+    }
+
+    override fun onPause(activity: Activity) {}
+    override fun onStop(activity: Activity) {}
+    override fun onResume(activity: Activity) {}
 
 }
 

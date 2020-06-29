@@ -24,44 +24,49 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        adManager.switchActivity(this)
 
-        adManager.showBanner(bannerContainer, object : AdPlatformShowListener() {
+        adManager.showBanner(this, bannerContainer, object : AdPlatformShowListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                Log.d("adManager", "showBanner>> $errorMode $errorMessage")
+                Log.d("adManager", "[BANNER] AdErrorMode.PLATFORM showBanner>> $errorMode $errorMessage")
             }
         })
-        adManager.showMrec(mrecContainer, object : AdPlatformShowListener() {
+        adManager.showMrec(this, mrecContainer, object : AdPlatformShowListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                Log.d("adManager", "showMrec>> $errorMode $errorMessage")
+                Log.d("adManager", "[MREC]AdErrorMode.PLATFORM showMrec>> $errorMode $errorMessage")
             }
         })
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        adManager.destroy(this)
+    }
+
     fun initViews() {
         btnShowInterstitial.setOnClickListener {
-            adManager.showInterstitial() // if autoload mode is false it will load and show
+            adManager.showInterstitial(this) // if autoload mode is false it will load and show
         }
 
         btnShowRewarded.setOnClickListener {
-            adManager.showRewarded() // if autoload mode is false it will load and show
+            adManager.showRewarded(this) // if autoload mode is false it will load and show
         }
 
         btnShowInterstitialForTimeStrategy.setOnClickListener {
-            adManager.showInterstitialForTimeStrategy()
+            adManager.showInterstitialForTimeStrategy(this)
         }
 
         btnOpenEmptyActivity.setOnClickListener {
             //startActivity(Intent(this, EmptyActivity::class.java))
-            startActivity(Intent(this, JavaSampleActivity::class.java))
+            startActivity(Intent(this@MainActivity, JavaSampleActivity::class.java))
         }
 
         btnLoadAndShowInterstitial.setOnClickListener {
-            adManager.loadAndShowInterstitial()
+            adManager.loadAndShowInterstitial(this)
         }
 
         btnLoadAndShowRewarded.setOnClickListener {
-            adManager.loadAndShowRewarded()
+            adManager.loadAndShowRewarded(this)
         }
     }
 
@@ -73,18 +78,16 @@ class MainActivity : AppCompatActivity() {
      */
     fun initAdManager() {
         adManager = AdManager().apply {
-            activity = this@MainActivity
-            context = applicationContext
             showAds = true
             autoLoad = true
             autoLoadDelay = 15 // seconds
             interstitialMinElapsedSecondsToNextShow = 60 // seconds
             randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
-            testMode = if (BuildConfig.DEBUG) true else false
+            testMode = BuildConfig.DEBUG
             deviceId = "47088e48-5195-4757-90b2-0da94116befd" // necessary if testmode enabled
             adPlatforms = mutableListOf<AdPlatformModel>(
                 AdPlatformModel(
-                    FacebookAdWrapper("your_app_id", this@MainActivity, applicationContext).apply {
+                    FacebookAdWrapper("your_app_id").apply {
                         interstitialPlacementId = "YOUR_PLACEMENT_ID"
                         bannerPlacementId = "YOUR_PLACEMENT_ID"
                         rewardedPlacementId = "YOUR_PLACEMENT_ID"
@@ -93,28 +96,26 @@ class MainActivity : AppCompatActivity() {
                     true, true, true, true
                 ),
                 AdPlatformModel(
-                    AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713", this@MainActivity, applicationContext).apply {
+                    AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713").apply {
                         interstitialPlacementId = "ca-app-pub-3940256099942544/1033173712"
                         bannerPlacementId = "ca-app-pub-3940256099942544/6300978111"
                         rewardedPlacementId = "ca-app-pub-3940256099942544/5224354917"
                         mrecPlacementId = "ca-app-pub-3940256099942544/6300978111"
                     },
-                    true,
-                    false,
-                    true,
-                    true
-                ),
-                AdPlatformModel(
-                    StartAppAdWrapper("207754325", this@MainActivity, applicationContext).apply {},
                     true, true, true, true
                 ),
+
                 AdPlatformModel(
-                    IronSourceAdWrapper("a1a67f75", this@MainActivity, applicationContext).apply {
+                    IronSourceAdWrapper("a1a67f75").apply {
                         interstitialPlacementId = "DefaultInterstitial"
                         bannerPlacementId = "DefaultBanner"
                         rewardedPlacementId = "DefaultRewardedVideo"
                         mrecPlacementId = "MREC_BANNER"
                     },
+                    true, true, true, true
+                ),
+                AdPlatformModel(
+                    StartAppAdWrapper("207754325").apply {},
                     true, true, true, true
                 )
             )
@@ -122,7 +123,7 @@ class MainActivity : AppCompatActivity() {
 
         adManager.addAdPlatform(
             AdPlatformModel(
-                MopubAdWrapper("207754325", this@MainActivity, applicationContext).apply {
+                MopubAdWrapper("207754325").apply {
                     interstitialPlacementId = "b75290feb5a74c79b2e7bf027a02f268"
                     bannerPlacementId = "1ac121edbb324cbf989df50731f69eae"
                     rewardedPlacementId = "7c13c6edc67a4fcab83e3cb45bd46597"
@@ -131,22 +132,27 @@ class MainActivity : AppCompatActivity() {
                 true, true, true, true
             )
         )
+        adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,mopub,admob,facebook")
+        adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,facebook,admob,startapp,mopub")
+        adManager.setAdPlatformSortByAdFormatStr("rewarded", "mopub,ironsource,admob,startapp,facebook")
+        adManager.setAdPlatformSortByAdFormatStr("mrec", "facebook,admob,startapp,mopub,ironsource")
+
 
         adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
                 if (errorMode == AdErrorMode.MANAGER) {
-                    Log.d("adManager", "AdErrorMode.MANAGER globalInterstitialLoadListener > $errorMessage")
+                    Log.d("adManager", "[LOAD][INTERSTITIAL] AdErrorMode.MANAGER globalInterstitialLoadListener > $errorMessage")
                 } else {
-                    Log.d("adManager", "AdErrorMode.PLATFORM globalInterstitialLoadListener > $errorMessage")
+                    Log.d("adManager", "[LOAD][INTERSTITIAL] AdErrorMode.PLATFORM globalInterstitialLoadListener > $errorMessage")
                 }
             }
         }
         adManager.globalRewardedLoadListener = object : AdPlatformLoadListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
                 if (errorMode == AdErrorMode.MANAGER) {
-                    Log.d("adManager", "AdErrorMode.MANAGER globalRewardedLoadListener > $errorMessage")
+                    Log.d("adManager", "[LOAD][REWARDED] AdErrorMode.MANAGER globalRewardedLoadListener > $errorMessage")
                 } else {
-                    Log.d("adManager", "AdErrorMode.PLATFORM globalRewardedLoadListener > $errorMessage")
+                    Log.d("adManager", "[LOAD][REWARDED] AdErrorMode.PLATFORM globalRewardedLoadListener > $errorMessage")
                 }
             }
         }
@@ -154,9 +160,9 @@ class MainActivity : AppCompatActivity() {
         adManager.globalInterstitialShowListener = object : AdPlatformShowListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
                 if (errorMode == AdErrorMode.MANAGER) {
-                    Log.d("adManager", "AdErrorMode.MANAGER globalInterstitialShowListener > $errorMessage")
+                    Log.d("adManager", "[SHOW][INTERSTITIAL] AdErrorMode.MANAGER globalInterstitialShowListener > $errorMessage")
                 } else {
-                    Log.d("adManager", "AdErrorMode.PLATFORM globalInterstitialShowListener > $errorMessage")
+                    Log.d("adManager", "[SHOW][INTERSTITIAL] AdErrorMode.PLATFORM globalInterstitialShowListener > $errorMessage")
                 }
             }
         }
@@ -165,15 +171,15 @@ class MainActivity : AppCompatActivity() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
                 // AdErrorMode.MANAGER >> it means . We tried to load in all platforms but no one load interstitial
                 if (errorMode == AdErrorMode.MANAGER) {
-                    Log.d("adManager", "AdErrorMode.MANAGER globalRewardedShowListener > $errorMessage")
+                    Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.MANAGER globalRewardedShowListener > $errorMessage")
                 } else {
-                    Log.d("adManager", "AdErrorMode.PLATFORM globalRewardedShowListener > $errorMessage")
+                    Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.PLATFORM globalRewardedShowListener > $errorMessage")
                 }
 
             }
         }
 
-        adManager.initialize()
+        adManager.initialize(this)
         // OR
         /*
         adManager.initializePlatforms()
