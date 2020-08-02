@@ -1,7 +1,6 @@
 package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
-import android.content.Context
 import android.widget.RelativeLayout
 import com.helikanonlib.admanager.*
 import com.mopub.common.MoPub
@@ -159,9 +158,11 @@ class MopubAdWrapper(appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onBannerLoaded(banner: MoPubView) {
-                _removeBannerViewIfExists(bannerAdView)
-                containerView.addView(bannerAdView, lp)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(bannerAdView)
+                    containerView.addView(bannerAdView, lp)
+                    listener?.onDisplayed()
+                }
             }
 
             override fun onBannerCollapsed(banner: MoPubView?) {
@@ -286,9 +287,12 @@ class MopubAdWrapper(appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onBannerLoaded(banner: MoPubView) {
-                _removeBannerViewIfExists(mrecAdView)
-                containerView.addView(mrecAdView, lp)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(mrecAdView)
+                    containerView.addView(mrecAdView, lp)
+                    listener?.onDisplayed()
+                }
+
             }
 
             override fun onBannerCollapsed(banner: MoPubView?) {

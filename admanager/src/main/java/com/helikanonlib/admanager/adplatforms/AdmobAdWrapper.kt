@@ -1,7 +1,6 @@
 package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
-import android.content.Context
 import android.widget.RelativeLayout
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.rewarded.RewardItem
@@ -135,9 +134,11 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onAdLoaded() {
                 super.onAdLoaded()
-                _removeBannerViewIfExists(bannerAdView)
-                containerView.addView(bannerAdView, lp)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(bannerAdView)
+                    containerView.addView(bannerAdView, lp)
+                    listener?.onDisplayed()
+                }
             }
 
             override fun onAdClicked() {
@@ -235,10 +236,11 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onAdLoaded() {
                 super.onAdLoaded()
-                _removeBannerViewIfExists(mrecAdView)
-                containerView.addView(mrecAdView, lp)
-
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(mrecAdView)
+                    containerView.addView(mrecAdView, lp)
+                    listener?.onDisplayed()
+                }
             }
 
             override fun onAdClicked() {
@@ -253,7 +255,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         interstitial = null
         destroyBanner(activity)
         rewardedAd = null
-        mrecAdView = null
+        destroyMrec(activity)
     }
 
     override fun destroyBanner(activity: Activity) {

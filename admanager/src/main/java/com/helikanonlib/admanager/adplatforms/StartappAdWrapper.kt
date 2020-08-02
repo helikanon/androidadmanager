@@ -2,7 +2,6 @@ package com.helikanonlib.admanager.adplatforms
 
 
 import android.app.Activity
-import android.content.Context
 import android.view.View
 import android.widget.RelativeLayout
 import com.helikanonlib.admanager.*
@@ -134,9 +133,11 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onReceiveAd(p0: View?) {
-                _removeBannerViewIfExists(bannerAdView)
-                containerView.addView(bannerAdView, lp)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(bannerAdView)
+                    containerView.addView(bannerAdView, lp)
+                    listener?.onDisplayed()
+                }
             }
 
             override fun onImpression(p0: View?) {}
@@ -229,10 +230,11 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onReceiveAd(p0: View?) {
-                _removeBannerViewIfExists(mrecAdView)
-                containerView.addView(mrecAdView, lp)
-
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(mrecAdView)
+                    containerView.addView(mrecAdView, lp)
+                    listener?.onDisplayed()
+                }
             }
 
             override fun onImpression(p0: View?) {}
@@ -246,7 +248,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         startAppAd = null
         startAppAdRewarded = null
         destroyBanner(activity)
-        mrecAdView = null
+        destroyMrec(activity)
     }
 
     override fun destroyBanner(activity: Activity) {

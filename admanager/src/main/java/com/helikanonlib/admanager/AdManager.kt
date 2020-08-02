@@ -368,6 +368,7 @@ class AdManager {
             if (bannerAdPlatforms.size > 0) {
                 run breaker@{
                     bannerAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
+
                         if (_platform.platformInstance.isBannerLoaded()) {
                             startFrom = i
                             return@breaker

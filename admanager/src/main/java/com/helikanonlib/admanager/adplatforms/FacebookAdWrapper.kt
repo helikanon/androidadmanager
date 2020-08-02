@@ -140,9 +140,11 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onAdLoaded(p0: Ad?) {
-                _removeBannerViewIfExists(bannerAdView)
-                containerView.addView(bannerAdView)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(bannerAdView)
+                    containerView.addView(bannerAdView)
+                    listener?.onDisplayed()
+                }
             }
 
             override fun onAdClicked(p0: Ad?) {
@@ -258,9 +260,11 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onAdLoaded(p0: Ad?) {
-                _removeBannerViewIfExists(mrecAdView)
-                containerView.addView(mrecAdView)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(mrecAdView)
+                    containerView.addView(mrecAdView)
+                    listener?.onDisplayed()
+                }
             }
 
             override fun onAdClicked(p0: Ad?) {
@@ -285,8 +289,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         rewardedVideoAd = null
 
 
-        mrecAdView?.destroy()
-        mrecAdView = null
+        destroyMrec(activity)
     }
 
     override fun destroyBanner(activity: Activity) {

@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.helikanonlib.admanager.AdManager;
 import com.helikanonlib.admanager.AdPlatformModel;
 import com.helikanonlib.admanager.AdPlatformShowListener;
-import com.helikanonlib.admanager.AdPlatformTypeEnum;
 import com.helikanonlib.admanager.AdPlatformWrapper;
 import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper;
 import com.helikanonlib.admanager.adplatforms.FacebookAdWrapper;
@@ -48,8 +47,17 @@ public class JavaSampleActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        adManager.onPause(this);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+
+        adManager.onResume(this);
 
         /*AdPlatformWrapper ironsrc = adManager.getAdPlatformByType(AdPlatformTypeEnum.IRONSOURCE).getPlatformInstance();
         oldBannerPlacementId = ironsrc.getBannerPlacementId();

@@ -35,10 +35,10 @@ abstract class AdPlatformWrapper(open var appId: String) {
     abstract fun destroyMrec(activity: Activity)
 
 
-    public open fun onCreate(activity: Activity) {}
-    public open fun onPause(activity: Activity) {}
-    public open fun onStop(activity: Activity) {}
-    public open fun onResume(activity: Activity) {}
+    open fun onCreate(activity: Activity) {}
+    open fun onPause(activity: Activity) {}
+    open fun onStop(activity: Activity) {}
+    open fun onResume(activity: Activity) {}
 
 
     protected fun _isBannerLoaded(bannerAdView: ViewGroup?): Boolean {

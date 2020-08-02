@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+        adManager.onResume(this)
+
         adManager.showBanner(this, bannerContainer, object : AdPlatformShowListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
                 Log.d("adManager", "[BANNER] AdErrorMode.PLATFORM showBanner>> $errorMode $errorMessage")
@@ -36,6 +38,14 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+    override fun onPause() {
+        super.onPause()
+
+        adManager.onPause(this)
+
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -106,7 +116,7 @@ class MainActivity : AppCompatActivity() {
                 ),
 
                 AdPlatformModel(
-                    IronSourceAdWrapper("a1a67f75").apply {
+                    IronSourceAdWrapper("cd353905").apply {
                         interstitialPlacementId = "DefaultInterstitial"
                         bannerPlacementId = "DefaultBanner"
                         rewardedPlacementId = "DefaultRewardedVideo"
@@ -132,7 +142,7 @@ class MainActivity : AppCompatActivity() {
                 true, true, true, true
             )
         )
-        adManager.setAdPlatformSortByAdFormatStr("interstitial", "mopub,ironsource,mopub,admob,facebook")
+        adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,mopub,admob,facebook")
         adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,facebook,admob,startapp,mopub")
         adManager.setAdPlatformSortByAdFormatStr("rewarded", "mopub,ironsource,admob,startapp,facebook")
         adManager.setAdPlatformSortByAdFormatStr("mrec", "facebook,admob,startapp,mopub,ironsource")

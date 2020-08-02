@@ -1,6 +1,7 @@
 package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
+import android.view.View
 import android.widget.RelativeLayout
 import com.helikanonlib.admanager.*
 import com.ironsource.mediationsdk.ISBannerSize
@@ -129,6 +130,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             try {
                 _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
+                bannerAdView?.visibility = View.VISIBLE
                 listener?.onDisplayed()
             } catch (e: Exception) {
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded")
@@ -137,7 +139,6 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         }
 
         bannerAdView = IronSource.createBanner(activity, ISBannerSize.BANNER)
-        bannerAdView?.placementName = ""
         bannerAdView?.bannerListener = object : BannerListener {
             override fun onBannerAdClicked() {
                 listener?.onClicked()
@@ -148,10 +149,12 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             }
 
             override fun onBannerAdLoaded() {
-                val a = bannerAdView?.placementName
-                _removeBannerViewIfExists(bannerAdView)
-                containerView.addView(bannerAdView, lp)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(bannerAdView)
+                    containerView.addView(bannerAdView, lp)
+                    bannerAdView?.visibility = View.VISIBLE
+                    listener?.onDisplayed()
+                }
             }
 
             override fun onBannerAdLeftApplication() {
@@ -254,6 +257,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             try {
                 _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
+                mrecAdView?.visibility = View.VISIBLE
                 listener?.onDisplayed()
             } catch (e: Exception) {
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded")
@@ -272,9 +276,12 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             }
 
             override fun onBannerAdLoaded() {
-                _removeBannerViewIfExists(mrecAdView)
-                containerView.addView(mrecAdView, lp)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(mrecAdView)
+                    containerView.addView(mrecAdView, lp)
+                    mrecAdView?.visibility = View.VISIBLE
+                    listener?.onDisplayed()
+                }
             }
 
             override fun onBannerAdLeftApplication() {
@@ -295,11 +302,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
 
     override fun destroy(activity: Activity) {
         destroyBanner(activity)
-
-        mrecAdView?.let {
-            IronSource.destroyBanner(mrecAdView)
-            mrecAdView = null
-        }
+        destroyMrec(activity)
     }
 
     override fun destroyBanner(activity: Activity) {
