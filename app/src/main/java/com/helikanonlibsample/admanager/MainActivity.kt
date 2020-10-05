@@ -143,9 +143,9 @@ class MainActivity : AppCompatActivity() {
             )
         )
         adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,mopub,admob,facebook")
-        adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,facebook,admob,startapp,mopub")
+        adManager.setAdPlatformSortByAdFormatStr("banner", "admob,ironsource,facebook,startapp,mopub")
         adManager.setAdPlatformSortByAdFormatStr("rewarded", "mopub,ironsource,admob,startapp,facebook")
-        adManager.setAdPlatformSortByAdFormatStr("mrec", "facebook,admob,startapp,mopub,ironsource")
+        adManager.setAdPlatformSortByAdFormatStr("mrec", "admob,facebook,startapp,mopub,ironsource")
 
 
         adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {
