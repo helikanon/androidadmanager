@@ -82,7 +82,7 @@ class AdManager {
 
     fun start(activity: Activity) {
         if (autoLoad) {
-            loadInterstitial(activity)
+            loadInterstitial(activity, parallel = true)
             loadRewarded(activity)
         }
     }
@@ -149,11 +149,22 @@ class AdManager {
         return filteredAdPlatforms
     }
 
-    fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null) {
+    @JvmOverloads
+    fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null, parallel: Boolean = false) {
         if (!showAds) return
 
         if (platform == null) {
-            _loadInterstitialFromFirstAvailable(activity, listener, 0)
+            if (parallel) {
+                // send true parallel when first load after init ads. Else you dont need parallel load
+                val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL)
+                interstitialAdPlatforms.forEach forEach@{ _platform ->
+                    if (!_platform.platformInstance.isInterstitialLoaded()) {
+                        _loadInterstitial(activity, listener, platform = _platform)
+                    }
+                }
+            } else {
+                _loadInterstitialFromFirstAvailable(activity, listener, 0)
+            }
         } else {
             _loadInterstitial(activity, listener = listener, platform = platform)
         }
@@ -423,11 +434,23 @@ class AdManager {
         })
     }
 
-    fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null) {
+    @JvmOverloads
+    fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null, parallel: Boolean = false) {
         if (!showAds) return
 
         if (platform == null) {
-            _loadRewardedFromFirstAvailable(activity, listener)
+            if (parallel) {
+                // send true parallel when first load after init ads. Else you dont need parallel load
+                val rewardedAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.REWARDED)
+                rewardedAdPlatforms.forEach forEach@{ _platform ->
+                    if (!_platform.platformInstance.isRewardedLoaded()) {
+                        _loadRewarded(activity, listener, platform = _platform)
+                    }
+                }
+            } else {
+                _loadRewardedFromFirstAvailable(activity, listener)
+            }
+
         } else {
             _loadRewarded(activity, listener, platform)
         }
