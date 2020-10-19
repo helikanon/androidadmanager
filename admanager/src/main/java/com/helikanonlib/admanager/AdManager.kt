@@ -159,6 +159,32 @@ class AdManager {
         }
     }
 
+    @JvmOverloads
+    fun loadAndShowInterstitial(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
+
+        /*
+        call _showInterstitial(listener, platform) in onLoaded and onError because of
+        we wants call listener?.onError by _showInterstitial
+         */
+        val loadListener: AdPlatformLoadListener = object : AdPlatformLoadListener() {
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                // this listener will trigger just one time after firt load any platform
+                _showInterstitial(activity, listener, platform)
+            }
+
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                // it will come here for each ad platforms, so we wants only call _showInterstitial
+                // after try all platforms
+                // _showInterstitial will trigger user listener
+                if (errorMode == AdErrorMode.MANAGER) {
+                    _showInterstitial(activity, listener, platform)
+                }
+
+            }
+        }
+        loadInterstitial(activity, loadListener, platform)
+    }
+
     private fun _loadInterstitialFromFirstAvailable(activity: Activity, listener: AdPlatformLoadListener? = null, index: Int = 0) {
         val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL)
         if (interstitialAdPlatforms.size == 0) {
@@ -204,32 +230,6 @@ class AdManager {
 
         }
         platform.platformInstance.loadInterstitial(activity, _listener)
-    }
-
-    @JvmOverloads
-    fun loadAndShowInterstitial(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
-
-        /*
-        call _showInterstitial(listener, platform) in onLoaded and onError because of
-        we wants call listener?.onError by _showInterstitial
-         */
-        val loadListener: AdPlatformLoadListener = object : AdPlatformLoadListener() {
-            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
-                // this listener will trigger just one time after firt load any platform
-                _showInterstitial(activity, listener, platform)
-            }
-
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                // it will come here for each ad platforms, so we wants only call _showInterstitial
-                // after try all platforms
-                // _showInterstitial will trigger user listener
-                if (errorMode == AdErrorMode.MANAGER) {
-                    _showInterstitial(activity, listener, platform)
-                }
-
-            }
-        }
-        loadInterstitial(activity, loadListener, platform)
     }
 
     @JvmOverloads
