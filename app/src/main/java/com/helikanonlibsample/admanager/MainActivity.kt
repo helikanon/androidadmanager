@@ -28,13 +28,13 @@ class MainActivity : AppCompatActivity() {
         adManager.onResume(this)
 
         adManager.showBanner(this, bannerContainer, object : AdPlatformShowListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                Log.d("adManager", "[BANNER] AdErrorMode.PLATFORM showBanner>> $errorMode $errorMessage")
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                Log.d("adManager", "[BANNER] AdErrorMode.PLATFORM showBanner>> $errorMode $errorMessage ${adPlatformEnum?.name}")
             }
         })
         adManager.showMrec(this, mrecContainer, object : AdPlatformShowListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                Log.d("adManager", "[MREC]AdErrorMode.PLATFORM showMrec>> $errorMode $errorMessage")
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                Log.d("adManager", "[MREC]AdErrorMode.PLATFORM showMrec>> $errorMode $errorMessage ${adPlatformEnum?.name}")
             }
         })
     }
@@ -142,48 +142,48 @@ class MainActivity : AppCompatActivity() {
                 true, true, true, true
             )
         )
-        adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,mopub,admob,facebook")
+        adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,admob,facebook,mopub")
         adManager.setAdPlatformSortByAdFormatStr("banner", "admob,ironsource,facebook,startapp,mopub")
-        adManager.setAdPlatformSortByAdFormatStr("rewarded", "mopub,ironsource,admob,startapp,facebook")
-        adManager.setAdPlatformSortByAdFormatStr("mrec", "admob,facebook,startapp,mopub,ironsource")
+        adManager.setAdPlatformSortByAdFormatStr("rewarded", "ironsource,admob,startapp,facebook,mopub")
+        adManager.setAdPlatformSortByAdFormatStr("mrec", "admob,facebook,startapp,ironsource,mopub")
 
 
         adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 if (errorMode == AdErrorMode.MANAGER) {
                     Log.d("adManager", "[LOAD][INTERSTITIAL] AdErrorMode.MANAGER globalInterstitialLoadListener > $errorMessage")
                 } else {
-                    Log.d("adManager", "[LOAD][INTERSTITIAL] AdErrorMode.PLATFORM globalInterstitialLoadListener > $errorMessage")
+                    Log.d("adManager", "[LOAD][INTERSTITIAL] AdErrorMode.PLATFORM globalInterstitialLoadListener > $errorMessage ${adPlatformEnum?.name}")
                 }
             }
         }
         adManager.globalRewardedLoadListener = object : AdPlatformLoadListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 if (errorMode == AdErrorMode.MANAGER) {
                     Log.d("adManager", "[LOAD][REWARDED] AdErrorMode.MANAGER globalRewardedLoadListener > $errorMessage")
                 } else {
-                    Log.d("adManager", "[LOAD][REWARDED] AdErrorMode.PLATFORM globalRewardedLoadListener > $errorMessage")
+                    Log.d("adManager", "[LOAD][REWARDED] AdErrorMode.PLATFORM globalRewardedLoadListener > $errorMessage ${adPlatformEnum?.name}")
                 }
             }
         }
 
         adManager.globalInterstitialShowListener = object : AdPlatformShowListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 if (errorMode == AdErrorMode.MANAGER) {
                     Log.d("adManager", "[SHOW][INTERSTITIAL] AdErrorMode.MANAGER globalInterstitialShowListener > $errorMessage")
                 } else {
-                    Log.d("adManager", "[SHOW][INTERSTITIAL] AdErrorMode.PLATFORM globalInterstitialShowListener > $errorMessage")
+                    Log.d("adManager", "[SHOW][INTERSTITIAL] AdErrorMode.PLATFORM globalInterstitialShowListener > $errorMessage ${adPlatformEnum?.name}")
                 }
             }
         }
 
         adManager.globalRewardedShowListener = object : AdPlatformShowListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 // AdErrorMode.MANAGER >> it means . We tried to load in all platforms but no one load interstitial
                 if (errorMode == AdErrorMode.MANAGER) {
                     Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.MANAGER globalRewardedShowListener > $errorMessage")
                 } else {
-                    Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.PLATFORM globalRewardedShowListener > $errorMessage")
+                    Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.PLATFORM globalRewardedShowListener > $errorMessage ${adPlatformEnum?.name}")
                 }
 
             }

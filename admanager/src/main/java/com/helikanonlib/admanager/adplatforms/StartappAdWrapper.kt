@@ -59,17 +59,17 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isInterstitialLoaded()) {
-            listener?.onLoaded()
+            listener?.onLoaded(platform)
             return
         }
 
         startAppAd?.loadAd(object : AdEventListener {
             override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onLoaded()
+                listener?.onLoaded(platform)
             }
         })
     }
@@ -79,19 +79,19 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         startAppAd?.showAd(object : AdDisplayListener {
             override fun adHidden(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onClosed()
+                listener?.onClosed(platform)
             }
 
             override fun adDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             }
 
             override fun adNotDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun adClicked(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
         })
     }
@@ -116,27 +116,27 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             try {
                 _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded",platform)
             }
             return
         }
 
         bannerAdView = Banner(activity, object : BannerListener {
             override fun onClick(p0: View?) {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
 
             override fun onFailedToReceiveAd(p0: View?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> failedtoreceivead")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> failedtoreceivead",platform)
             }
 
             override fun onReceiveAd(p0: View?) {
                 activity.runOnUiThread {
                     _removeBannerViewIfExists(bannerAdView)
                     containerView.addView(bannerAdView, lp)
-                    listener?.onDisplayed()
+                    listener?.onDisplayed(platform)
                 }
             }
 
@@ -149,47 +149,47 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isRewardedLoaded()) {
-            listener?.onLoaded()
+            listener?.onLoaded(platform)
             return
         }
 
         startAppAdRewarded?.loadAd(StartAppAd.AdMode.REWARDED_VIDEO, object : AdEventListener {
             override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onLoaded()
+                listener?.onLoaded(platform)
             }
         })
     }
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded")
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded",platform)
             return
         }
 
         startAppAdRewarded?.setVideoListener(object : VideoListener {
             override fun onVideoCompleted() {
-                listener?.onRewarded()
+                listener?.onRewarded(null,null,platform)
             }
         })
         startAppAdRewarded?.showAd(object : AdDisplayListener {
             override fun adHidden(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onClosed()
+                listener?.onClosed(platform)
             }
 
             override fun adDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             }
 
             override fun adNotDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun adClicked(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
         })
     }
@@ -213,27 +213,27 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             try {
                 _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded",platform)
             }
             return
         }
 
         mrecAdView = Mrec(activity, object : BannerListener {
             override fun onClick(p0: View?) {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
 
             override fun onFailedToReceiveAd(p0: View?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> failedtoreceivead")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> failedtoreceivead",platform)
             }
 
             override fun onReceiveAd(p0: View?) {
                 activity.runOnUiThread {
                     _removeBannerViewIfExists(mrecAdView)
                     containerView.addView(mrecAdView, lp)
-                    listener?.onDisplayed()
+                    listener?.onDisplayed(platform)
                 }
             }
 

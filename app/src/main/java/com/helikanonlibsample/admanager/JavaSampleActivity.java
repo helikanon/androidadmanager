@@ -1,6 +1,7 @@
 package com.helikanonlibsample.admanager;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -8,9 +9,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.helikanonlib.admanager.AdErrorMode;
 import com.helikanonlib.admanager.AdManager;
 import com.helikanonlib.admanager.AdPlatformModel;
 import com.helikanonlib.admanager.AdPlatformShowListener;
+import com.helikanonlib.admanager.AdPlatformTypeEnum;
 import com.helikanonlib.admanager.AdPlatformWrapper;
 import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper;
 import com.helikanonlib.admanager.adplatforms.FacebookAdWrapper;
@@ -99,7 +102,7 @@ public class JavaSampleActivity extends AppCompatActivity {
             public void onClick(View view) {
                 adManager.showRewarded(JavaSampleActivity.this, new AdPlatformShowListener() {
                     @Override
-                    public void onRewarded(@Nullable String type, @Nullable Integer amount) {
+                    public void onRewarded(@Nullable String type, @Nullable Integer amount, @Nullable AdPlatformTypeEnum adPlatformEnum) {
                         Toast.makeText(JavaSampleActivity.this, "Rewarded!", Toast.LENGTH_LONG).show();
                     }
                 });
@@ -171,8 +174,17 @@ public class JavaSampleActivity extends AppCompatActivity {
 
         adManager.setGlobalRewardedShowListener(new AdPlatformShowListener() {
             @Override
-            public void onRewarded(@Nullable String type, @Nullable Integer amount) {
+            public void onRewarded(@Nullable String type, @Nullable Integer amount, @Nullable AdPlatformTypeEnum adPlatformEnum) {
                 Toast.makeText(JavaSampleActivity.this, "Rewarded", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(@Nullable AdErrorMode errorMode, @Nullable String errorMessage, @Nullable AdPlatformTypeEnum adPlatformEnum) {
+                if (errorMode == AdErrorMode.MANAGER) {
+                    Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.MANAGER globalRewardedLoadListener > $errorMessage");
+                } else {
+                    Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.PLATFORM globalRewardedLoadListener > " + errorMessage + " | " + adPlatformEnum.name());
+                }
             }
         });
 

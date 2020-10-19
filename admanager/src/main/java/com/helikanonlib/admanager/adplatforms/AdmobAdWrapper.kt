@@ -49,7 +49,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isInterstitialLoaded()) {
-            listener?.onLoaded()
+            listener?.onLoaded(platform)
             return
         }
 
@@ -59,12 +59,12 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onAdFailedToLoad(p0: Int) {
                 super.onAdFailedToLoad(p0)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> errorcode = $p0")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> errorcode = $p0", platform)
             }
 
             override fun onAdLoaded() {
                 super.onAdLoaded()
-                listener?.onLoaded()
+                listener?.onLoaded(platform)
             }
         }
         interstitial?.loadAd(AdRequest.Builder().build())
@@ -72,7 +72,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isInterstitialLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded")
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded", platform)
             return
         }
 
@@ -80,17 +80,17 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             interstitial?.adListener = object : AdListener() {
                 override fun onAdClicked() {
                     super.onAdClicked()
-                    listener?.onClicked()
+                    listener?.onClicked(platform)
                 }
 
                 override fun onAdClosed() {
                     super.onAdClosed()
-                    listener?.onClosed()
+                    listener?.onClosed(platform)
                 }
 
                 override fun onAdOpened() {
                     super.onAdOpened()
-                    listener?.onDisplayed()
+                    listener?.onDisplayed(platform)
                 }
 
             }
@@ -116,9 +116,9 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             try {
                 _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded",platform)
             }
             return
         }
@@ -129,7 +129,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         bannerAdView?.adListener = object : AdListener() {
             override fun onAdFailedToLoad(p0: Int) {
                 super.onAdFailedToLoad(p0)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=$p0")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=$p0",platform)
             }
 
             override fun onAdLoaded() {
@@ -137,12 +137,12 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 activity.runOnUiThread {
                     _removeBannerViewIfExists(bannerAdView)
                     containerView.addView(bannerAdView, lp)
-                    listener?.onDisplayed()
+                    listener?.onDisplayed(platform)
                 }
             }
 
             override fun onAdClicked() {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
         }
         bannerAdView?.loadAd(AdRequest.Builder().build());
@@ -151,18 +151,18 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isRewardedLoaded()) {
-            listener?.onLoaded()
+            listener?.onLoaded(platform)
             return
         }
 
         rewardedAd = RewardedAd(activity.applicationContext, rewardedPlacementId)
         val adLoadCallback = object : RewardedAdLoadCallback() {
             override fun onRewardedAdLoaded() {
-                listener?.onLoaded()
+                listener?.onLoaded(platform)
             }
 
             override fun onRewardedAdFailedToLoad(errorCode: Int) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$errorCode")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$errorCode",platform)
             }
         }
         rewardedAd?.loadAd(AdRequest.Builder().build(), adLoadCallback)
@@ -170,7 +170,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded")
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded",platform)
             return
         }
 
@@ -178,21 +178,21 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onRewardedAdFailedToShow(p0: Int) {
                 super.onRewardedAdFailedToShow(p0)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$p0")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$p0",platform)
             }
 
             override fun onRewardedAdClosed() {
                 super.onRewardedAdClosed()
-                listener?.onClosed()
+                listener?.onClosed(platform)
             }
 
             override fun onRewardedAdOpened() {
                 super.onRewardedAdOpened()
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             }
 
             override fun onUserEarnedReward(p0: RewardItem) {
-                listener?.onRewarded(p0.type, p0.amount)
+                listener?.onRewarded(p0.type, p0.amount, platform)
             }
 
         })
@@ -218,9 +218,9 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             try {
                 _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded",platform)
             }
             return
         }
@@ -231,7 +231,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         mrecAdView?.adListener = object : AdListener() {
             override fun onAdFailedToLoad(p0: Int) {
                 super.onAdFailedToLoad(p0)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> errorcode=$p0")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> errorcode=$p0",platform)
             }
 
             override fun onAdLoaded() {
@@ -239,12 +239,12 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 activity.runOnUiThread {
                     _removeBannerViewIfExists(mrecAdView)
                     containerView.addView(mrecAdView, lp)
-                    listener?.onDisplayed()
+                    listener?.onDisplayed(platform)
                 }
             }
 
             override fun onAdClicked() {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
         }
         mrecAdView?.loadAd(AdRequest.Builder().build());
