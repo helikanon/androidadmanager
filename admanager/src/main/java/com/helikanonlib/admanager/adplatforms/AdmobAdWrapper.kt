@@ -52,6 +52,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         bannerPlacementId = "ca-app-pub-3940256099942544/6300978111"
         rewardedPlacementId = "ca-app-pub-3940256099942544/5224354917"
         mrecPlacementId = "ca-app-pub-3940256099942544/6300978111"
+        nativePlacementId = "ca-app-pub-3940256099942544/2247696110"
     }
 
     override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?) {
@@ -266,7 +267,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun loadNativeAds(activity: Activity,count: Int, listener: AdPlatformLoadListener?) {
         lateinit var adLoader: AdLoader
 
-        adLoader = AdLoader.Builder(activity, "ca-app-pub-3940256099942544/2247696110")
+        adLoader = AdLoader.Builder(activity, nativePlacementId)
             .forUnifiedNativeAd { unifiedNativeAd: UnifiedNativeAd ->
                 nativeAds.add(unifiedNativeAd)
 

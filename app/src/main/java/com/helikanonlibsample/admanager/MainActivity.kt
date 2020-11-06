@@ -122,6 +122,7 @@ class MainActivity : AppCompatActivity() {
                         bannerPlacementId = "ca-app-pub-3940256099942544/6300978111"
                         rewardedPlacementId = "ca-app-pub-3940256099942544/5224354917"
                         mrecPlacementId = "ca-app-pub-3940256099942544/6300978111"
+                        nativePlacementId = "ca-app-pub-3940256099942544/2247696110"
                     },
                     true, true, true, true
                 ),
