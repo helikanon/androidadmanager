@@ -260,12 +260,23 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun isNativeLoaded(): Boolean {
-        return nativeAds.size>0
+        return nativeAds.size > 0
     }
 
     @JvmOverloads
-    override fun loadNativeAds(activity: Activity,count: Int, listener: AdPlatformLoadListener?) {
+    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?) {
         lateinit var adLoader: AdLoader
+
+        // destroy olds
+        try {
+            nativeAds.forEach {
+                (it as UnifiedNativeAd).destroy()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            nativeAds.clear()
+        }
 
         adLoader = AdLoader.Builder(activity, nativePlacementId)
             .forUnifiedNativeAd { unifiedNativeAd: UnifiedNativeAd ->
@@ -278,11 +289,10 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
             .withAdListener(object : AdListener() {
                 override fun onAdLoaded() {
-                    val a = 1
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
-                    val a = 1
+                    listener?.onError(AdErrorMode.PLATFORM, adError.message, platform)
                 }
             })
             .withNativeAdOptions(
