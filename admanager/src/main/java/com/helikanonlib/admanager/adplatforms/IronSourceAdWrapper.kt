@@ -300,6 +300,18 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         IronSource.loadBanner(mrecAdView, mrecPlacementId)
     }
 
+    override fun isNativeLoaded(): Boolean {
+        return nativeAds.size > 0
+    }
+
+    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?) {
+        listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
+    }
+
+    override fun showNative(activity: Activity, pos: Int, containerView: RelativeLayout, adSize: String, listener: AdPlatformShowListener?) {
+        listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
+    }
+
     override fun destroy(activity: Activity) {
         destroyBanner(activity)
         destroyMrec(activity)

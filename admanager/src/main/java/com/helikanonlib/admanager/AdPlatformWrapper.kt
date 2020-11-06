@@ -12,6 +12,7 @@ abstract class AdPlatformWrapper(open var appId: String) {
     var bannerPlacementId: String? = null
     var rewardedPlacementId: String? = null
     var mrecPlacementId: String? = null
+    var nativePlacementId: String? = null
 
     abstract fun initialize(activity: Activity)
     abstract fun enableTestMode(deviceId: String? = null)
@@ -30,16 +31,21 @@ abstract class AdPlatformWrapper(open var appId: String) {
     abstract fun isMrecLoaded(): Boolean
     abstract fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null)
 
+
+    val nativeAds: ArrayList<Any> = arrayListOf()
+    abstract fun isNativeLoaded(): Boolean
+    abstract fun loadNativeAds(activity: Activity,count: Int, listener: AdPlatformLoadListener? = null)
+    // adSize >> [small,medium]
+    abstract fun showNative(activity: Activity, pos: Int, containerView: RelativeLayout, adSize: String, listener: AdPlatformShowListener? = null)
+
     abstract fun destroy(activity: Activity)
     abstract fun destroyBanner(activity: Activity)
     abstract fun destroyMrec(activity: Activity)
-
 
     open fun onCreate(activity: Activity) {}
     open fun onPause(activity: Activity) {}
     open fun onStop(activity: Activity) {}
     open fun onResume(activity: Activity) {}
-
 
     protected fun _isBannerLoaded(bannerAdView: ViewGroup?): Boolean {
         return bannerAdView != null && bannerAdView.parent != null

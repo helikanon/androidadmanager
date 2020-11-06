@@ -1,13 +1,20 @@
 package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
+import android.content.Context
+import android.view.LayoutInflater
 import android.widget.RelativeLayout
+import com.google.android.ads.nativetemplates.NativeTemplateStyle
+import com.google.android.ads.nativetemplates.TemplateView
 import com.google.android.gms.ads.*
+import com.google.android.gms.ads.formats.NativeAdOptions
+import com.google.android.gms.ads.formats.UnifiedNativeAd
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdCallback
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.helikanonlib.admanager.*
+import com.helikanonlib.admanager.R
 
 
 /**
@@ -118,7 +125,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded", platform)
             }
             return
         }
@@ -129,7 +136,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         bannerAdView?.adListener = object : AdListener() {
             override fun onAdFailedToLoad(p0: Int) {
                 super.onAdFailedToLoad(p0)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=$p0",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=$p0", platform)
             }
 
             override fun onAdLoaded() {
@@ -162,7 +169,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onRewardedAdFailedToLoad(errorCode: Int) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$errorCode",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$errorCode", platform)
             }
         }
         rewardedAd?.loadAd(AdRequest.Builder().build(), adLoadCallback)
@@ -170,7 +177,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded",platform)
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded", platform)
             return
         }
 
@@ -178,7 +185,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onRewardedAdFailedToShow(p0: Int) {
                 super.onRewardedAdFailedToShow(p0)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$p0",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$p0", platform)
             }
 
             override fun onRewardedAdClosed() {
@@ -220,7 +227,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(mrecAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded", platform)
             }
             return
         }
@@ -231,7 +238,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         mrecAdView?.adListener = object : AdListener() {
             override fun onAdFailedToLoad(p0: Int) {
                 super.onAdFailedToLoad(p0)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> errorcode=$p0",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> errorcode=$p0", platform)
             }
 
             override fun onAdLoaded() {
@@ -248,6 +255,74 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
         }
         mrecAdView?.loadAd(AdRequest.Builder().build());
+
+    }
+
+    override fun isNativeLoaded(): Boolean {
+        return nativeAds.size>0
+    }
+
+    @JvmOverloads
+    override fun loadNativeAds(activity: Activity,count: Int, listener: AdPlatformLoadListener?) {
+        lateinit var adLoader: AdLoader
+
+        adLoader = AdLoader.Builder(activity, "ca-app-pub-3940256099942544/2247696110")
+            .forUnifiedNativeAd { unifiedNativeAd: UnifiedNativeAd ->
+                nativeAds.add(unifiedNativeAd)
+
+                if (!adLoader.isLoading) {
+                    listener?.onLoaded(platform)
+                }
+
+            }
+            .withAdListener(object : AdListener() {
+                override fun onAdLoaded() {
+                    val a = 1
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    val a = 1
+                }
+            })
+            .withNativeAdOptions(
+                NativeAdOptions.Builder()
+                    // Methods in the NativeAdOptions.Builder class can be
+                    // used here to specify individual options settings.
+                    .build()
+            )
+            .build()
+        // adLoader.loadAd(AdRequest.Builder().build())
+        adLoader.loadAds(AdRequest.Builder().build(), count)
+    }
+
+    override fun showNative(activity: Activity, pos: Int, containerView: RelativeLayout, adSize: String, listener: AdPlatformShowListener?) {
+        if (nativeAds.size < (pos + 1)) {
+            return
+        }
+
+        val nativeAd: UnifiedNativeAd = nativeAds[pos] as UnifiedNativeAd
+
+        val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val v = inflater.inflate(
+            if (adSize == "small") {
+                R.layout.admob_native_small_template
+            } else {
+                R.layout.admob_native_medium_template
+            }, null
+        )
+
+        val template = v.findViewById<TemplateView>(
+            if (adSize == "small") {
+                R.id.admanager_native_small
+            } else {
+                R.id.admanager_native_medium
+            }
+        )
+        val styles = NativeTemplateStyle.Builder().build()
+        template.setStyles(styles)
+        template.setNativeAd(nativeAd)
+        containerView.addView(v)
+
 
     }
 

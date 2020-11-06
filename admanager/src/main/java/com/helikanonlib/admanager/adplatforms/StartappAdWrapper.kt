@@ -8,6 +8,9 @@ import com.helikanonlib.admanager.*
 import com.startapp.sdk.ads.banner.Banner
 import com.startapp.sdk.ads.banner.BannerListener
 import com.startapp.sdk.ads.banner.Mrec
+import com.startapp.sdk.ads.nativead.NativeAdPreferences
+import com.startapp.sdk.ads.nativead.StartAppNativeAd
+import com.startapp.sdk.adsbase.Ad
 import com.startapp.sdk.adsbase.StartAppAd
 import com.startapp.sdk.adsbase.StartAppSDK
 import com.startapp.sdk.adsbase.VideoListener
@@ -118,7 +121,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded", platform)
             }
             return
         }
@@ -129,7 +132,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onFailedToReceiveAd(p0: View?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> failedtoreceivead",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> failedtoreceivead", platform)
             }
 
             override fun onReceiveAd(p0: View?) {
@@ -166,13 +169,13 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded",platform)
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded", platform)
             return
         }
 
         startAppAdRewarded?.setVideoListener(object : VideoListener {
             override fun onVideoCompleted() {
-                listener?.onRewarded(null,null,platform)
+                listener?.onRewarded(null, null, platform)
             }
         })
         startAppAdRewarded?.showAd(object : AdDisplayListener {
@@ -215,7 +218,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(mrecAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded", platform)
             }
             return
         }
@@ -226,7 +229,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onFailedToReceiveAd(p0: View?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> failedtoreceivead",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> failedtoreceivead", platform)
             }
 
             override fun onReceiveAd(p0: View?) {
@@ -243,6 +246,17 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         mrecAdView?.loadAd()
     }
 
+    override fun isNativeLoaded(): Boolean {
+        return nativeAds.size>0
+    }
+
+    override fun loadNativeAds(activity: Activity, count: Int,listener: AdPlatformLoadListener?) {
+        listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
+    }
+
+    override fun showNative(activity: Activity, pos: Int, containerView: RelativeLayout, adSize: String, listener: AdPlatformShowListener?) {
+        listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
+    }
 
     override fun destroy(activity: Activity) {
         startAppAd = null
