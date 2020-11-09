@@ -23,13 +23,13 @@ class MainActivity : AppCompatActivity() {
         initAdManager()
         initViews()
 
-        val x = adManager.getAdPlatformByType(AdPlatformTypeEnum.ADMOB)?.platformInstance as AdmobAdWrapper
+        /*val x = adManager.getAdPlatformByType(AdPlatformTypeEnum.ADMOB)?.platformInstance as AdmobAdWrapper
         x.loadNativeAds(this, 3, object : AdPlatformLoadListener() {
             override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
                 super.onLoaded(adPlatformEnum)
                 x.showNative(this@MainActivity, 1, bannerContainer, "medium")
             }
-        })
+        })*/
 
     }
 
@@ -38,12 +38,12 @@ class MainActivity : AppCompatActivity() {
 
         adManager.onResume(this)
 
-        /*adManager.showBanner(this, bannerContainer, object : AdPlatformShowListener() {
+        adManager.showBanner(this, bannerContainer, object : AdPlatformShowListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 Log.d("adManager", "[BANNER] AdErrorMode.PLATFORM showBanner>> $errorMode $errorMessage ${adPlatformEnum?.name}")
             }
         })
-        adManager.showMrec(this, mrecContainer, object : AdPlatformShowListener() {
+        /*adManager.showMrec(this, mrecContainer, object : AdPlatformShowListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 Log.d("adManager", "[MREC]AdErrorMode.PLATFORM showMrec>> $errorMode $errorMessage ${adPlatformEnum?.name}")
             }

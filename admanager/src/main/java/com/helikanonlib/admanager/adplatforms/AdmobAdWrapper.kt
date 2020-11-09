@@ -133,7 +133,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         bannerAdView = AdView(activity.applicationContext)
-        bannerAdView?.adSize = AdSize.BANNER
+        bannerAdView?.adSize = AdSize.SMART_BANNER
         bannerAdView?.adUnitId = bannerPlacementId
         bannerAdView?.adListener = object : AdListener() {
             override fun onAdFailedToLoad(p0: Int) {
@@ -293,7 +293,9 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
-                    listener?.onError(AdErrorMode.PLATFORM, adError.message, platform)
+                    if (!adLoader.isLoading) {
+                        listener?.onError(AdErrorMode.PLATFORM, adError.message, platform)
+                    }
                 }
             })
             .withNativeAdOptions(
@@ -313,7 +315,6 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         val nativeAd: UnifiedNativeAd = nativeAds[pos] as UnifiedNativeAd
-
         val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val v = inflater.inflate(
             if (adSize == "small") {
