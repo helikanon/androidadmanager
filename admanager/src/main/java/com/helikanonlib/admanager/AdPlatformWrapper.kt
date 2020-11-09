@@ -36,7 +36,7 @@ abstract class AdPlatformWrapper(open var appId: String) {
     abstract fun isNativeLoaded(): Boolean
     abstract fun loadNativeAds(activity: Activity,count: Int, listener: AdPlatformLoadListener? = null)
     // adSize >> [small,medium]
-    abstract fun showNative(activity: Activity, pos: Int, containerView: RelativeLayout, adSize: String, listener: AdPlatformShowListener? = null)
+    abstract fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener? = null)
 
     abstract fun destroy(activity: Activity)
     abstract fun destroyBanner(activity: Activity)

@@ -2,6 +2,7 @@ package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.helikanonlib.admanager.*
 import com.ironsource.mediationsdk.ISBannerSize
@@ -308,7 +309,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 
-    override fun showNative(activity: Activity, pos: Int, containerView: RelativeLayout, adSize: String, listener: AdPlatformShowListener?) {
+    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener?) {
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 

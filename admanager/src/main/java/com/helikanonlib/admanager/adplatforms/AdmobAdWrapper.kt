@@ -3,6 +3,7 @@ package com.helikanonlib.admanager.adplatforms
 import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.google.android.ads.nativetemplates.NativeTemplateStyle
 import com.google.android.ads.nativetemplates.TemplateView
@@ -306,7 +307,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         adLoader.loadAds(AdRequest.Builder().build(), count)
     }
 
-    override fun showNative(activity: Activity, pos: Int, containerView: RelativeLayout, adSize: String, listener: AdPlatformShowListener?) {
+    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener?) {
         if (nativeAds.size < (pos + 1)) {
             return
         }
