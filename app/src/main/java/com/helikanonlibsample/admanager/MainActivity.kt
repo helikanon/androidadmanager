@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        adManager.addAdPlatform(
+        /*adManager.addAdPlatform(
             AdPlatformModel(
                 MopubAdWrapper("207754325").apply {
                     interstitialPlacementId = "b75290feb5a74c79b2e7bf027a02f268"
@@ -153,11 +153,11 @@ class MainActivity : AppCompatActivity() {
                 },
                 true, true, true, true
             )
-        )
-        adManager.setAdPlatformSortByAdFormatStr("interstitial", "admob,ironsource,facebook,mopub")
-        adManager.setAdPlatformSortByAdFormatStr("banner", "admob,ironsource,facebook,startapp,mopub")
-        adManager.setAdPlatformSortByAdFormatStr("rewarded", "admob,ironsource,startapp,facebook,mopub")
-        adManager.setAdPlatformSortByAdFormatStr("mrec", "admob,facebook,startapp,ironsource,mopub")
+        )*/
+        adManager.setAdPlatformSortByAdFormatStr("interstitial", "admob,ironsource,facebook")
+        adManager.setAdPlatformSortByAdFormatStr("banner", "admob,ironsource,facebook,startapp")
+        adManager.setAdPlatformSortByAdFormatStr("rewarded", "admob,ironsource,startapp,facebook")
+        adManager.setAdPlatformSortByAdFormatStr("mrec", "admob,facebook,startapp,ironsource")
 
 
         adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {

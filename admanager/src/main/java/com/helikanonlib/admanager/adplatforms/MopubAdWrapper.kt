@@ -1,4 +1,5 @@
 package com.helikanonlib.admanager.adplatforms
+/*
 
 import android.app.Activity
 import android.view.ViewGroup
@@ -376,4 +377,4 @@ class MopubAdWrapper(appId: String) : AdPlatformWrapper(appId) {
     override fun onResume(activity: Activity) {
         MoPub.onResume(activity)
     }
-}
+}*/
