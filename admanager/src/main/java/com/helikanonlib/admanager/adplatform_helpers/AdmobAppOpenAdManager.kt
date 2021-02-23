@@ -14,7 +14,14 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
 import java.util.*
 
-class AdmobAppOpenAdManager(val application: Application, var adOpenPlacementId: String = "ca-app-pub-3940256099942544/3419835294") : AppOpenAdBaseLifeCycle(application), LifecycleObserver {
+class AdmobAppOpenAdManager(
+    val application: Application,
+    var appOpenPlacementId: String = "ca-app-pub-3940256099942544/3419835294",
+    var showListener: AdPlatformShowListener? = null,
+    var loadListener: AdPlatformLoadListener? = null
+
+
+) : AppOpenAdBaseLifeCycle(application), LifecycleObserver {
     var platform = AdPlatformTypeEnum.ADMOB
 
     private var appOpenAd: AppOpenAd? = null
@@ -39,32 +46,40 @@ class AdmobAppOpenAdManager(val application: Application, var adOpenPlacementId:
     }
 
     fun load(listener: AdPlatformLoadListener?) {
-        if (isAdOpenLoaded()) {
-            listener?.onLoaded(platform)
+        if (listener != null) {
+            loadListener = listener
+        }
+
+        if (isAdLoaded()) {
+            loadListener?.onLoaded(platform)
             return
         }
 
         val request: AdRequest = AdRequest.Builder().build();
-        AppOpenAd.load(application, adOpenPlacementId, request, AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT, object : AppOpenAd.AppOpenAdLoadCallback() {
+        AppOpenAd.load(application, appOpenPlacementId, request, AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT, object : AppOpenAd.AppOpenAdLoadCallback() {
             override fun onAdLoaded(ad: AppOpenAd) {
                 appOpenAd = ad
                 loadTime = Date().time
-                listener?.onLoaded(platform)
+                loadListener?.onLoaded(platform)
             }
 
             override fun onAdFailedToLoad(p0: LoadAdError) {
-                listener?.onError(AdErrorMode.PLATFORM, p0?.message, platform)
+                loadListener?.onError(AdErrorMode.PLATFORM, p0?.message, platform)
             }
         })
     }
 
-    fun isAdOpenLoaded(): Boolean {
+    fun isAdLoaded(): Boolean {
         return appOpenAd != null && wasLoadTimeLessThanNHoursAgo(4)
     }
 
-    fun show(activity: Activity, listener: AdPlatformShowListener?=null) {
-        if (!isAdOpenLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} adopen >> noads loaded", platform)
+    fun show(activity: Activity, listener: AdPlatformShowListener? = null) {
+        if (listener != null) {
+            showListener = listener
+        }
+
+        if (!isAdLoaded()) {
+            showListener?.onError(AdErrorMode.PLATFORM, "${platform.name} adopen >> noads loaded", platform)
             load(null)
             return
         }
@@ -72,15 +87,18 @@ class AdmobAppOpenAdManager(val application: Application, var adOpenPlacementId:
         if (isShowing) return
 
         appOpenAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-            override fun onAdFailedToShowFullScreenContent(p0: AdError?) {
-
+            override fun onAdFailedToShowFullScreenContent(error: AdError?) {
+                showListener?.onError(AdErrorMode.PLATFORM, error?.message ?: "", platform)
             }
 
             override fun onAdShowedFullScreenContent() {
                 isShowing = true
+                showListener?.onDisplayed(platform)
             }
 
             override fun onAdDismissedFullScreenContent() {
+                showListener?.onClosed(platform)
+
                 appOpenAd = null
                 isShowing = false
                 load(null)

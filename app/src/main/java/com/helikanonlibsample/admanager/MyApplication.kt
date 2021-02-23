@@ -1,8 +1,5 @@
 package com.helikanonlibsample.admanager
 
-import android.app.Application
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.multidex.MultiDexApplication
 import com.helikanonlib.admanager.*
@@ -24,7 +21,15 @@ class MyApplication : MultiDexApplication() {
         super.onCreate()
 
         initAdManager()
-        admobAppOpenAdManager =  AdmobAppOpenAdManager(this, "ca-app-pub-3940256099942544/3419835294")
+        admobAppOpenAdManager = AdmobAppOpenAdManager(this, "ca-app-pub-3940256099942544/3419835294",
+            object : AdPlatformShowListener() {
+                override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
+
+                }
+
+            },
+            object : AdPlatformLoadListener() {}
+        )
 
     }
 

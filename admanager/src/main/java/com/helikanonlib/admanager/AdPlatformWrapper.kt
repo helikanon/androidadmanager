@@ -14,7 +14,7 @@ abstract class AdPlatformWrapper(open var appId: String) {
     var rewardedPlacementId: String? = null
     var mrecPlacementId: String? = null
     var nativePlacementId: String? = null
-    var adOpenPlacementId: String? = null
+    var appOpenAdPlacementId: String? = null
 
     abstract fun initialize(activity: Activity)
     abstract fun initialize(context: Context)
