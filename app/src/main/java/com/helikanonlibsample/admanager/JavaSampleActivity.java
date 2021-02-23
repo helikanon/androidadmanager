@@ -42,7 +42,7 @@ public class JavaSampleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_java_sample_activity);
 
-        adManager = MainActivity.adManager;
+        adManager = MyApplication.adManager;
         //adManager.destroyBannersAndMrecs(this);
 
         // initAdManager(); // already inited in MainActivity
@@ -188,6 +188,7 @@ public class JavaSampleActivity extends AppCompatActivity {
             }
         });
 
-        adManager.initialize(this);
+        adManager.initializePlatforms(getApplicationContext());
+        adManager.initializePlatformsWithActivity(this);
     }
 }

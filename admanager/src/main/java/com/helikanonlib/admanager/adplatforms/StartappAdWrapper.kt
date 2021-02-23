@@ -2,6 +2,7 @@ package com.helikanonlib.admanager.adplatforms
 
 
 import android.app.Activity
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
@@ -9,9 +10,6 @@ import com.helikanonlib.admanager.*
 import com.startapp.sdk.ads.banner.Banner
 import com.startapp.sdk.ads.banner.BannerListener
 import com.startapp.sdk.ads.banner.Mrec
-import com.startapp.sdk.ads.nativead.NativeAdPreferences
-import com.startapp.sdk.ads.nativead.StartAppNativeAd
-import com.startapp.sdk.adsbase.Ad
 import com.startapp.sdk.adsbase.StartAppAd
 import com.startapp.sdk.adsbase.StartAppSDK
 import com.startapp.sdk.adsbase.VideoListener
@@ -38,9 +36,13 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun initialize(activity: Activity) {
+
+    }
+
+    override fun initialize(context: Context) {
         if (isInitialized) return
 
-        StartAppSDK.init(activity.applicationContext, appId, false);
+        StartAppSDK.init(context, appId, false);
         StartAppAd.disableSplash();
         StartAppAd.disableAutoInterstitial()
 
@@ -51,8 +53,8 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             true
         );*/
 
-        startAppAd = StartAppAd(activity.applicationContext)
-        startAppAdRewarded = StartAppAd(activity.applicationContext)
+        startAppAd = StartAppAd(context)
+        startAppAdRewarded = StartAppAd(context)
 
         isInitialized = true
     }
@@ -248,10 +250,10 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun isNativeLoaded(): Boolean {
-        return nativeAds.size>0
+        return nativeAds.size > 0
     }
 
-    override fun loadNativeAds(activity: Activity, count: Int,listener: AdPlatformLoadListener?) {
+    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?) {
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 

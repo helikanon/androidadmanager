@@ -1,6 +1,7 @@
 package com.helikanonlib.admanager
 
 import android.app.Activity
+import android.content.Context
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 
@@ -13,8 +14,10 @@ abstract class AdPlatformWrapper(open var appId: String) {
     var rewardedPlacementId: String? = null
     var mrecPlacementId: String? = null
     var nativePlacementId: String? = null
+    var adOpenPlacementId: String? = null
 
     abstract fun initialize(activity: Activity)
+    abstract fun initialize(context: Context)
     abstract fun enableTestMode(deviceId: String? = null)
 
     abstract fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null)

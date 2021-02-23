@@ -28,8 +28,11 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun initialize(activity: Activity) {
+    }
+
+    override fun initialize(context: Context) {
         if (isInitialized) return
-        AudienceNetworkAds.initialize(activity.applicationContext);
+        AudienceNetworkAds.initialize(context);
 
         isInitialized = true
     }
@@ -60,7 +63,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p1?.errorMessage ?: ""}",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p1?.errorMessage ?: ""}", platform)
             }
 
             override fun onAdLoaded(p0: Ad?) {
@@ -78,7 +81,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isInterstitialLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded",platform)
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded", platform)
             return
         }
 
@@ -97,7 +100,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 }
 
                 override fun onError(p0: Ad?, p1: AdError?) {
-                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} >> ${p1?.errorMessage ?: ""}",platform)
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} >> ${p1?.errorMessage ?: ""}", platform)
                 }
 
                 override fun onAdLoaded(p0: Ad?) {
@@ -128,7 +131,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(bannerAdView)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded error",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded error", platform)
             }
             return
         }
@@ -137,7 +140,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         bannerAdView?.setAdListener(object : AdListener {
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> ${p1?.errorMessage ?: ""}",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> ${p1?.errorMessage ?: ""}", platform)
             }
 
             override fun onAdLoaded(p0: Ad?) {
@@ -181,7 +184,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p1?.errorMessage ?: ""}",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p1?.errorMessage ?: ""}", platform)
             }
 
             override fun onAdLoaded(p0: Ad?) {
@@ -198,7 +201,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noads loaded",platform)
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noads loaded", platform)
             return
         }
 
@@ -212,11 +215,11 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onRewardedVideoCompleted() {
-                listener?.onRewarded(null, null,platform)
+                listener?.onRewarded(null, null, platform)
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p1?.errorMessage ?: ""}",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p1?.errorMessage ?: ""}", platform)
             }
 
             override fun onAdLoaded(p0: Ad?) {
@@ -248,7 +251,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(mrecAdView)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded error",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded error", platform)
             }
             return
         }
@@ -257,7 +260,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         mrecAdView?.setAdListener(object : AdListener {
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ${p1?.errorMessage ?: ""}",platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ${p1?.errorMessage ?: ""}", platform)
             }
 
             override fun onAdLoaded(p0: Ad?) {
@@ -280,10 +283,10 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun isNativeLoaded(): Boolean {
-        return nativeAds.size>0
+        return nativeAds.size > 0
     }
 
-    override fun loadNativeAds(activity: Activity, count: Int,listener: AdPlatformLoadListener?) {
+    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?) {
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 

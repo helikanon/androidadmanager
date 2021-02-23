@@ -1,6 +1,7 @@
 package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
@@ -29,6 +30,10 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         //IntegrationHelper.validateIntegration(activity);
         IronSource.init(activity, appId, IronSource.AD_UNIT.INTERSTITIAL, IronSource.AD_UNIT.BANNER, IronSource.AD_UNIT.REWARDED_VIDEO)
         isInitialized = true
+    }
+
+    override fun initialize(context: Context) {
+
     }
 
     override fun enableTestMode(deviceId: String?) {

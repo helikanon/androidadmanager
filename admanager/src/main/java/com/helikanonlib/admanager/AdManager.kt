@@ -2,6 +2,7 @@ package com.helikanonlib.admanager
 
 
 import android.app.Activity
+import android.content.Context
 import android.os.Handler
 import android.os.HandlerThread
 import android.widget.RelativeLayout
@@ -61,18 +62,30 @@ class AdManager {
         this.adPlatforms = builder.adPlatforms
     }
 
-    fun initialize(activity: Activity) {
+    /*fun initialize(context: Context) {
         if (!showAds) return
 
         initializePlatforms(activity)
         start(activity)
-    }
+    }*/
 
-    fun initializePlatforms(activity: Activity) {
+    fun initializePlatformsWithActivity(activity: Activity) {
         if (!showAds) return
 
         adPlatforms.forEach forEach@{ platform ->
             platform.platformInstance.initialize(activity)
+
+            if (testMode) {
+                platform.platformInstance.enableTestMode(deviceId)
+            }
+        }
+    }
+
+    fun initializePlatforms(context: Context) {
+        if (!showAds) return
+
+        adPlatforms.forEach forEach@{ platform ->
+            platform.platformInstance.initialize(context)
 
             if (testMode) {
                 platform.platformInstance.enableTestMode(deviceId)

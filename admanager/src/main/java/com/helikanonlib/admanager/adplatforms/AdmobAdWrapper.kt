@@ -42,9 +42,12 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun initialize(activity: Activity) {
+    }
+
+    override fun initialize(context: Context) {
         if (isInitialized) return
 
-        MobileAds.initialize(activity.applicationContext)
+        MobileAds.initialize(context)
         isInitialized = true
     }
 
@@ -54,6 +57,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         rewardedPlacementId = "ca-app-pub-3940256099942544/5224354917"
         mrecPlacementId = "ca-app-pub-3940256099942544/6300978111"
         nativePlacementId = "ca-app-pub-3940256099942544/2247696110"
+        adOpenPlacementId = "ca-app-pub-3940256099942544/3419835294"
     }
 
     override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?) {
