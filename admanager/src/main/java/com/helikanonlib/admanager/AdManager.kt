@@ -266,8 +266,7 @@ class AdManager {
         if (lastShowDate != null) {
             val now = Date()
             val elapsedSeconds = (now.time - lastShowDate.time) / 1000
-            val requiredElapsedTime =
-                randInt(0, randomInterval) + interstitialMinElapsedSecondsToNextShow
+            val requiredElapsedTime = randInt(0, randomInterval) + interstitialMinElapsedSecondsToNextShow
             isAvailableToShow = elapsedSeconds > requiredElapsedTime
         }
 

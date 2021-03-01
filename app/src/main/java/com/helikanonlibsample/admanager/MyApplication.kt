@@ -30,6 +30,7 @@ class MyApplication : MultiDexApplication() {
             },
             object : AdPlatformLoadListener() {}
         )
+        admobAppOpenAdManager?.minElapsedSecondsToNextShow = 10
 
     }
 

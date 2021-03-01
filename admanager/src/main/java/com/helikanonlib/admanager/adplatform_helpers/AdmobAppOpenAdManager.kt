@@ -29,6 +29,8 @@ class AdmobAppOpenAdManager(
     // private val adOpenPlacementId = "ca-app-pub-3940256099942544/3419835294"
     private var isShowing = false
     private var loadTime: Long = 0
+    var lastShowDate: Date? = null
+    var minElapsedSecondsToNextShow = 10
 
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -41,7 +43,15 @@ class AdmobAppOpenAdManager(
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public fun onStart() {
         currentActivity?.let {
-            show(it, null)
+            var show = true
+
+            if (lastShowDate != null) {
+                val x = ((Date().time - lastShowDate!!.time) / 1000)
+                show = ((Date().time - lastShowDate!!.time) / 1000) > minElapsedSecondsToNextShow
+            }
+            if (show) {
+                show(it, null)
+            }
         } ?: load(null)
     }
 
@@ -92,11 +102,13 @@ class AdmobAppOpenAdManager(
             }
 
             override fun onAdShowedFullScreenContent() {
+                lastShowDate = Date()
                 isShowing = true
                 showListener?.onDisplayed(platform)
             }
 
             override fun onAdDismissedFullScreenContent() {
+                lastShowDate = Date() // kapattığında bunu güncellemeliyiz gösterdiğinde güncellememizin nedeni işimizi sağlama alalım
                 showListener?.onClosed(platform)
 
                 appOpenAd = null
