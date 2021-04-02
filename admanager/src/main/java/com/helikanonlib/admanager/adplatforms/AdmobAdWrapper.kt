@@ -346,6 +346,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun destroy(activity: Activity) {
         interstitial = null
         destroyBanner(activity)
+
         rewardedAd = null
         destroyMrec(activity)
     }

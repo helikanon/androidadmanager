@@ -262,8 +262,8 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun destroy(activity: Activity) {
-        startAppAd = null
-        startAppAdRewarded = null
+        //startAppAd = null
+        // startAppAdRewarded = null
         destroyBanner(activity)
         destroyMrec(activity)
     }

@@ -297,13 +297,12 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun destroy(activity: Activity) {
         interstitialAd?.destroy()
-        interstitialAd = null
+        //interstitialAd = null
 
         destroyBanner(activity)
 
         rewardedVideoAd?.destroy()
-        rewardedVideoAd = null
-
+        //rewardedVideoAd = null
 
         destroyMrec(activity)
     }
