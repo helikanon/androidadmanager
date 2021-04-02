@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
 
         initAds()
         initViews()
@@ -69,7 +69,28 @@ class MainActivity : AppCompatActivity() {
 
     fun initViews() {
         binding.btnShowInterstitial.setOnClickListener {
-            MyApplication.adManager.showInterstitial(this) // if autoload mode is false it will load and show
+            MyApplication.adManager.showInterstitial(this,object:AdPlatformShowListener(){
+                override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
+                    super.onDisplayed(adPlatformEnum)
+                }
+
+                override fun onClicked(adPlatformEnum: AdPlatformTypeEnum?) {
+                    super.onClicked(adPlatformEnum)
+                }
+
+                override fun onClosed(adPlatformEnum: AdPlatformTypeEnum?) {
+                    super.onClosed(adPlatformEnum)
+                }
+
+                override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum?) {
+                    super.onRewarded(type, amount, adPlatformEnum)
+                }
+
+                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                    super.onError(errorMode, errorMessage, adPlatformEnum)
+                }
+
+            }) // if autoload mode is false it will load and show
         }
 
         binding.btnShowRewarded.setOnClickListener {

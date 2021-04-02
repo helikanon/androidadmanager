@@ -14,8 +14,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 21
-        versionName "2.002"
+        versionCode 23
+        versionName "2.003"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -59,12 +59,12 @@ dependencies {
     implementation 'com.facebook.android:audience-network-sdk:5.+'
 
     // startapp
-    implementation 'com.startapp:inapp-sdk:4.6.3'
+    implementation 'com.startapp:inapp-sdk:4.8.4'
 
     // ironsource
-    implementation 'com.ironsource.sdk:mediationsdk:7.1.0'
     implementation 'com.google.android.gms:play-services-ads-identifier:17.0.0'
     implementation 'com.google.android.gms:play-services-basement:17.5.0'
+    implementation 'com.ironsource.sdk:mediationsdk:7.1.4.1'
 
     // mopub
     /*implementation('com.mopub:mopub-sdk:+@aar') {

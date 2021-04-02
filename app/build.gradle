@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId "com.helikanonlibsample.admanager"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 20
         versionName "2.0"
