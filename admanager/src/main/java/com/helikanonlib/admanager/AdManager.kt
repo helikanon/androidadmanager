@@ -2,6 +2,7 @@ package com.helikanonlib.admanager
 
 
 import android.app.Activity
+import android.content.Context
 import android.os.Handler
 import android.os.HandlerThread
 import android.widget.RelativeLayout
@@ -61,14 +62,14 @@ class AdManager {
         this.adPlatforms = builder.adPlatforms
     }
 
-    fun initialize(activity: Activity) {
+    /*fun initialize(context: Context) {
         if (!showAds) return
 
         initializePlatforms(activity)
         start(activity)
-    }
+    }*/
 
-    fun initializePlatforms(activity: Activity) {
+    fun initializePlatformsWithActivity(activity: Activity) {
         if (!showAds) return
 
         adPlatforms.forEach forEach@{ platform ->
@@ -80,9 +81,21 @@ class AdManager {
         }
     }
 
+    fun initializePlatforms(context: Context) {
+        if (!showAds) return
+
+        adPlatforms.forEach forEach@{ platform ->
+            platform.platformInstance.initialize(context)
+
+            if (testMode) {
+                platform.platformInstance.enableTestMode(deviceId)
+            }
+        }
+    }
+
     fun start(activity: Activity) {
         if (autoLoad) {
-            loadInterstitial(activity)
+            loadInterstitial(activity, parallel = true)
             loadRewarded(activity)
         }
     }
@@ -149,61 +162,25 @@ class AdManager {
         return filteredAdPlatforms
     }
 
-    fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null) {
+    @JvmOverloads
+    fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null, parallel: Boolean = false) {
         if (!showAds) return
 
         if (platform == null) {
-            _loadInterstitialFromFirstAvailable(activity, listener, 0)
+            if (parallel) {
+                // send true parallel when first load after init ads. Else you dont need parallel load
+                val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL)
+                interstitialAdPlatforms.forEach forEach@{ _platform ->
+                    if (!_platform.platformInstance.isInterstitialLoaded()) {
+                        _loadInterstitial(activity, listener, platform = _platform)
+                    }
+                }
+            } else {
+                _loadInterstitialFromFirstAvailable(activity, listener, 0)
+            }
         } else {
             _loadInterstitial(activity, listener = listener, platform = platform)
         }
-    }
-
-    private fun _loadInterstitialFromFirstAvailable(activity: Activity, listener: AdPlatformLoadListener? = null, index: Int = 0) {
-        val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL)
-        if (interstitialAdPlatforms.size == 0) {
-            return
-        }
-        val platform = interstitialAdPlatforms[index]
-
-        val _listener = object : AdPlatformLoadListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                if ((index + 1) < interstitialAdPlatforms.size) {
-                    activity.runOnUiThread { _loadInterstitialFromFirstAvailable(activity, listener, index + 1) }
-                } else {
-                    globalInterstitialLoadListener?.onError(AdErrorMode.MANAGER, "No interstitial found in all platforms")
-                    listener?.onError(AdErrorMode.MANAGER, "No interstitial found in all platforms")
-                }
-                globalInterstitialLoadListener?.onError(errorMode, errorMessage)
-                listener?.onError(errorMode, errorMessage)
-            }
-
-            override fun onLoaded() {
-                globalInterstitialLoadListener?.onLoaded()
-                listener?.onLoaded()
-            }
-        }
-        platform.platformInstance.loadInterstitial(activity, _listener)
-    }
-
-    private fun _loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel) {
-        val _listener = object : AdPlatformLoadListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                globalInterstitialLoadListener?.onError(errorMode, errorMessage)
-                listener?.onError(errorMode, errorMessage)
-
-                globalInterstitialLoadListener?.onError(AdErrorMode.MANAGER, errorMessage)
-                listener?.onError(AdErrorMode.MANAGER, errorMessage)
-            }
-
-            override fun onLoaded() {
-
-                globalInterstitialLoadListener?.onLoaded()
-                listener?.onLoaded()
-            }
-
-        }
-        platform.platformInstance.loadInterstitial(activity, _listener)
     }
 
     @JvmOverloads
@@ -214,12 +191,12 @@ class AdManager {
         we wants call listener?.onError by _showInterstitial
          */
         val loadListener: AdPlatformLoadListener = object : AdPlatformLoadListener() {
-            override fun onLoaded() {
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
                 // this listener will trigger just one time after firt load any platform
                 _showInterstitial(activity, listener, platform)
             }
 
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 // it will come here for each ad platforms, so we wants only call _showInterstitial
                 // after try all platforms
                 // _showInterstitial will trigger user listener
@@ -232,6 +209,53 @@ class AdManager {
         loadInterstitial(activity, loadListener, platform)
     }
 
+    private fun _loadInterstitialFromFirstAvailable(activity: Activity, listener: AdPlatformLoadListener? = null, index: Int = 0) {
+        val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL)
+        if (interstitialAdPlatforms.size == 0) {
+            return
+        }
+        val platform = interstitialAdPlatforms[index]
+
+        val _listener = object : AdPlatformLoadListener() {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                if ((index + 1) < interstitialAdPlatforms.size) {
+                    activity.runOnUiThread { _loadInterstitialFromFirstAvailable(activity, listener, index + 1) }
+                } else {
+                    globalInterstitialLoadListener?.onError(AdErrorMode.MANAGER, "No interstitial found in all platforms", adPlatformEnum)
+                    listener?.onError(AdErrorMode.MANAGER, "No interstitial found in all platforms", adPlatformEnum)
+                }
+                globalInterstitialLoadListener?.onError(errorMode, errorMessage, adPlatformEnum)
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
+            }
+
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                globalInterstitialLoadListener?.onLoaded(adPlatformEnum)
+                listener?.onLoaded(adPlatformEnum)
+            }
+        }
+        platform.platformInstance.loadInterstitial(activity, _listener)
+    }
+
+    private fun _loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel) {
+        val _listener = object : AdPlatformLoadListener() {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                globalInterstitialLoadListener?.onError(errorMode, errorMessage, adPlatformEnum)
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
+
+                globalInterstitialLoadListener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum)
+                listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum)
+            }
+
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+
+                globalInterstitialLoadListener?.onLoaded(adPlatformEnum)
+                listener?.onLoaded(adPlatformEnum)
+            }
+
+        }
+        platform.platformInstance.loadInterstitial(activity, _listener)
+    }
+
     @JvmOverloads
     fun showInterstitialForTimeStrategy(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null) {
         if (!showAds) return
@@ -242,8 +266,7 @@ class AdManager {
         if (lastShowDate != null) {
             val now = Date()
             val elapsedSeconds = (now.time - lastShowDate.time) / 1000
-            val requiredElapsedTime =
-                randInt(0, randomInterval) + interstitialMinElapsedSecondsToNextShow
+            val requiredElapsedTime = randInt(0, randomInterval) + interstitialMinElapsedSecondsToNextShow
             isAvailableToShow = elapsedSeconds > requiredElapsedTime
         }
 
@@ -273,34 +296,34 @@ class AdManager {
         val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL)
 
         val _listener = object : AdPlatformShowListener() {
-            override fun onClosed() {
+            override fun onClosed(adPlatformEnum: AdPlatformTypeEnum?) {
                 // on close load new one for next show
                 if (autoLoad) {
                     _autoloadInterstitialByHandler(activity, null, platform)
                 }
-                globalInterstitialShowListener?.onClosed()
-                listener?.onClosed()
+                globalInterstitialShowListener?.onClosed(adPlatformEnum)
+                listener?.onClosed(adPlatformEnum)
             }
 
-            override fun onDisplayed() {
-                globalInterstitialShowListener?.onDisplayed()
-                listener?.onDisplayed()
+            override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
+                globalInterstitialShowListener?.onDisplayed(adPlatformEnum)
+                listener?.onDisplayed(adPlatformEnum)
             }
 
-            override fun onClicked() {
-                globalInterstitialShowListener?.onClicked()
-                listener?.onClicked()
+            override fun onClicked(adPlatformEnum: AdPlatformTypeEnum?) {
+                globalInterstitialShowListener?.onClicked(adPlatformEnum)
+                listener?.onClicked(adPlatformEnum)
             }
 
-            override fun onRewarded(type: String?, amount: Int?) {
-                globalInterstitialShowListener?.onRewarded()
-                listener?.onRewarded()
+            override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum?) {
+                globalInterstitialShowListener?.onRewarded(type, amount, adPlatformEnum)
+                listener?.onRewarded(type, amount, adPlatformEnum)
             }
 
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                globalInterstitialShowListener?.onError(errorMode, errorMessage)
-                listener?.onError(errorMode, errorMessage) // call for adplatform
-                listener?.onError(AdErrorMode.MANAGER, errorMessage) // call for manager
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                globalInterstitialShowListener?.onError(errorMode, errorMessage, adPlatformEnum)
+                listener?.onError(errorMode, errorMessage, adPlatformEnum) // call for adplatform
+                listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum) // call for manager
             }
         }
 
@@ -327,8 +350,8 @@ class AdManager {
         if (isShowed) {
             saveLastShowDate(AdFormatEnum.INTERSTITIAL)
         } else {
-            globalInterstitialShowListener?.onError(AdErrorMode.MANAGER, "there is no loaded interstitial for show. All platforms is not loaded")
-            listener?.onError(AdErrorMode.MANAGER, "there is no loaded interstitial for show. All platforms is not loaded")
+            globalInterstitialShowListener?.onError(AdErrorMode.MANAGER, "there is no loaded interstitial for show. All platforms is not loaded", null)
+            listener?.onError(AdErrorMode.MANAGER, "there is no loaded interstitial for show. All platforms is not loaded", null)
             if (autoLoad) {
                 _autoloadInterstitialByHandler(activity, null, platform)
             }
@@ -368,6 +391,7 @@ class AdManager {
             if (bannerAdPlatforms.size > 0) {
                 run breaker@{
                     bannerAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
+
                         if (_platform.platformInstance.isBannerLoaded()) {
                             startFrom = i
                             return@breaker
@@ -388,18 +412,18 @@ class AdManager {
         }
 
         val _listener = object : AdPlatformShowListener() {
-            override fun onDisplayed() {
+            override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
                 saveLastShowDate(AdFormatEnum.BANNER)
-                listener?.onDisplayed()
+                listener?.onDisplayed(adPlatformEnum)
             }
 
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 if ((index + 1) < bannerAdPlatforms.size) {
                     activity.runOnUiThread { _showBannerFromFirstAvailable(activity, containerView, listener, index + 1) }
                 } else {
-                    listener?.onError(AdErrorMode.MANAGER, errorMessage) // there is no banner ads. Tried on all platforms
+                    listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum) // there is no banner ads. Tried on all platforms
                 }
-                listener?.onError(errorMode, errorMessage)
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
             }
         }
 
@@ -410,23 +434,35 @@ class AdManager {
     private fun _showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null, platform: AdPlatformModel) {
 
         platform.platformInstance.showBanner(activity, containerView, object : AdPlatformShowListener() {
-            override fun onDisplayed() {
+            override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
                 saveLastShowDate(AdFormatEnum.BANNER)
-                listener?.onDisplayed()
+                listener?.onDisplayed(adPlatformEnum)
             }
 
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                listener?.onError(errorMode, errorMessage)
-                listener?.onError(AdErrorMode.MANAGER, errorMessage)
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
+                listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum)
             }
         })
     }
 
-    fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null) {
+    @JvmOverloads
+    fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null, parallel: Boolean = false) {
         if (!showAds) return
 
         if (platform == null) {
-            _loadRewardedFromFirstAvailable(activity, listener)
+            if (parallel) {
+                // send true parallel when first load after init ads. Else you dont need parallel load
+                val rewardedAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.REWARDED)
+                rewardedAdPlatforms.forEach forEach@{ _platform ->
+                    if (!_platform.platformInstance.isRewardedLoaded()) {
+                        _loadRewarded(activity, listener, platform = _platform)
+                    }
+                }
+            } else {
+                _loadRewardedFromFirstAvailable(activity, listener)
+            }
+
         } else {
             _loadRewarded(activity, listener, platform)
         }
@@ -434,17 +470,17 @@ class AdManager {
 
     private fun _loadRewarded(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel) {
         val _listener = object : AdPlatformLoadListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                globalRewardedLoadListener?.onError(errorMode, errorMessage)
-                listener?.onError(errorMode, errorMessage)
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                globalRewardedLoadListener?.onError(errorMode, errorMessage, adPlatformEnum)
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
 
-                globalRewardedLoadListener?.onError(AdErrorMode.MANAGER, errorMessage)
-                listener?.onError(AdErrorMode.MANAGER, errorMessage)
+                globalRewardedLoadListener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum)
+                listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum)
             }
 
-            override fun onLoaded() {
-                globalRewardedLoadListener?.onLoaded()
-                listener?.onLoaded()
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                globalRewardedLoadListener?.onLoaded(adPlatformEnum)
+                listener?.onLoaded(adPlatformEnum)
             }
 
         }
@@ -460,22 +496,22 @@ class AdManager {
         val platform = rewardedAdPlatforms[index]
 
         val _listener = object : AdPlatformLoadListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 if ((index + 1) < rewardedAdPlatforms.size) {
                     activity.runOnUiThread { _loadRewardedFromFirstAvailable(activity, listener, index + 1) }
                 } else {
-                    globalRewardedLoadListener?.onError(AdErrorMode.MANAGER, "No rewarded found in all platforms")
-                    listener?.onError(AdErrorMode.MANAGER, "No rewarded found in all platforms")
+                    globalRewardedLoadListener?.onError(AdErrorMode.MANAGER, "No rewarded found in all platforms", null)
+                    listener?.onError(AdErrorMode.MANAGER, "No rewarded found in all platforms", adPlatformEnum)
 
                 }
-                globalRewardedLoadListener?.onError(errorMode, errorMessage)
-                listener?.onError(errorMode, errorMessage)
+                globalRewardedLoadListener?.onError(errorMode, errorMessage, adPlatformEnum)
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
 
             }
 
-            override fun onLoaded() {
-                globalRewardedLoadListener?.onLoaded()
-                listener?.onLoaded()
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                globalRewardedLoadListener?.onLoaded(adPlatformEnum)
+                listener?.onLoaded(adPlatformEnum)
 
             }
         }
@@ -490,11 +526,11 @@ class AdManager {
         we wants call listener?.onError by _showRewarded
          */
         val loadListener: AdPlatformLoadListener = object : AdPlatformLoadListener() {
-            override fun onLoaded() {
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
                 _showRewarded(activity, listener, platform)
             }
 
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 if (errorMode == AdErrorMode.MANAGER) {
                     _showRewarded(activity, listener, platform)
                 }
@@ -523,34 +559,34 @@ class AdManager {
 
         val rewardedAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.REWARDED)
         val _listener = object : AdPlatformShowListener() {
-            override fun onClosed() {
+            override fun onClosed(adPlatformEnum: AdPlatformTypeEnum?) {
                 // on close load new one for next show
                 if (autoLoad) {
                     _autoloadRewardedByHandler(activity, null, platform)
                 }
-                globalRewardedShowListener?.onClosed()
-                listener?.onClosed()
+                globalRewardedShowListener?.onClosed(adPlatformEnum)
+                listener?.onClosed(adPlatformEnum)
             }
 
-            override fun onDisplayed() {
-                globalRewardedShowListener?.onDisplayed()
-                listener?.onDisplayed()
+            override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
+                globalRewardedShowListener?.onDisplayed(adPlatformEnum)
+                listener?.onDisplayed(adPlatformEnum)
             }
 
-            override fun onClicked() {
-                globalRewardedShowListener?.onClicked()
-                listener?.onClicked()
+            override fun onClicked(adPlatformEnum: AdPlatformTypeEnum?) {
+                globalRewardedShowListener?.onClicked(adPlatformEnum)
+                listener?.onClicked(adPlatformEnum)
             }
 
-            override fun onRewarded(type: String?, amount: Int?) {
-                globalRewardedShowListener?.onRewarded()
-                listener?.onRewarded()
+            override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum?) {
+                globalRewardedShowListener?.onRewarded(type, amount, adPlatformEnum)
+                listener?.onRewarded(type, amount, adPlatformEnum)
             }
 
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                globalRewardedShowListener?.onError(errorMode, errorMessage)
-                listener?.onError(errorMode, errorMessage)
-                listener?.onError(AdErrorMode.MANAGER, errorMessage)
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                globalRewardedShowListener?.onError(errorMode, errorMessage, adPlatformEnum)
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
+                listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum)
             }
         }
 
@@ -577,8 +613,8 @@ class AdManager {
         if (isShowed) {
             saveLastShowDate(AdFormatEnum.REWARDED)
         } else {
-            globalRewardedShowListener?.onError(AdErrorMode.MANAGER, "There is no loaded rewarded. Tried in all platforms")
-            listener?.onError(AdErrorMode.MANAGER, "There is no loaded rewarded. Tried in all platforms")
+            globalRewardedShowListener?.onError(AdErrorMode.MANAGER, "There is no loaded rewarded. Tried in all platforms", null)
+            listener?.onError(AdErrorMode.MANAGER, "There is no loaded rewarded. Tried in all platforms", null)
             if (autoLoad) {
                 _autoloadRewardedByHandler(activity, null, platform)
             }
@@ -621,18 +657,18 @@ class AdManager {
         val platform = mrecAdPlatforms[index]
 
         platform.platformInstance.showMrec(activity, containerView, object : AdPlatformShowListener() {
-            override fun onDisplayed() {
+            override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
                 saveLastShowDate(AdFormatEnum.MREC)
-                listener?.onDisplayed()
+                listener?.onDisplayed(adPlatformEnum)
             }
 
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 if ((index + 1) < mrecAdPlatforms.size) {
                     activity.runOnUiThread { _showMrecFromFirstAvailable(activity, containerView, listener, index + 1) }
                 } else {
-                    listener?.onError(AdErrorMode.MANAGER, errorMessage) // not found any ads in all platforms
+                    listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum) // not found any ads in all platforms
                 }
-                listener?.onError(errorMode, errorMessage)
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
             }
         })
     }
@@ -640,14 +676,14 @@ class AdManager {
     private fun _showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null, platform: AdPlatformModel) {
 
         platform.platformInstance.showMrec(activity, containerView, object : AdPlatformShowListener() {
-            override fun onDisplayed() {
+            override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
                 saveLastShowDate(AdFormatEnum.MREC)
-                listener?.onDisplayed()
+                listener?.onDisplayed(adPlatformEnum)
             }
 
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                listener?.onError(errorMode, errorMessage)
-                listener?.onError(AdErrorMode.MANAGER, errorMessage)
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
+                listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum)
             }
         })
     }

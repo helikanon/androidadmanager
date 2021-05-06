@@ -1,6 +1,9 @@
 package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
+import android.content.Context
+import android.view.View
+import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.helikanonlib.admanager.*
 import com.ironsource.mediationsdk.ISBannerSize
@@ -29,19 +32,23 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         isInitialized = true
     }
 
+    override fun initialize(context: Context) {
+
+    }
+
     override fun enableTestMode(deviceId: String?) {
 
     }
 
     override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isInterstitialLoaded()) {
-            listener?.onLoaded()
+            listener?.onLoaded(platform)
             return
         }
 
         IronSource.setInterstitialListener(object : InterstitialListener {
             override fun onInterstitialAdLoadFailed(p0: IronSourceError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >>${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >>${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onInterstitialAdClosed() {
@@ -57,7 +64,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             }
 
             override fun onInterstitialAdReady() {
-                listener?.onLoaded()
+                listener?.onLoaded(platform)
             }
 
             override fun onInterstitialAdOpened() {
@@ -74,25 +81,25 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
 
     override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isInterstitialLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noadsloaded")
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noadsloaded", platform)
             return
         }
 
         IronSource.setInterstitialListener(object : InterstitialListener {
             override fun onInterstitialAdLoadFailed(p0: IronSourceError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onInterstitialAdClosed() {
-                listener?.onClosed()
+                listener?.onClosed(platform)
             }
 
             override fun onInterstitialAdShowFailed(p0: IronSourceError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onInterstitialAdClicked() {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
 
             override fun onInterstitialAdReady() {
@@ -104,7 +111,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             }
 
             override fun onInterstitialAdShowSucceeded() {
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             }
         })
         IronSource.showInterstitial(interstitialPlacementId)
@@ -129,29 +136,31 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             try {
                 _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
-                listener?.onDisplayed()
+                bannerAdView?.visibility = View.VISIBLE
+                listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded", platform)
             }
             return
         }
 
         bannerAdView = IronSource.createBanner(activity, ISBannerSize.BANNER)
-        bannerAdView?.placementName = ""
         bannerAdView?.bannerListener = object : BannerListener {
             override fun onBannerAdClicked() {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
 
             override fun onBannerAdLoadFailed(p0: IronSourceError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onBannerAdLoaded() {
-                val a = bannerAdView?.placementName
-                _removeBannerViewIfExists(bannerAdView)
-                containerView.addView(bannerAdView, lp)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(bannerAdView)
+                    containerView.addView(bannerAdView, lp)
+                    bannerAdView?.visibility = View.VISIBLE
+                    listener?.onDisplayed(platform)
+                }
             }
 
             override fun onBannerAdLeftApplication() {
@@ -172,37 +181,37 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
 
     override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isRewardedLoaded()) {
-            listener?.onLoaded()
+            listener?.onLoaded(platform)
         } else {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> load error")
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> load error", platform)
         }
     }
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded")
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded", platform)
             return
         }
 
         IronSource.setRewardedVideoListener(object : RewardedVideoListener {
             override fun onRewardedVideoAdClosed() {
-                listener?.onClosed()
+                listener?.onClosed(platform)
             }
 
             override fun onRewardedVideoAdRewarded(p0: Placement?) {
-                listener?.onRewarded(p0?.rewardName, p0?.rewardAmount)
+                listener?.onRewarded(p0?.rewardName, p0?.rewardAmount, platform)
             }
 
             override fun onRewardedVideoAdClicked(p0: Placement?) {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
 
             override fun onRewardedVideoAdOpened() {
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             }
 
             override fun onRewardedVideoAdShowFailed(p0: IronSourceError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}", platform)
             }
 
             // TODO debug this method
@@ -240,7 +249,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
 
     override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?) {
         if (bannerAdView != null) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> allow only one banner in app. Already a banner created before") // ironsource allow only one banner at time
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> allow only one banner in app. Already a banner created before", platform) // ironsource allow only one banner at time
             return
         }
 
@@ -254,9 +263,10 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             try {
                 _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView, lp)
-                listener?.onDisplayed()
+                mrecAdView?.visibility = View.VISIBLE
+                listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded", platform)
             }
             return
         }
@@ -264,17 +274,20 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         mrecAdView = IronSource.createBanner(activity, ISBannerSize.RECTANGLE)
         mrecAdView?.bannerListener = object : BannerListener {
             override fun onBannerAdClicked() {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
 
             override fun onBannerAdLoadFailed(p0: IronSourceError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onBannerAdLoaded() {
-                _removeBannerViewIfExists(mrecAdView)
-                containerView.addView(mrecAdView, lp)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(mrecAdView)
+                    containerView.addView(mrecAdView, lp)
+                    mrecAdView?.visibility = View.VISIBLE
+                    listener?.onDisplayed(platform)
+                }
             }
 
             override fun onBannerAdLeftApplication() {
@@ -293,13 +306,21 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         IronSource.loadBanner(mrecAdView, mrecPlacementId)
     }
 
+    override fun isNativeLoaded(): Boolean {
+        return nativeAds.size > 0
+    }
+
+    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?) {
+        listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
+    }
+
+    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener?) {
+        listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
+    }
+
     override fun destroy(activity: Activity) {
         destroyBanner(activity)
-
-        mrecAdView?.let {
-            IronSource.destroyBanner(mrecAdView)
-            mrecAdView = null
-        }
+        destroyMrec(activity)
     }
 
     override fun destroyBanner(activity: Activity) {

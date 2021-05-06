@@ -3,6 +3,7 @@ package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
 import android.content.Context
+import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.facebook.ads.*
 import com.helikanonlib.admanager.*
@@ -27,8 +28,11 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun initialize(activity: Activity) {
+    }
+
+    override fun initialize(context: Context) {
         if (isInitialized) return
-        AudienceNetworkAds.initialize(activity.applicationContext);
+        AudienceNetworkAds.initialize(context);
 
         isInitialized = true
     }
@@ -40,7 +44,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isInterstitialLoaded()) {
-            listener?.onLoaded()
+            listener?.onLoaded(platform)
             return
         }
 
@@ -59,11 +63,11 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p1?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p1?.errorMessage ?: ""}", platform)
             }
 
             override fun onAdLoaded(p0: Ad?) {
-                listener?.onLoaded()
+                listener?.onLoaded(platform)
             }
 
             override fun onLoggingImpression(p0: Ad?) {
@@ -77,26 +81,26 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isInterstitialLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded")
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded", platform)
             return
         }
 
         if (listener != null) {
             interstitialAd?.setAdListener(object : InterstitialAdListener {
                 override fun onInterstitialDisplayed(p0: Ad?) {
-                    listener?.onDisplayed()
+                    listener?.onDisplayed(platform)
                 }
 
                 override fun onAdClicked(p0: Ad?) {
-                    listener?.onClicked()
+                    listener?.onClicked(platform)
                 }
 
                 override fun onInterstitialDismissed(p0: Ad?) {
-                    listener?.onClosed()
+                    listener?.onClosed(platform)
                 }
 
                 override fun onError(p0: Ad?, p1: AdError?) {
-                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} >> ${p1?.errorMessage ?: ""}")
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} >> ${p1?.errorMessage ?: ""}", platform)
                 }
 
                 override fun onAdLoaded(p0: Ad?) {
@@ -125,9 +129,9 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             try {
                 _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView)
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded error")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded error", platform)
             }
             return
         }
@@ -136,17 +140,19 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         bannerAdView?.setAdListener(object : AdListener {
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> ${p1?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> ${p1?.errorMessage ?: ""}", platform)
             }
 
             override fun onAdLoaded(p0: Ad?) {
-                _removeBannerViewIfExists(bannerAdView)
-                containerView.addView(bannerAdView)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(bannerAdView)
+                    containerView.addView(bannerAdView)
+                    listener?.onDisplayed(platform)
+                }
             }
 
             override fun onAdClicked(p0: Ad?) {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
 
             override fun onLoggingImpression(p0: Ad?) {}
@@ -159,7 +165,7 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?) {
         if (isRewardedLoaded()) {
-            listener?.onLoaded()
+            listener?.onLoaded(platform)
             return
         }
 
@@ -178,11 +184,11 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p1?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p1?.errorMessage ?: ""}", platform)
             }
 
             override fun onAdLoaded(p0: Ad?) {
-                listener?.onLoaded()
+                listener?.onLoaded(platform)
             }
 
             override fun onLoggingImpression(p0: Ad?) {
@@ -195,25 +201,25 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
         if (!isRewardedLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noads loaded")
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noads loaded", platform)
             return
         }
 
         rewardedVideoAd?.setAdListener(object : RewardedVideoAdListener {
             override fun onRewardedVideoClosed() {
-                listener?.onClosed()
+                listener?.onClosed(platform)
             }
 
             override fun onAdClicked(p0: Ad?) {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
 
             override fun onRewardedVideoCompleted() {
-                listener?.onRewarded(null, null)
+                listener?.onRewarded(null, null, platform)
             }
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p1?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p1?.errorMessage ?: ""}", platform)
             }
 
             override fun onAdLoaded(p0: Ad?) {
@@ -243,9 +249,9 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             try {
                 _removeBannerViewIfExists(mrecAdView)
                 containerView.addView(mrecAdView)
-                listener?.onDisplayed()
+                listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded error")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> isbannerloaded error", platform)
             }
             return
         }
@@ -254,17 +260,19 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         mrecAdView?.setAdListener(object : AdListener {
 
             override fun onError(p0: Ad?, p1: AdError?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ${p1?.errorMessage ?: ""}")
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ${p1?.errorMessage ?: ""}", platform)
             }
 
             override fun onAdLoaded(p0: Ad?) {
-                _removeBannerViewIfExists(mrecAdView)
-                containerView.addView(mrecAdView)
-                listener?.onDisplayed()
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(mrecAdView)
+                    containerView.addView(mrecAdView)
+                    listener?.onDisplayed(platform)
+                }
             }
 
             override fun onAdClicked(p0: Ad?) {
-                listener?.onClicked()
+                listener?.onClicked(platform)
             }
 
             override fun onLoggingImpression(p0: Ad?) {}
@@ -274,19 +282,29 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         mrecAdView?.loadAd()
     }
 
+    override fun isNativeLoaded(): Boolean {
+        return nativeAds.size > 0
+    }
+
+    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?) {
+        listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
+    }
+
+    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener?) {
+        listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
+    }
+
 
     override fun destroy(activity: Activity) {
         interstitialAd?.destroy()
-        interstitialAd = null
+        //interstitialAd = null
 
         destroyBanner(activity)
 
         rewardedVideoAd?.destroy()
-        rewardedVideoAd = null
+        //rewardedVideoAd = null
 
-
-        mrecAdView?.destroy()
-        mrecAdView = null
+        destroyMrec(activity)
     }
 
     override fun destroyBanner(activity: Activity) {

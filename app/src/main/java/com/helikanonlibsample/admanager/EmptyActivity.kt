@@ -1,23 +1,25 @@
 package com.helikanonlibsample.admanager
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.helikanonlib.admanager.AdErrorMode
 import com.helikanonlib.admanager.AdPlatformShowListener
-import com.helikanonlibsample.admanager.MainActivity.Companion.adManager
-import kotlinx.android.synthetic.main.activity_main.*
+import com.helikanonlib.admanager.AdPlatformTypeEnum
+import com.helikanonlibsample.admanager.databinding.ActivityEmptyBinding
 
 class EmptyActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityEmptyBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityEmptyBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_empty)
 
-
-
-        MainActivity.adManager.showBanner(this,bannerContainer, object : AdPlatformShowListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
-                Log.d("adManager", "showBanner>> $errorMode $errorMessage")
+        MyApplication.adManager.showBanner(this, binding.bannerContainer, object : AdPlatformShowListener() {
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                Log.d("adManager", "showBanner>> $errorMode $errorMessage ${adPlatformEnum?.name}")
             }
         })
     }
