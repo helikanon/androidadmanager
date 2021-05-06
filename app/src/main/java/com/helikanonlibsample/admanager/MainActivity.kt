@@ -116,6 +116,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnLoadAppOpenAd.setOnClickListener {
             MyApplication.admobAppOpenAdManager?.show(this,null)
+
+            //MyApplication.admobAppOpenAdManager?.disable()
         }
     }
 

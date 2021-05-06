@@ -31,6 +31,7 @@ class AdmobAppOpenAdManager(
     private var loadTime: Long = 0
     var lastShowDate: Date? = null
     var minElapsedSecondsToNextShow = 10
+    var isEnable = true
 
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -42,6 +43,8 @@ class AdmobAppOpenAdManager(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public fun onStart() {
+        if (!isEnable) return
+
         currentActivity?.let {
             var show = true
 
@@ -56,6 +59,8 @@ class AdmobAppOpenAdManager(
     }
 
     fun load(listener: AdPlatformLoadListener?) {
+        if (!isEnable) return
+
         if (listener != null) {
             loadListener = listener
         }
@@ -84,6 +89,8 @@ class AdmobAppOpenAdManager(
     }
 
     fun show(activity: Activity, listener: AdPlatformShowListener? = null) {
+        if (!isEnable) return
+
         if (listener != null) {
             showListener = listener
         }
@@ -119,6 +126,9 @@ class AdmobAppOpenAdManager(
         appOpenAd?.show(activity)
     }
 
+    fun disable(){
+        isEnable = false
+    }
 
     private fun wasLoadTimeLessThanNHoursAgo(numHours: Long): Boolean {
         val dateDifference: Long = Date().time - this.loadTime

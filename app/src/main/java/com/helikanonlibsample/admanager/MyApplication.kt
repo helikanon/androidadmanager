@@ -24,14 +24,27 @@ class MyApplication : MultiDexApplication() {
         admobAppOpenAdManager = AdmobAppOpenAdManager(this, "ca-app-pub-3940256099942544/3419835294",
             object : AdPlatformShowListener() {
                 override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
+                    Log.e("adManager", "AdmobAppOpenAdManager >>> success display")
+                }
 
+                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+
+                    Log.e("adManager", "AdmobAppOpenAdManager show error >>> $errorMessage")
                 }
 
             },
-            object : AdPlatformLoadListener() {}
+            object : AdPlatformLoadListener() {
+                override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                    Log.e("adManager", "AdmobAppOpenAdManager >>> success load")
+                }
+
+                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                    Log.e("adManager", "AdmobAppOpenAdManager load error >>> $errorMessage")
+                }
+
+            }
         )
         admobAppOpenAdManager?.minElapsedSecondsToNextShow = 10
-
     }
 
     fun initAdManager() {
