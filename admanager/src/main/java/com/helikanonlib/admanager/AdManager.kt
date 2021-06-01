@@ -446,6 +446,46 @@ class AdManager {
         })
     }
 
+    fun hasInterstitialRewarded(platform: AdPlatformModel? = null): Boolean {
+        var hasLoaded = false
+
+        val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL)
+        run breaker@{
+            interstitialAdPlatforms.forEach forEach@{ _platform ->
+                if (platform != null && _platform.platformInstance.platform != platform.platformInstance.platform) {
+                    return@forEach
+                }
+
+                if (_platform.platformInstance.isInterstitialLoaded()) {
+                    hasLoaded = true
+                    return@breaker
+                }
+            }
+        }
+
+        return hasLoaded
+    }
+
+    fun hasLoadedRewarded(platform: AdPlatformModel? = null): Boolean {
+        var hasLoaded = false
+
+        val rewardedAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.REWARDED)
+        run breaker@{
+            rewardedAdPlatforms.forEach forEach@{ _platform ->
+                if (platform != null && _platform.platformInstance.platform != platform.platformInstance.platform) {
+                    return@forEach
+                }
+
+                if (_platform.platformInstance.isRewardedLoaded()) {
+                    hasLoaded = true
+                    return@breaker
+                }
+            }
+        }
+
+        return hasLoaded
+    }
+
     @JvmOverloads
     fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null, parallel: Boolean = false) {
         if (!showAds) return

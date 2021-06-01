@@ -20,15 +20,16 @@ allprojects {
         google()
         jcenter()
 
-        maven { url "https://dl.bintray.com/ironsource-mobile/android-sdk" } // ironsource
-        maven {
+        // maven { url "https://dl.bintray.com/ironsource-mobile/android-sdk" } // ironsource
+        maven {url 'https://android-sdk.is.com/'}
+        /*maven {
             url "https://s3.amazonaws.com/moat-sdk-builds"
             // aşağıdaki content satırını mopub ve onesignal aynı projede olduğunda hata verdiği için koyduk. çözdü
             // https://github.com/mopub/mopub-android-sdk/issues/290#issuecomment-521563964
             content {
                 includeGroupByRegex "com\\.moat.*"
             }
-        } // mopub
+        } // mopub*/
     }
 }
 
