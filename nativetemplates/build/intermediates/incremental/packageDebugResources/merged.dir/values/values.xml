@@ -28,6 +28,6 @@
     <dimen name="gnt_text_size_large">15sp</dimen>
     <dimen name="gnt_text_size_small">12sp</dimen>
     <declare-styleable name="TemplateView">
-    <attr format="reference" name="gnt_template_type"/>
-  </declare-styleable>
+        <attr format="reference" name="gnt_template_type"/>
+    </declare-styleable>
 </resources>

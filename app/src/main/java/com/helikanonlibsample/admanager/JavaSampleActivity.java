@@ -16,7 +16,6 @@ import com.helikanonlib.admanager.AdPlatformShowListener;
 import com.helikanonlib.admanager.AdPlatformTypeEnum;
 import com.helikanonlib.admanager.AdPlatformWrapper;
 import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper;
-import com.helikanonlib.admanager.adplatforms.FacebookAdWrapper;
 import com.helikanonlib.admanager.adplatforms.IronSourceAdWrapper;
 import com.helikanonlib.admanager.adplatforms.StartAppAdWrapper;
 
@@ -133,18 +132,18 @@ public class JavaSampleActivity extends AppCompatActivity {
     }
 
     private void initAdManager() {
-        AdPlatformWrapper facebookAdWrapper = new FacebookAdWrapper("your_app_id");
+        /*AdPlatformWrapper facebookAdWrapper = new FacebookAdWrapper("your_app_id");
         facebookAdWrapper.setInterstitialPlacementId("YOUR_PLACEMENT_ID");
         facebookAdWrapper.setBannerPlacementId("YOUR_PLACEMENT_ID");
         facebookAdWrapper.setRewardedPlacementId("YOUR_PLACEMENT_ID");
-        facebookAdWrapper.setRewardedPlacementId("YOUR_PLACEMENT_ID");
+        facebookAdWrapper.setRewardedPlacementId("YOUR_PLACEMENT_ID");*/
 
 
         AdPlatformWrapper admobAdWrapper = new AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713");
         admobAdWrapper.setInterstitialPlacementId("ca-app-pub-3940256099942544/1033173712");
         admobAdWrapper.setBannerPlacementId("ca-app-pub-3940256099942544/6300978111");
         admobAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/5224354917");
-        facebookAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/6300978111");
+        // facebookAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/6300978111");
 
         AdPlatformWrapper startappAdWrapper = new StartAppAdWrapper("207754325");
 
@@ -165,7 +164,7 @@ public class JavaSampleActivity extends AppCompatActivity {
                 .testMode(BuildConfig.DEBUG)
                 .deviceId("47088e48-5195-4757-90b2-0da94116befd") // necessary if test mode enabled
                 .addAdPlatforms(
-                        new AdPlatformModel(facebookAdWrapper, true, true, true, true),
+                        // new AdPlatformModel(facebookAdWrapper, true, true, true, true),
                         new AdPlatformModel(admobAdWrapper, true, false, true, true),
                         new AdPlatformModel(startappAdWrapper, true, true, true, true),
                         new AdPlatformModel(ironsourceAdWrapper, true, true, true, false)

@@ -1,6 +1,6 @@
 package com.helikanonlib.admanager.adplatforms
 
-
+/*
 import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
@@ -9,11 +9,11 @@ import com.facebook.ads.*
 import com.helikanonlib.admanager.*
 
 
-/**
+*//**
  * *************************************************************************************************
  * FACEBOOK ADS HELPER
  * *************************************************************************************************
- */
+ *//*
 class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override val platform = AdPlatformTypeEnum.FACEBOOK
 
@@ -337,5 +337,5 @@ class FacebookAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun onPause(activity: Activity) {}
     override fun onStop(activity: Activity) {}
     override fun onResume(activity: Activity) {}
-}
+}*/
 

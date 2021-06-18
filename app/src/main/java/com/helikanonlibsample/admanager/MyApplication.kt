@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.multidex.MultiDexApplication
 import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper
-import com.helikanonlib.admanager.adplatforms.FacebookAdWrapper
 import com.helikanonlib.admanager.adplatforms.IronSourceAdWrapper
 import com.helikanonlib.admanager.adplatforms.StartAppAdWrapper
 
@@ -57,7 +56,7 @@ class MyApplication : MultiDexApplication() {
             testMode = BuildConfig.DEBUG
             deviceId = "47088e48-5195-4757-90b2-0da94116befd" // necessary if testmode enabled
             adPlatforms = mutableListOf<AdPlatformModel>(
-                AdPlatformModel(
+                /*AdPlatformModel(
                     FacebookAdWrapper("your_app_id").apply {
                         interstitialPlacementId = "YOUR_PLACEMENT_ID"
                         bannerPlacementId = "YOUR_PLACEMENT_ID"
@@ -65,7 +64,7 @@ class MyApplication : MultiDexApplication() {
                         mrecPlacementId = "YOUR_PLACEMENT_ID"
                     },
                     true, true, true, true
-                ),
+                ),*/
                 AdPlatformModel(
                     AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713").apply {
                         interstitialPlacementId = "ca-app-pub-3940256099942544/1033173712"
@@ -105,7 +104,7 @@ class MyApplication : MultiDexApplication() {
             )
         )*/
         adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,admob,facebook")
-        adManager.setAdPlatformSortByAdFormatStr("banner", "admob,ironsource,facebook,startapp")
+        adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,admob,facebook,startapp")
         adManager.setAdPlatformSortByAdFormatStr("rewarded", "ironsource,admob,startapp,facebook")
         adManager.setAdPlatformSortByAdFormatStr("mrec", "facebook,admob,startapp,ironsource")
 

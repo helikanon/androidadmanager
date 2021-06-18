@@ -124,3 +124,12 @@
     public static final ** CREATOR;
 }
 # ----------- MOPUB -----------
+
+
+# ----------- facebook -----------
+-dontwarn com.facebook.ads.internal.**
+-keeppackagenames com.facebook.*
+-keep public class com.facebook.ads.** {*;}
+-keep public class com.facebook.ads.**
+{ public protected *; }
+# ----------- facebook -----------

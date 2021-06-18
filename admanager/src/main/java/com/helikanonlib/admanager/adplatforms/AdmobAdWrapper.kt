@@ -8,11 +8,12 @@ import android.widget.RelativeLayout
 import com.google.android.ads.nativetemplates.NativeTemplateStyle
 import com.google.android.ads.nativetemplates.TemplateView
 import com.google.android.gms.ads.*
-import com.google.android.gms.ads.formats.NativeAdOptions
-import com.google.android.gms.ads.formats.UnifiedNativeAd
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdCallback
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.R
@@ -66,21 +67,20 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             return
         }
 
-        interstitial = InterstitialAd(activity.applicationContext)
-        interstitial?.adUnitId = interstitialPlacementId
-        interstitial?.adListener = object : AdListener() {
+        interstitial = null
+        InterstitialAd.load(
+            activity, interstitialPlacementId, AdRequest.Builder()
+                .build(), object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    listener?.onLoaded(platform)
+                    interstitial = interstitialAd
+                }
 
-            override fun onAdFailedToLoad(p0: Int) {
-                super.onAdFailedToLoad(p0)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> errorcode = $p0", platform)
-            }
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> error code=${adError.code} / ${adError.message}", platform)
+                }
+            })
 
-            override fun onAdLoaded() {
-                super.onAdLoaded()
-                listener?.onLoaded(platform)
-            }
-        }
-        interstitial?.loadAd(AdRequest.Builder().build())
     }
 
     override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?) {
@@ -90,29 +90,30 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         if (listener != null) {
-            interstitial?.adListener = object : AdListener() {
-                override fun onAdClicked() {
-                    super.onAdClicked()
-                    listener?.onClicked(platform)
+
+            interstitial?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial show >> error code=${adError.code} / ${adError.message}", platform)
+                    interstitial = null
                 }
 
-                override fun onAdClosed() {
-                    super.onAdClosed()
+                override fun onAdShowedFullScreenContent() {
+                    listener?.onDisplayed(platform)
+                    interstitial = null
+                }
+
+                override fun onAdDismissedFullScreenContent() {
                     listener?.onClosed(platform)
                 }
 
-                override fun onAdOpened() {
-                    super.onAdOpened()
-                    listener?.onDisplayed(platform)
-                }
-
             }
+
         }
-        interstitial?.show()
+        interstitial?.show(activity)
     }
 
     override fun isInterstitialLoaded(): Boolean {
-        return interstitial?.isLoaded ?: false
+        return interstitial != null
     }
 
     override fun isBannerLoaded(): Boolean {
@@ -140,10 +141,14 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         bannerAdView?.adSize = AdSize.SMART_BANNER
         bannerAdView?.adUnitId = bannerPlacementId
         bannerAdView?.adListener = object : AdListener() {
-            override fun onAdFailedToLoad(p0: Int) {
+            override fun onAdFailedToLoad(error: LoadAdError) {
+                super.onAdFailedToLoad(error)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=${error.code} / ${error.message}", platform)
+            }
+            /*override fun onAdFailedToLoad(p0: Int) {
                 super.onAdFailedToLoad(p0)
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=$p0", platform)
-            }
+            }*/
 
             override fun onAdLoaded() {
                 super.onAdLoaded()
@@ -168,17 +173,19 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             return
         }
 
-        rewardedAd = RewardedAd(activity.applicationContext, rewardedPlacementId)
-        val adLoadCallback = object : RewardedAdLoadCallback() {
-            override fun onRewardedAdLoaded() {
-                listener?.onLoaded(platform)
-            }
+        rewardedAd = null
+        RewardedAd.load(
+            activity, rewardedPlacementId, AdRequest.Builder()
+                .build(), object : RewardedAdLoadCallback() {
+                override fun onAdLoaded(p0: RewardedAd) {
+                    rewardedAd = p0
+                }
 
-            override fun onRewardedAdFailedToLoad(errorCode: Int) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> errorcode=$errorCode", platform)
-            }
-        }
-        rewardedAd?.loadAd(AdRequest.Builder().build(), adLoadCallback)
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded load >> error code=${adError.code} / ${adError.message}", platform)
+                }
+            })
+
     }
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
@@ -187,7 +194,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             return
         }
 
-        rewardedAd?.show(activity, object : RewardedAdCallback() {
+        /*rewardedAd?.show(activity, object : RewardedAdCallback() {
 
             override fun onRewardedAdFailedToShow(p0: Int) {
                 super.onRewardedAdFailedToShow(p0)
@@ -208,11 +215,37 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 listener?.onRewarded(p0.type, p0.amount, platform)
             }
 
+        })*/
+
+        if (listener != null) {
+
+            rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded show >> error code=${adError.code} / ${adError.message}", platform)
+                    rewardedAd = null
+                }
+
+                override fun onAdShowedFullScreenContent() {
+                    listener?.onDisplayed(platform)
+                    rewardedAd = null
+                }
+
+                override fun onAdDismissedFullScreenContent() {
+                    listener?.onClosed(platform)
+                }
+
+            }
+        }
+
+        rewardedAd?.show(activity, OnUserEarnedRewardListener() {
+            fun onUserEarnedReward(rewardItem: RewardItem) {
+                listener?.onRewarded(rewardItem.type, rewardItem.amount, platform)
+            }
         })
     }
 
     override fun isRewardedLoaded(): Boolean {
-        return rewardedAd?.isLoaded ?: false
+        return rewardedAd != null
     }
 
     override fun isMrecLoaded(): Boolean {
@@ -242,9 +275,10 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         mrecAdView?.adSize = AdSize.MEDIUM_RECTANGLE
         mrecAdView?.adUnitId = mrecPlacementId
         mrecAdView?.adListener = object : AdListener() {
-            override fun onAdFailedToLoad(p0: Int) {
-                super.onAdFailedToLoad(p0)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> errorcode=$p0", platform)
+            override fun onAdFailedToLoad(error: LoadAdError) {
+                super.onAdFailedToLoad(error)
+
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> errorcode=${error.code} / ${error.message}", platform)
             }
 
             override fun onAdLoaded() {
@@ -275,7 +309,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         // destroy olds
         try {
             nativeAds.forEach {
-                (it as UnifiedNativeAd).destroy()
+                (it as NativeAd).destroy()
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -284,13 +318,12 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         adLoader = AdLoader.Builder(activity, nativePlacementId)
-            .forUnifiedNativeAd { unifiedNativeAd: UnifiedNativeAd ->
-                nativeAds.add(unifiedNativeAd)
+            .forNativeAd { nativeAd ->
+                nativeAds.add(nativeAd)
 
                 if (!adLoader.isLoading) {
                     listener?.onLoaded(platform)
                 }
-
             }
             .withAdListener(object : AdListener() {
                 override fun onAdLoaded() {
@@ -304,8 +337,6 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             })
             .withNativeAdOptions(
                 NativeAdOptions.Builder()
-                    // Methods in the NativeAdOptions.Builder class can be
-                    // used here to specify individual options settings.
                     .build()
             )
             .build()
@@ -318,7 +349,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             return
         }
 
-        val nativeAd: UnifiedNativeAd = nativeAds[pos] as UnifiedNativeAd
+        val nativeAd: NativeAd = nativeAds[pos] as NativeAd
         val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val v = inflater.inflate(
             if (adSize == "small") {

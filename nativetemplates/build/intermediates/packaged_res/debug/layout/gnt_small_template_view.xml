@@ -2,7 +2,7 @@
 <merge xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
-  <com.google.android.gms.ads.formats.UnifiedNativeAdView
+  <com.google.android.gms.ads.nativead.NativeAdView
       android:layout_height="wrap_content"
       android:layout_width="match_parent"
       android:layout_centerInParent="true"
@@ -16,7 +16,6 @@
         android:background="@drawable/gnt_outline_shape"
         >
       <androidx.constraintlayout.widget.ConstraintLayout
-
           android:layout_width="@dimen/gnt_no_size"
           android:layout_height="@dimen/gnt_no_size"
           android:layout_marginEnd="@dimen/gnt_default_margin"
@@ -59,7 +58,7 @@
             app:layout_constraintStart_toEndOf="@id/icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-          >
+            >
           <LinearLayout
               android:id="@+id/headline"
               android:orientation="horizontal"
@@ -75,13 +74,12 @@
 
             <TextView
                 android:id="@+id/primary"
-                android:background="@color/gnt_white"
                 android:textStyle="bold"
                 android:textSize="@dimen/gnt_text_size_large"
                 android:textColor="@color/gnt_gray"
                 android:lines="1"
                 android:layout_height="match_parent"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_marginTop="@dimen/gnt_no_margin"
                 android:layout_marginBottom="@dimen/gnt_no_margin"
                 android:layout_marginStart="@dimen/gnt_no_margin"
@@ -124,11 +122,12 @@
             <RatingBar
                 android:id="@+id/rating_bar"
                 android:background="@color/gnt_white"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:textSize="@dimen/gnt_text_size_small"
                 android:textColor="@color/gnt_gray"
-                android:numStars="0"
+                android:numStars="5"
+                android:stepSize="0.1"
                 android:lines="1"
                 android:layout_marginTop="@dimen/gnt_no_margin"
                 android:layout_marginBottom="@dimen/gnt_no_margin"
@@ -143,7 +142,7 @@
             <TextView
                 android:id="@+id/secondary"
                 android:background="@color/gnt_white"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="top"
                 android:textSize="@dimen/gnt_text_size_small"
@@ -160,7 +159,7 @@
                 ></TextView>
 
           </LinearLayout>
-          <Button
+          <androidx.appcompat.widget.AppCompatButton
               android:id="@+id/cta"
               android:layout_width="match_parent"
               android:layout_height="@dimen/gnt_no_size"
@@ -181,6 +180,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-  </com.google.android.gms.ads.formats.UnifiedNativeAdView>
+  </com.google.android.gms.ads.nativead.NativeAdView>
 
 </merge>
