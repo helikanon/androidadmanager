@@ -76,6 +76,9 @@ dependencies {
 
     implementation project(path: ':admanager')
 
+    // for ironsource and inmobi
+    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.1'
+    implementation 'com.google.android.gms:play-services-basement:17.6.0'
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Add AdColony Network

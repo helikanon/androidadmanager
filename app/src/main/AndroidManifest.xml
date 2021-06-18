@@ -3,11 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.helikanonlibsample.admanager">
 
-    <uses-permission android:name="android.permission.INTERNET" /> <!-- Startapp -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Ironsource içinde gerekli -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Ironsource içinde gerekli -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
+
+
+    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />-->
+
 
     <application
         android:name=".MyApplication"

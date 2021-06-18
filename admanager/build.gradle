@@ -64,8 +64,6 @@ dependencies {
     implementation 'com.startapp:inapp-sdk:4.8.+'
 
     // ironsource
-    implementation 'com.google.android.gms:play-services-ads-identifier:17.0.1'
-    implementation 'com.google.android.gms:play-services-basement:17.6.0'
     implementation 'com.ironsource.sdk:mediationsdk:7.1.6'
 
     // mopub
