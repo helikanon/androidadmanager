@@ -138,23 +138,6 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, adWidth)
     }
 
-    fun getMrecBannerAdaptiveSize(activity: Activity, containerView: RelativeLayout): AdSize {
-        val display = activity.windowManager.defaultDisplay
-        val outMetrics = DisplayMetrics()
-        display.getMetrics(outMetrics)
-
-        val density = outMetrics.density
-
-        var adWidthPixels = containerView.width.toFloat()
-        if (adWidthPixels == 0f) {
-            adWidthPixels = outMetrics.widthPixels.toFloat()
-        }
-
-        val adWidth = (adWidthPixels / density).toInt()
-
-        return AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(activity, adWidth)
-    }
-
     override fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?) {
         val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
             .apply {
@@ -308,7 +291,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         mrecAdView = AdView(activity.applicationContext)
-        mrecAdView?.adSize = getMrecBannerAdaptiveSize(activity, containerView)
+        mrecAdView?.adSize = AdSize.MEDIUM_RECTANGLE
         mrecAdView?.adUnitId = mrecPlacementId
         mrecAdView?.adListener = object : AdListener() {
             override fun onAdFailedToLoad(error: LoadAdError) {
