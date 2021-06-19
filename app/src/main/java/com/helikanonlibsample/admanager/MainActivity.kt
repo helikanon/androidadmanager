@@ -46,11 +46,11 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MyApplication.adManager", "[BANNER] AdErrorMode.PLATFORM showBanner>> $errorMode $errorMessage ${adPlatformEnum?.name}")
             }
         })
-        /*MyApplication.adManager.showMrec(this, mrecContainer, object : AdPlatformShowListener() {
+        MyApplication.adManager.showMrec(this, binding.mrecContainer, object : AdPlatformShowListener() {
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
                 Log.d("MyApplication.adManager", "[MREC]AdErrorMode.PLATFORM showMrec>> $errorMode $errorMessage ${adPlatformEnum?.name}")
             }
-        })*/
+        })
     }
 
     override fun onPause() {

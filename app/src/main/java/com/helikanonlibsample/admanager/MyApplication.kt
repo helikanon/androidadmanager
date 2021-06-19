@@ -103,10 +103,10 @@ class MyApplication : MultiDexApplication() {
                 true, true, true, true
             )
         )*/
-        adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,admob,facebook")
-        adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,admob,facebook,startapp")
-        adManager.setAdPlatformSortByAdFormatStr("rewarded", "ironsource,admob,startapp,facebook")
-        adManager.setAdPlatformSortByAdFormatStr("mrec", "facebook,admob,startapp,ironsource")
+        adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr("banner", "admob,ironsource,startapp")
+        adManager.setAdPlatformSortByAdFormatStr("rewarded", "ironsource,admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr("mrec", "admob,startapp,ironsource")
 
 
         adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {
