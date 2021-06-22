@@ -305,6 +305,11 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 
+    override fun getNativeAds(activity: Activity, placementGroupIndex: Int): ArrayList<Any> {
+        val placementName = getPlacementGroupByIndex(placementGroupIndex).native
+        return ArrayList<Any>()
+    }
+
     override fun destroy(activity: Activity) {
         //startAppAd = null
         // startAppAdRewarded = null

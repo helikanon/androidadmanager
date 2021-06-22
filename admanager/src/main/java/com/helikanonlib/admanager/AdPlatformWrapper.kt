@@ -48,6 +48,7 @@ abstract class AdPlatformWrapper(open var appId: String) {
 
     // adSize >> [small,medium]
     abstract fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
+    abstract fun getNativeAds(activity: Activity, placementGroupIndex: Int = 0):ArrayList<Any>
 
     abstract fun destroy(activity: Activity)
     abstract fun destroyBanner(activity: Activity)

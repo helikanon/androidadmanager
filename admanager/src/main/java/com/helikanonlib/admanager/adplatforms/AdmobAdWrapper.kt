@@ -414,6 +414,11 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     }
 
+    override fun getNativeAds(activity: Activity, placementGroupIndex: Int): ArrayList<Any> {
+        val placementName = getPlacementGroupByIndex(placementGroupIndex).native
+        return if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
+    }
+
     override fun destroy(activity: Activity) {
 
         for (i in 0 until placementGroups.size) {
