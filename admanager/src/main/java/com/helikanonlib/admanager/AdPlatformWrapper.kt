@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.google.android.ads.nativetemplates.TemplateView
+import com.google.android.gms.ads.nativead.NativeAd
 
 abstract class AdPlatformWrapper(open var appId: String) {
 
@@ -48,8 +48,8 @@ abstract class AdPlatformWrapper(open var appId: String) {
     abstract fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0)
 
     // adSize >> [small,medium]
-    abstract fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, template: TemplateView, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
-    abstract fun getNativeAds(activity: Activity, placementGroupIndex: Int = 0):ArrayList<Any>
+    abstract fun showNative(activity: Activity, pos: Int, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0): NativeAd?
+    abstract fun getNativeAds(activity: Activity, placementGroupIndex: Int = 0): ArrayList<Any>
 
     abstract fun destroy(activity: Activity)
     abstract fun destroyBanner(activity: Activity)

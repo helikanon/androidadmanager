@@ -3,10 +3,7 @@ package com.helikanonlib.admanager.adplatforms
 import android.app.Activity
 import android.content.Context
 import android.util.DisplayMetrics
-import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.google.android.ads.nativetemplates.NativeTemplateStyle
-import com.google.android.ads.nativetemplates.TemplateView
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -378,15 +375,17 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         adLoader.loadAds(AdRequest.Builder().build(), count)
     }
 
-    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, template: TemplateView, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+    override fun showNative(activity: Activity, pos: Int, listener: AdPlatformShowListener?, placementGroupIndex: Int): NativeAd? {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).native
         val nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
 
         if (nativeAds.size < (pos + 1)) {
-            return
+            return null
         }
 
-        val nativeAd: NativeAd = nativeAds[pos] as NativeAd
+        //val nativeAd: NativeAd = nativeAds[pos] as NativeAd
+        return nativeAds[pos] as NativeAd
+
         /*val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val v = inflater.inflate(
             if (adSize == "small") {
@@ -404,10 +403,10 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
         )*/
 
-        val styles = NativeTemplateStyle.Builder().build()
+        /*val styles = NativeTemplateStyle.Builder().build()
         template.setStyles(styles)
         template.setNativeAd(nativeAd)
-        containerView.addView(template.parent as ViewGroup)
+        containerView.addView(template.parent as ViewGroup)*/
 
 
     }

@@ -8,6 +8,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.ads.nativetemplates.NativeTemplateStyle
 import com.google.android.ads.nativetemplates.TemplateView
 import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.adplatforms.*
@@ -34,15 +35,19 @@ class MainActivity : AppCompatActivity() {
 
                     runOnUiThread {
                         val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                        val v = inflater.inflate(R.layout.admob_native_medium_template, null)
-                        val template = v.findViewById<TemplateView>(R.id.admanager_native_medium)
+                        val templateRoot = inflater.inflate(R.layout.admob_native_medium_template, null)
+                        val template = templateRoot.findViewById<TemplateView>(R.id.admanager_native_medium)
 
-                        ap?.platformInstance?.showNative(
+                        val nativeAd = ap?.platformInstance?.showNative(
                             this@MainActivity,
-                            0,
-                            binding.nativeContainer,
-                            template
+                            0
                         )
+                        nativeAd?.let {
+                            val styles = NativeTemplateStyle.Builder().build()
+                            template.setStyles(styles)
+                            template.setNativeAd(nativeAd)
+                            binding.nativeContainer.addView(templateRoot)
+                        }
                     }
                 }
 

@@ -76,9 +76,10 @@ dependencies {
     // admob
     //implementation 'com.google.android.gms:play-services-ads:19.7.0'
     implementation 'com.google.android.gms:play-services-ads:20.2.0'
+    implementation project(path: ':nativetemplates')
 
-    implementation project(':nativetemplates')
     implementation project(path: ':admanager')
+    //implementation project(path: ':nativetemplates')
 
 
     // for ironsource and inmobi

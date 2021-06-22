@@ -50,9 +50,12 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
 
 
     implementation 'com.google.android.gms:play-services-ads:20.2.0'
+    // implementation project(path: ':nativetemplates')
 
     // ironsource
     implementation 'com.ironsource.sdk:mediationsdk:7.1.6'
@@ -70,7 +73,7 @@ dependencies {
         transitive = true
     }*/
 
-    implementation project(':nativetemplates')
+    // implementation project(':nativetemplates')
 
 
     //implementation "androidx.lifecycle:lifecycle-common-java8:2.3.0"
