@@ -66,15 +66,13 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
 
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     // lifecycle
     //implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     //implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.0"
 
-
-    implementation project(path: ':admanager')
 
     // for ironsource and inmobi
     implementation 'com.google.android.gms:play-services-ads-identifier:17.0.1'
@@ -116,9 +114,20 @@ dependencies {
     implementation 'com.vungle:publisher-sdk-android:6.9.1'
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Add Chartboost Network
+    implementation 'com.ironsource.adapters:chartboostadapter:4.3.5'
+    implementation 'com.chartboost:chartboost-sdk:8.2.0'
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     // Add UnityAds Network
     implementation 'com.ironsource.adapters:unityadsadapter:4.3.11'
     implementation 'com.unity3d.ads:unity-ads:3.7.2'
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    implementation project(path: ':admanager')
 
 }

@@ -25,10 +25,12 @@ import com.startapp.sdk.adsbase.adlisteners.AdEventListener
 class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override val platform = AdPlatformTypeEnum.STARTAPP
 
-    var startAppAd: StartAppAd? = null
+    var viewIntances: MutableMap<String, Any?> = mutableMapOf()
+
+    /*var startAppAd: StartAppAd? = null
     var bannerAdView: Banner? = null
     var startAppAdRewarded: StartAppAd? = null
-    var mrecAdView: Mrec? = null
+    var mrecAdView: Mrec? = null*/
 
 
     companion object {
@@ -53,8 +55,13 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             true
         );*/
 
-        startAppAd = StartAppAd(context)
-        startAppAdRewarded = StartAppAd(context)
+        //startAppAd = StartAppAd(context)
+        // startAppAdRewarded = StartAppAd(context)
+
+        for (group in placementGroups) {
+            viewIntances.put("interstitial_${group.groupName}", StartAppAd(context))
+            viewIntances.put("rewarded_${group.groupName}", StartAppAd(context))
+        }
 
         isInitialized = true
     }
@@ -63,11 +70,14 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         StartAppSDK.setTestAdsEnabled(true);
     }
 
-    override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?) {
-        if (isInterstitialLoaded()) {
+    override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
+        if (isInterstitialLoaded(placementGroupIndex)) {
             listener?.onLoaded(platform)
             return
         }
+
+        val placementName = "interstitial_" + getPlacementGroupByIndex(placementGroupIndex).groupName
+        val startAppAd = viewIntances[placementName] as StartAppAd
 
         startAppAd?.loadAd(object : AdEventListener {
             override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
@@ -80,8 +90,12 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         })
     }
 
-    override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?) {
-        if (!isInterstitialLoaded()) return
+    override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+        if (!isInterstitialLoaded(placementGroupIndex)) return
+
+        val placementName = "interstitial_" + getPlacementGroupByIndex(placementGroupIndex).groupName
+        val startAppAd = viewIntances[placementName] as StartAppAd
+
 
         startAppAd?.showAd(object : AdDisplayListener {
             override fun adHidden(p0: com.startapp.sdk.adsbase.Ad?) {
@@ -102,15 +116,85 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         })
     }
 
-    override fun isInterstitialLoaded(): Boolean {
+    override fun isInterstitialLoaded(placementGroupIndex: Int): Boolean {
+        val placementName = "interstitial_" + getPlacementGroupByIndex(placementGroupIndex).groupName
+        val startAppAd = viewIntances[placementName] as StartAppAd
         return startAppAd?.isReady ?: false
     }
 
-    override fun isBannerLoaded(): Boolean {
+
+    override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
+        if (isRewardedLoaded(placementGroupIndex)) {
+            listener?.onLoaded(platform)
+            return
+        }
+
+        val placementName = "rewarded_" + getPlacementGroupByIndex(placementGroupIndex).groupName
+        val startAppAdRewarded = viewIntances[placementName] as StartAppAd
+
+        startAppAdRewarded?.loadAd(StartAppAd.AdMode.REWARDED_VIDEO, object : AdEventListener {
+            override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}", platform)
+            }
+
+            override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
+                listener?.onLoaded(platform)
+            }
+        })
+    }
+
+    override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+        if (!isRewardedLoaded()) {
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded", platform)
+            return
+        }
+
+        val placementName = "rewarded_" + getPlacementGroupByIndex(placementGroupIndex).groupName
+        val startAppAdRewarded = viewIntances[placementName] as StartAppAd
+
+        startAppAdRewarded?.setVideoListener(object : VideoListener {
+            override fun onVideoCompleted() {
+                listener?.onRewarded(null, null, platform)
+            }
+        })
+        startAppAdRewarded?.showAd(object : AdDisplayListener {
+            override fun adHidden(p0: com.startapp.sdk.adsbase.Ad?) {
+                listener?.onClosed(platform)
+            }
+
+            override fun adDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
+                listener?.onDisplayed(platform)
+            }
+
+            override fun adNotDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}", platform)
+            }
+
+            override fun adClicked(p0: com.startapp.sdk.adsbase.Ad?) {
+                listener?.onClicked(platform)
+            }
+        })
+    }
+
+    override fun isRewardedLoaded(placementGroupIndex: Int): Boolean {
+        val placementName = "rewarded_" + getPlacementGroupByIndex(placementGroupIndex).groupName
+        val startAppAdRewarded = viewIntances[placementName] as StartAppAd
+
+        return startAppAdRewarded?.isReady ?: false
+    }
+
+
+    override fun isBannerLoaded(placementGroupIndex: Int): Boolean {
+        val placementName = "banner_" + getPlacementGroupByIndex(placementGroupIndex).groupName
+        var bannerAdView: Banner? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as Banner? else null
+
         return _isBannerLoaded(bannerAdView)
     }
 
-    override fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?) {
+    override fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+        val placementName = "banner_" + getPlacementGroupByIndex(placementGroupIndex).groupName
+        var bannerAdView: Banner? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as Banner? else null
+
 
         val lp =
             RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
@@ -150,65 +234,21 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         })
         bannerAdView?.loadAd()
+        viewIntances[placementName] = bannerAdView
     }
 
 
-    override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?) {
-        if (isRewardedLoaded()) {
-            listener?.onLoaded(platform)
-            return
-        }
+    override fun isMrecLoaded(placementGroupIndex: Int): Boolean {
+        val placementName = "mrec_" + getPlacementGroupByIndex(placementGroupIndex).groupName
+        var mrecAdView: Mrec? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as Mrec? else null
 
-        startAppAdRewarded?.loadAd(StartAppAd.AdMode.REWARDED_VIDEO, object : AdEventListener {
-            override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}", platform)
-            }
-
-            override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onLoaded(platform)
-            }
-        })
-    }
-
-    override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?) {
-        if (!isRewardedLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded", platform)
-            return
-        }
-
-        startAppAdRewarded?.setVideoListener(object : VideoListener {
-            override fun onVideoCompleted() {
-                listener?.onRewarded(null, null, platform)
-            }
-        })
-        startAppAdRewarded?.showAd(object : AdDisplayListener {
-            override fun adHidden(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onClosed(platform)
-            }
-
-            override fun adDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onDisplayed(platform)
-            }
-
-            override fun adNotDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}", platform)
-            }
-
-            override fun adClicked(p0: com.startapp.sdk.adsbase.Ad?) {
-                listener?.onClicked(platform)
-            }
-        })
-    }
-
-    override fun isRewardedLoaded(): Boolean {
-        return startAppAdRewarded?.isReady ?: false
-    }
-
-    override fun isMrecLoaded(): Boolean {
         return _isBannerLoaded(mrecAdView)
     }
 
-    override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?) {
+    override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+        val placementName = "mrec_" + getPlacementGroupByIndex(placementGroupIndex).groupName
+        var mrecAdView: Mrec? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as Mrec? else null
+
         val lp =
             RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
                 .apply {
@@ -247,17 +287,21 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         })
         mrecAdView?.loadAd()
+
+        viewIntances[placementName] = mrecAdView
     }
 
-    override fun isNativeLoaded(): Boolean {
+    override fun isNativeLoaded(placementGroupIndex: Int): Boolean {
+        val placementName = getPlacementGroupByIndex(placementGroupIndex).native
+        val nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
         return nativeAds.size > 0
     }
 
-    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?) {
+    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 
-    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener?) {
+    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 
@@ -269,25 +313,39 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun destroyBanner(activity: Activity) {
-        if (_isBannerLoaded(bannerAdView)) {
-            try {
-                _removeBannerViewIfExists(bannerAdView)
-            } catch (e: Exception) {
-                e.printStackTrace()
+        for (i in 0 until placementGroups.size) {
+            val pg = placementGroups[i]
+            val placementName = "banner_" + pg.groupName
+            var bannerAdView: Banner? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as Banner? else null
+
+            if (_isBannerLoaded(bannerAdView)) {
+                try {
+                    _removeBannerViewIfExists(bannerAdView)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
+            bannerAdView = null
         }
-        bannerAdView = null
+
     }
 
     override fun destroyMrec(activity: Activity) {
-        if (_isBannerLoaded(mrecAdView)) {
-            try {
-                _removeBannerViewIfExists(mrecAdView)
-            } catch (e: Exception) {
-                e.printStackTrace()
+
+        for (i in 0 until placementGroups.size) {
+            val pg = placementGroups[i]
+            val placementName = "mrec_" + pg.groupName
+            var mrecAdView: Mrec? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as Mrec? else null
+
+            if (_isBannerLoaded(mrecAdView)) {
+                try {
+                    _removeBannerViewIfExists(mrecAdView)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
+            mrecAdView = null
         }
-        mrecAdView = null
     }
 
     override fun onPause(activity: Activity) {}

@@ -8,38 +8,46 @@ import android.widget.RelativeLayout
 abstract class AdPlatformWrapper(open var appId: String) {
 
     abstract val platform: AdPlatformTypeEnum
+    var placementGroups: ArrayList<AdPlacementGroupModel> = ArrayList()
+    protected fun getPlacementGroupByIndex(placementGroupIndex: Int): AdPlacementGroupModel {
+        /*if (index >= placementGroups.size) {
+            return null
+        }*/
+        return placementGroups.get(placementGroupIndex)
+    }
 
-    var interstitialPlacementId: String? = null
+    /*var interstitialPlacementId: String? = null
     var bannerPlacementId: String? = null
     var rewardedPlacementId: String? = null
     var mrecPlacementId: String? = null
     var nativePlacementId: String? = null
-    var appOpenAdPlacementId: String? = null
+    var appOpenAdPlacementId: String? = null*/
 
     abstract fun initialize(activity: Activity)
     abstract fun initialize(context: Context)
     abstract fun enableTestMode(deviceId: String? = null)
 
-    abstract fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null)
-    abstract fun showInterstitial(activity: Activity, listener: AdPlatformShowListener? = null)
-    abstract fun isInterstitialLoaded(): Boolean
+    abstract fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0)
+    abstract fun showInterstitial(activity: Activity, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
+    abstract fun isInterstitialLoaded(placementGroupIndex: Int = 0): Boolean
 
-    abstract fun isBannerLoaded(): Boolean
-    abstract fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null)
+    abstract fun isBannerLoaded(placementGroupIndex: Int = 0): Boolean
+    abstract fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
 
-    abstract fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener? = null)
-    abstract fun showRewarded(activity: Activity, listener: AdPlatformShowListener? = null)
-    abstract fun isRewardedLoaded(): Boolean
+    abstract fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0)
+    abstract fun showRewarded(activity: Activity, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
+    abstract fun isRewardedLoaded(placementGroupIndex: Int = 0): Boolean
 
-    abstract fun isMrecLoaded(): Boolean
-    abstract fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null)
+    abstract fun isMrecLoaded(placementGroupIndex: Int = 0): Boolean
+    abstract fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
 
 
-    val nativeAds: ArrayList<Any> = arrayListOf()
-    abstract fun isNativeLoaded(): Boolean
-    abstract fun loadNativeAds(activity: Activity,count: Int, listener: AdPlatformLoadListener? = null)
+    // val nativeAds: ArrayList<Any> = arrayListOf()
+    abstract fun isNativeLoaded(placementGroupIndex: Int = 0): Boolean
+    abstract fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0)
+
     // adSize >> [small,medium]
-    abstract fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener? = null)
+    abstract fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
 
     abstract fun destroy(activity: Activity)
     abstract fun destroyBanner(activity: Activity)

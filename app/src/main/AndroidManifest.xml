@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Ironsource içinde gerekli -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /><!--for chartboost-->
 
     <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -128,6 +129,15 @@
         <!--<meta-data android:name="applovin.sdk.key"
             android:value="pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP"  />-->
         <!--applovin-->
+
+        <!--chartboost-->
+        <activity
+            android:name="com.chartboost.sdk.CBImpressionActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:excludeFromRecents="true"
+            android:hardwareAccelerated="true"/>
+        <!--chartboost-->
     </application>
 
     <queries>

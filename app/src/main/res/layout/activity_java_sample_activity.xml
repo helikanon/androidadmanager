@@ -17,7 +17,7 @@
 
     <RelativeLayout
         android:id="@+id/bannerContainer"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
         app:layout_constraintBottom_toBottomOf="parent"
