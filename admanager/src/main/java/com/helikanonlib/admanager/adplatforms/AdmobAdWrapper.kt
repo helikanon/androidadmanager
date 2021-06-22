@@ -3,7 +3,6 @@ package com.helikanonlib.admanager.adplatforms
 import android.app.Activity
 import android.content.Context
 import android.util.DisplayMetrics
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.google.android.ads.nativetemplates.NativeTemplateStyle
@@ -17,7 +16,6 @@ import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.helikanonlib.admanager.*
-import com.helikanonlib.admanager.R
 
 
 /**
@@ -380,7 +378,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         adLoader.loadAds(AdRequest.Builder().build(), count)
     }
 
-    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, template: TemplateView, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).native
         val nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
 
@@ -389,7 +387,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         val nativeAd: NativeAd = nativeAds[pos] as NativeAd
-        val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        /*val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val v = inflater.inflate(
             if (adSize == "small") {
                 R.layout.admob_native_small_template
@@ -404,12 +402,12 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             } else {
                 R.id.admanager_native_medium
             }
-        )
+        )*/
 
         val styles = NativeTemplateStyle.Builder().build()
         template.setStyles(styles)
         template.setNativeAd(nativeAd)
-        containerView.addView(v)
+        containerView.addView(template.parent as ViewGroup)
 
 
     }

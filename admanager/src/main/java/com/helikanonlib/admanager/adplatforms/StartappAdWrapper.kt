@@ -6,6 +6,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import com.google.android.ads.nativetemplates.TemplateView
 import com.helikanonlib.admanager.*
 import com.startapp.sdk.ads.banner.Banner
 import com.startapp.sdk.ads.banner.BannerListener
@@ -301,7 +302,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 
-    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, adSize: String, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+    override fun showNative(activity: Activity, pos: Int, containerView: ViewGroup, template: TemplateView, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 

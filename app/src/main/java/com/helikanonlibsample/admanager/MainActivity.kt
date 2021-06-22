@@ -1,11 +1,14 @@
 package com.helikanonlibsample.admanager
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.ads.nativetemplates.TemplateView
 import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.adplatforms.*
 import com.helikanonlibsample.admanager.databinding.ActivityMainBinding
@@ -21,7 +24,6 @@ class MainActivity : AppCompatActivity() {
         initAds()
         initViews()
 
-
         Handler(Looper.getMainLooper()).postDelayed({
             MyApplication.admobAppOpenAdManager?.show(this@MainActivity, null)
 
@@ -30,12 +32,18 @@ class MainActivity : AppCompatActivity() {
                 override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
                     super.onLoaded(adPlatformEnum)
 
-                    ap?.platformInstance?.showNative(
-                        this@MainActivity,
-                        0,
-                        binding.nativeContainer,
-                        "medium" //if (showPositionAt == 0) "medium" else "small"
-                    )
+                    runOnUiThread {
+                        val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                        val v = inflater.inflate(R.layout.admob_native_medium_template, null)
+                        val template = v.findViewById<TemplateView>(R.id.admanager_native_medium)
+
+                        ap?.platformInstance?.showNative(
+                            this@MainActivity,
+                            0,
+                            binding.nativeContainer,
+                            template
+                        )
+                    }
                 }
 
                 override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
