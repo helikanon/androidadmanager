@@ -118,7 +118,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun isInterstitialLoaded(placementGroupIndex: Int): Boolean {
         val placementName = "interstitial_" + getPlacementGroupByIndex(placementGroupIndex).groupName
-        val startAppAd = viewIntances[placementName] as StartAppAd
+        val startAppAd = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
         return startAppAd?.isReady ?: false
     }
 
@@ -178,8 +178,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun isRewardedLoaded(placementGroupIndex: Int): Boolean {
         val placementName = "rewarded_" + getPlacementGroupByIndex(placementGroupIndex).groupName
-        val startAppAdRewarded = viewIntances[placementName] as StartAppAd
-
+        val startAppAdRewarded = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
         return startAppAdRewarded?.isReady ?: false
     }
 

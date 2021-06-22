@@ -32,6 +32,7 @@ class AdmobAppOpenAdManager(
     var lastShowDate: Date? = null
     var minElapsedSecondsToNextShow = 10
     var isEnable = true
+    var excludedActivities = arrayListOf<String>()
 
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -52,6 +53,11 @@ class AdmobAppOpenAdManager(
                 val x = ((Date().time - lastShowDate!!.time) / 1000)
                 show = ((Date().time - lastShowDate!!.time) / 1000) > minElapsedSecondsToNextShow
             }
+
+            if (excludedActivities.contains(it.javaClass.simpleName)) {
+                show = false
+            }
+
             if (show) {
                 show(it, null)
             }
@@ -126,7 +132,7 @@ class AdmobAppOpenAdManager(
         appOpenAd?.show(activity)
     }
 
-    fun disable(){
+    fun disable() {
         isEnable = false
     }
 
