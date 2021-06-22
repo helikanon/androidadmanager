@@ -1,6 +1,8 @@
 package com.helikanonlibsample.admanager;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,7 +38,7 @@ public class JavaSampleActivity extends AppCompatActivity {
     Button btnLoadAndShowRewarded;
 
     String oldBannerPlacementId = "";
-    private int placementGroupIndex = 1;
+    private int placementGroupIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +70,16 @@ public class JavaSampleActivity extends AppCompatActivity {
         oldBannerPlacementId = ironsrc.getBannerPlacementId();
         ironsrc.setBannerPlacementId("new_placementId");*/
 
-        adManager.showBanner(this, bannerContainer, null, null, placementGroupIndex);
-        adManager.showMrec(this, mrecContainer, null, null, placementGroupIndex);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            adManager.showBanner(this, bannerContainer, null, null, placementGroupIndex);
+        }, 2000);
+
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            adManager.showMrec(this, mrecContainer, null, null, placementGroupIndex);
+        }, 5000);
+
+
     }
 
     @Override

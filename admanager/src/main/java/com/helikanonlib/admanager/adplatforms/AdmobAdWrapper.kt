@@ -270,7 +270,8 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
 
         val placementName = getPlacementGroupByIndex(placementGroupIndex).mrec
-        var mrecAdView: AdView? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as AdView? else null
+        val instanceKeyName = placementName + "_mrec"
+        var mrecAdView: AdView? = if (viewIntances.containsKey(instanceKeyName)) viewIntances.get(instanceKeyName) as AdView? else null
 
         val lp =
             RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
@@ -313,7 +314,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
         }
         mrecAdView?.loadAd(AdRequest.Builder().build())
-        viewIntances[placementName] = mrecAdView
+        viewIntances[instanceKeyName] = mrecAdView
 
     }
 
@@ -344,11 +345,16 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         lateinit var adLoader: AdLoader
         adLoader = AdLoader.Builder(activity, placementName)
             .forNativeAd { nativeAd ->
-                nativeAds.add(nativeAd)
-                viewIntances.put(placementName, nativeAds)
 
-                if (!adLoader.isLoading) {
-                    listener?.onLoaded(platform)
+                if (activity.isDestroyed) {
+                    nativeAd.destroy()
+                } else {
+                    nativeAds.add(nativeAd)
+                    viewIntances.put(placementName, nativeAds)
+
+                    if (!adLoader.isLoading) {
+                        listener?.onLoaded(platform)
+                    }
                 }
             }
             .withAdListener(object : AdListener() {
@@ -357,7 +363,11 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     if (!adLoader.isLoading) {
-                        listener?.onError(AdErrorMode.PLATFORM, adError.message, platform)
+                        if (nativeAds.size > 0) {
+                            listener?.onLoaded(platform)
+                        } else {
+                            listener?.onError(AdErrorMode.PLATFORM, adError.message, platform)
+                        }
                     }
                 }
             })
@@ -395,6 +405,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 R.id.admanager_native_medium
             }
         )
+
         val styles = NativeTemplateStyle.Builder().build()
         template.setStyles(styles)
         template.setNativeAd(nativeAd)
@@ -409,6 +420,19 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             val pg = placementGroups[i]
             viewIntances.put(pg.interstitial, null)
             viewIntances.put(pg.rewarded, null)
+
+            // destroy NATIVE ads
+            var nativeAds: ArrayList<Any> = if (viewIntances.containsKey(pg.native) && viewIntances[pg.native] != null) viewIntances.get(pg.native) as ArrayList<Any> else ArrayList<Any>()
+            try {
+                nativeAds.forEach {
+                    (it as NativeAd).destroy()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                nativeAds.clear()
+                viewIntances.put(pg.native, nativeAds)
+            }
         }
 
         destroyBanner(activity)
@@ -457,6 +481,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
     }
+
 
     override fun onPause(activity: Activity) {}
     override fun onStop(activity: Activity) {}

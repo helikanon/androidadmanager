@@ -98,6 +98,7 @@ class AdManager {
     fun start(activity: Activity) {
         if (autoLoad) {
             placementGroups.forEachIndexed { index, pgName ->
+                if (index > 0) return@forEachIndexed
                 loadInterstitial(activity, listener = null, platform = null, parallel = true, placementGroupIndex = getPlacementGroupIndexByName(pgName))
                 loadRewarded(activity, null, null, false, getPlacementGroupIndexByName(pgName))
             }
@@ -384,7 +385,8 @@ class AdManager {
         autoloadInterstitialHandler.postDelayed({
             try {
                 activity.runOnUiThread {
-                    for (pgName in placementGroups) {
+                    placementGroups.forEachIndexed { index, pgName ->
+                        if (index > 0) return@forEachIndexed
                         loadInterstitial(activity, listener, platform, false, getPlacementGroupIndexByName(pgName))
                     }
 
@@ -755,7 +757,8 @@ class AdManager {
         autoloadRewardedHandler.postDelayed({
             try {
                 activity.runOnUiThread {
-                    for (pgName in placementGroups) {
+                    placementGroups.forEachIndexed { index, pgName ->
+                        if (index > 0) return@forEachIndexed
                         loadRewarded(activity, listener, platform, false, getPlacementGroupIndexByName(pgName))
                     }
                 }
@@ -799,30 +802,34 @@ class AdManager {
 
     // TODO this fun will check. and it will remove if unnecessary
     fun destroyBannersAndMrecs(activity: Activity) {
-        val bannerAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.BANNER, 0)
-        if (bannerAdPlatforms.size > 0) {
-            run breaker@{
-                bannerAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
-                    if (_platform.platformInstance.isBannerLoaded()) {
-                        _platform.platformInstance.destroyBanner(activity)
-                        return@breaker
+
+        placementGroups.forEachIndexed { placementGroupIndex, pgName ->
+            val bannerAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.BANNER, placementGroupIndex)
+            if (bannerAdPlatforms.size > 0) {
+                run breaker@{
+                    bannerAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
+                        if (_platform.platformInstance.isBannerLoaded()) {
+                            _platform.platformInstance.destroyBanner(activity)
+                            return@breaker
+                        }
+                    }
+                }
+            }
+
+            val mrecAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.MREC, placementGroupIndex)
+            if (mrecAdPlatforms.size > 0) {
+                run breaker@{
+                    mrecAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
+                        if (_platform.platformInstance.isMrecLoaded()) {
+
+                            _platform.platformInstance.destroyMrec(activity)
+                            return@breaker
+                        }
                     }
                 }
             }
         }
 
-        val mrecAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.MREC, 0)
-        if (mrecAdPlatforms.size > 0) {
-            run breaker@{
-                mrecAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
-                    if (_platform.platformInstance.isMrecLoaded()) {
-
-                        _platform.platformInstance.destroyMrec(activity)
-                        return@breaker
-                    }
-                }
-            }
-        }
     }
 
 

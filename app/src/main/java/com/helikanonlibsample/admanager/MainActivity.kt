@@ -23,8 +23,27 @@ class MainActivity : AppCompatActivity() {
 
 
         Handler(Looper.getMainLooper()).postDelayed({
-            MyApplication.admobAppOpenAdManager?.show(this@MainActivity,null)
-        },2000)
+            MyApplication.admobAppOpenAdManager?.show(this@MainActivity, null)
+
+            val ap = MyApplication.adManager?.getAdPlatformByType(AdPlatformTypeEnum.ADMOB)
+            ap?.platformInstance?.loadNativeAds(this@MainActivity, 4, object : AdPlatformLoadListener() {
+                override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                    super.onLoaded(adPlatformEnum)
+
+                    ap?.platformInstance?.showNative(
+                        this@MainActivity,
+                        0,
+                        binding.nativeContainer,
+                        "medium" //if (showPositionAt == 0) "medium" else "small"
+                    )
+                }
+
+                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                    Log.d("MyApplication.adManager", "[NATIVE] ${errorMode?.name} / $errorMessage / ${adPlatformEnum?.name}")
+                }
+            })
+        }, 2000)
+
 
         /*val x = MyApplication.adManager.getAdPlatformByType(AdPlatformTypeEnum.ADMOB)?.platformInstance as AdmobAdWrapper
         x.loadNativeAds(this, 3, object : AdPlatformLoadListener() {
@@ -49,10 +68,10 @@ class MainActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             MyApplication.adManager.showMrec(this, binding.mrecContainer, object : AdPlatformShowListener() {
                 override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                    Log.d("MyApplication.adManager", "[MREC]AdErrorMode.PLATFORM showMrec>> $errorMode $errorMessage ${adPlatformEnum?.name}")
+                    Log.d("MyApplication.adManager", "[MREC] AdErrorMode.PLATFORM showMrec>> $errorMode $errorMessage ${adPlatformEnum?.name}")
                 }
             })
-        },2000)
+        }, 3000)
     }
 
     override fun onPause() {
@@ -71,7 +90,7 @@ class MainActivity : AppCompatActivity() {
 
     fun initViews() {
         binding.btnShowInterstitial.setOnClickListener {
-            MyApplication.adManager.showInterstitial(this,object:AdPlatformShowListener(){
+            MyApplication.adManager.showInterstitial(this, object : AdPlatformShowListener() {
                 override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
                     super.onDisplayed(adPlatformEnum)
                 }
@@ -117,7 +136,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnLoadAppOpenAd.setOnClickListener {
-            MyApplication.admobAppOpenAdManager?.show(this,null)
+            MyApplication.admobAppOpenAdManager?.show(this, null)
 
             //MyApplication.admobAppOpenAdManager?.disable()
         }

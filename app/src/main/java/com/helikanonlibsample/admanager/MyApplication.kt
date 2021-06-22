@@ -55,7 +55,7 @@ class MyApplication : MultiDexApplication() {
             randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
             testMode = BuildConfig.DEBUG
             deviceId = "47088e48-5195-4757-90b2-0da94116befd" // necessary if testmode enabled
-            placementGroups = arrayListOf("default", "second_group")
+            placementGroups = arrayListOf("default")
             adPlatforms = mutableListOf<AdPlatformModel>(
                 /*AdPlatformModel(
                     FacebookAdWrapper("your_app_id").apply {
@@ -74,22 +74,22 @@ class MyApplication : MultiDexApplication() {
                                 interstitial = "ca-app-pub-3940256099942544/1033173712",
                                 rewarded = "ca-app-pub-3940256099942544/5224354917",
                                 banner = "ca-app-pub-3940256099942544/6300978111",
-                                mrec = "ca-app-pub-3940256099942544/6300978111",
+                                mrec = "ca-app-pub-3940256099942544/6300978112",
                                 native = "ca-app-pub-3940256099942544/2247696110",
                                 appOpenAd = "ca-app-pub-3940256099942544/3419835294"
                             )
                         )
-                        placementGroups.add(
+                        /*placementGroups.add(
                             AdPlacementGroupModel(
                                 groupName = "second_group",
-                                interstitial = "ca-app-pub-3940256099942544/1033173712",
-                                rewarded = "ca-app-pub-3940256099942544/5224354917",
+                                interstitial = "ca-app-pub-3940256099942544/8691691433",
+                                rewarded = "ca-app-pub-3940256099942544/5354046379",
                                 banner = "ca-app-pub-3940256099942544/6300978111",
                                 mrec = "ca-app-pub-3940256099942544/6300978111",
-                                native = "ca-app-pub-3940256099942544/2247696110",
+                                native = "ca-app-pub-3940256099942544/1044960115",
                                 appOpenAd = "ca-app-pub-3940256099942544/3419835294"
                             )
-                        )
+                        )*/
                     },
                     true, true, true, true
                 ),
@@ -107,7 +107,7 @@ class MyApplication : MultiDexApplication() {
                                 appOpenAd = ""
                             )
                         )
-                        placementGroups.add(
+                        /*placementGroups.add(
                             AdPlacementGroupModel(
                                 groupName = "second_group",
                                 interstitial = "SecondInterstitial",
@@ -117,7 +117,7 @@ class MyApplication : MultiDexApplication() {
                                 native = "SecondNative",
                                 appOpenAd = ""
                             )
-                        )
+                        )*/
                     },
                     true, true, true, true
                 ),
@@ -134,7 +134,7 @@ class MyApplication : MultiDexApplication() {
                                 appOpenAd = ""
                             )
                         )
-                        placementGroups.add(
+                        /*placementGroups.add(
                             AdPlacementGroupModel(
                                 groupName = "second_group",
                                 interstitial = "SecondInterstitial",
@@ -144,7 +144,7 @@ class MyApplication : MultiDexApplication() {
                                 native = "SecondNative",
                                 appOpenAd = ""
                             )
-                        )
+                        )*/
                     },
                     true, true, true, true
                 )
@@ -168,19 +168,19 @@ class MyApplication : MultiDexApplication() {
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp,ironsource")*/
 
         adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "ironsource,admob,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "ironsource,admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob,ironsource,startapp")
         adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "ironsource,admob,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "ironsource,admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp")
 
         /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "startapp,ironsource,admob")
         adManager.setAdPlatformSortByAdFormatStr(1, "banner", "startapp,ironsource,startapp")
         adManager.setAdPlatformSortByAdFormatStr(1, "rewarded", "startapp,ironsource,admob,startapp")
         adManager.setAdPlatformSortByAdFormatStr(1, "mrec", "startapp,admob,startapp,ironsource")*/
 
-        adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "admob")
+        /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "admob")
         adManager.setAdPlatformSortByAdFormatStr(1, "banner", "startapp,admob")
         adManager.setAdPlatformSortByAdFormatStr(1, "rewarded", "admob")
-        adManager.setAdPlatformSortByAdFormatStr(1, "mrec", "admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(1, "mrec", "admob,startapp")*/
 
 
 
