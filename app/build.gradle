@@ -66,7 +66,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
 
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     // lifecycle
@@ -119,6 +119,11 @@ dependencies {
     // Add UnityAds Network
     implementation 'com.ironsource.adapters:unityadsadapter:4.3.11'
     implementation 'com.unity3d.ads:unity-ads:3.7.2'
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Add Chartboost Network
+    implementation 'com.ironsource.adapters:chartboostadapter:4.3.5'
+    implementation 'com.chartboost:chartboost-sdk:8.2.0'
 
 
 }

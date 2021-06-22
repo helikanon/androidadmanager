@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.helikanonlib.admanager.AdErrorMode;
 import com.helikanonlib.admanager.AdManager;
+import com.helikanonlib.admanager.AdPlacementGroupModel;
 import com.helikanonlib.admanager.AdPlatformModel;
 import com.helikanonlib.admanager.AdPlatformShowListener;
 import com.helikanonlib.admanager.AdPlatformTypeEnum;
@@ -35,6 +36,7 @@ public class JavaSampleActivity extends AppCompatActivity {
     Button btnLoadAndShowRewarded;
 
     String oldBannerPlacementId = "";
+    private int placementGroupIndex = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,8 @@ public class JavaSampleActivity extends AppCompatActivity {
 
         adManager = MyApplication.adManager;
         //adManager.destroyBannersAndMrecs(this);
-
+        adManager.loadInterstitial(this, null, null, false, placementGroupIndex);
+        adManager.loadRewarded(this, null, null, false, placementGroupIndex);
         // initAdManager(); // already inited in MainActivity
         initViews();
     }
@@ -65,8 +68,8 @@ public class JavaSampleActivity extends AppCompatActivity {
         oldBannerPlacementId = ironsrc.getBannerPlacementId();
         ironsrc.setBannerPlacementId("new_placementId");*/
 
-        adManager.showBanner(this, bannerContainer);
-        adManager.showMrec(this, mrecContainer);
+        adManager.showBanner(this, bannerContainer, null, null, placementGroupIndex);
+        adManager.showMrec(this, mrecContainer, null, null, placementGroupIndex);
     }
 
     @Override
@@ -92,7 +95,7 @@ public class JavaSampleActivity extends AppCompatActivity {
         btnShowInterstitial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.showInterstitial(JavaSampleActivity.this);
+                adManager.showInterstitial(JavaSampleActivity.this, null, null, placementGroupIndex);
             }
         });
 
@@ -104,14 +107,14 @@ public class JavaSampleActivity extends AppCompatActivity {
                     public void onRewarded(@Nullable String type, @Nullable Integer amount, @Nullable AdPlatformTypeEnum adPlatformEnum) {
                         Toast.makeText(JavaSampleActivity.this, "Rewarded!", Toast.LENGTH_LONG).show();
                     }
-                });
+                }, null, placementGroupIndex);
             }
         });
 
         btnShowInterstitialForTimeStrategy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.showInterstitial(JavaSampleActivity.this);
+                adManager.showInterstitial(JavaSampleActivity.this, null, null, placementGroupIndex);
             }
         });
 
@@ -119,14 +122,14 @@ public class JavaSampleActivity extends AppCompatActivity {
         btnLoadAndShowInterstitial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.loadAndShowInterstitial(JavaSampleActivity.this);
+                adManager.loadAndShowInterstitial(JavaSampleActivity.this, null, null, placementGroupIndex);
             }
         });
 
         btnLoadAndShowRewarded.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.loadAndShowRewarded(JavaSampleActivity.this);
+                adManager.loadAndShowRewarded(JavaSampleActivity.this, null, null, placementGroupIndex);
             }
         });
     }
@@ -140,18 +143,46 @@ public class JavaSampleActivity extends AppCompatActivity {
 
 
         AdPlatformWrapper admobAdWrapper = new AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713");
-        admobAdWrapper.setInterstitialPlacementId("ca-app-pub-3940256099942544/1033173712");
+        admobAdWrapper.getPlacementGroups().add(new AdPlacementGroupModel(
+                "default",
+                "ca-app-pub-3940256099942544/1033173712",
+                "ca-app-pub-3940256099942544/5224354917",
+                "ca-app-pub-3940256099942544/6300978111",
+                "ca-app-pub-3940256099942544/6300978111",
+                "ca-app-pub-3940256099942544/2247696110",
+                "ca-app-pub-3940256099942544/3419835294"
+        ));
+        /*admobAdWrapper.setInterstitialPlacementId("ca-app-pub-3940256099942544/1033173712");
         admobAdWrapper.setBannerPlacementId("ca-app-pub-3940256099942544/6300978111");
         admobAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/5224354917");
-        // facebookAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/6300978111");
+        // facebookAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/6300978111");*/
 
         AdPlatformWrapper startappAdWrapper = new StartAppAdWrapper("207754325");
+        startappAdWrapper.getPlacementGroups().add(new AdPlacementGroupModel(
+                "default",
+                "DefaultInterstitial",
+                "DefaultRewardedVideo",
+                "DefaultBanner",
+                "MREC_BANNER",
+                "DefaultNative",
+                ""
+        ));
 
         AdPlatformWrapper ironsourceAdWrapper = new IronSourceAdWrapper("a1a67f75");
-        ironsourceAdWrapper.setInterstitialPlacementId("DefaultInterstitial");
+        ironsourceAdWrapper.getPlacementGroups().add(new AdPlacementGroupModel(
+                "default",
+                "DefaultInterstitial",
+                "DefaultRewardedVideo",
+                "DefaultBanner",
+                "MREC_BANNER",
+                "",
+                ""
+        ));
+
+        /*ironsourceAdWrapper.setInterstitialPlacementId("DefaultInterstitial");
         ironsourceAdWrapper.setBannerPlacementId("DefaultBanner");
         ironsourceAdWrapper.setRewardedPlacementId("DefaultRewardedVideo");
-        ironsourceAdWrapper.setMrecPlacementId("MREC_BANNER");
+        ironsourceAdWrapper.setMrecPlacementId("MREC_BANNER");*/
 
 
         adManager = new AdManager

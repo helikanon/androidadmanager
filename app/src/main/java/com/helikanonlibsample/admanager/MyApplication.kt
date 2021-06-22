@@ -55,6 +55,7 @@ class MyApplication : MultiDexApplication() {
             randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
             testMode = BuildConfig.DEBUG
             deviceId = "47088e48-5195-4757-90b2-0da94116befd" // necessary if testmode enabled
+            placementGroups = arrayListOf("default", "second_group")
             adPlatforms = mutableListOf<AdPlatformModel>(
                 /*AdPlatformModel(
                     FacebookAdWrapper("your_app_id").apply {
@@ -67,26 +68,84 @@ class MyApplication : MultiDexApplication() {
                 ),*/
                 AdPlatformModel(
                     AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713").apply {
-                        interstitialPlacementId = "ca-app-pub-3940256099942544/1033173712"
-                        bannerPlacementId = "ca-app-pub-3940256099942544/6300978111"
-                        rewardedPlacementId = "ca-app-pub-3940256099942544/5224354917"
-                        mrecPlacementId = "ca-app-pub-3940256099942544/6300978111"
-                        nativePlacementId = "ca-app-pub-3940256099942544/2247696110"
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "default",
+                                interstitial = "ca-app-pub-3940256099942544/1033173712",
+                                rewarded = "ca-app-pub-3940256099942544/5224354917",
+                                banner = "ca-app-pub-3940256099942544/6300978111",
+                                mrec = "ca-app-pub-3940256099942544/6300978111",
+                                native = "ca-app-pub-3940256099942544/2247696110",
+                                appOpenAd = "ca-app-pub-3940256099942544/3419835294"
+                            )
+                        )
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "second_group",
+                                interstitial = "ca-app-pub-3940256099942544/1033173713",
+                                rewarded = "ca-app-pub-3940256099942544/5224354918",
+                                banner = "ca-app-pub-3940256099942544/6300978112",
+                                mrec = "ca-app-pub-3940256099942544/6300978112",
+                                native = "ca-app-pub-3940256099942544/2247696111",
+                                appOpenAd = "ca-app-pub-3940256099942544/3419835295"
+                            )
+                        )
                     },
                     true, true, true, true
                 ),
 
-                AdPlatformModel(
+                /*AdPlatformModel(
                     IronSourceAdWrapper("cd353905").apply {
-                        interstitialPlacementId = "DefaultInterstitial"
-                        bannerPlacementId = "DefaultBanner"
-                        rewardedPlacementId = "DefaultRewardedVideo"
-                        mrecPlacementId = "MREC_BANNER"
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "default",
+                                interstitial = "DefaultInterstitial",
+                                rewarded = "DefaultRewardedVideo",
+                                banner = "DefaultBanner",
+                                mrec = "MREC_BANNER",
+                                native = "DefaultNative",
+                                appOpenAd = ""
+                            )
+                        )
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "second_group",
+                                interstitial = "SecondInterstitial",
+                                rewarded = "SecondRewardedVideo",
+                                banner = "SecondBanner",
+                                mrec = "SecondMrec",
+                                native = "SecondNative",
+                                appOpenAd = ""
+                            )
+                        )
                     },
                     true, true, true, true
-                ),
+                ),*/
                 AdPlatformModel(
-                    StartAppAdWrapper("207754325").apply {},
+                    StartAppAdWrapper("207754325").apply {
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "default",
+                                interstitial = "DefaultInterstitial",
+                                rewarded = "DefaultRewardedVideo",
+                                banner = "DefaultBanner",
+                                mrec = "MREC_BANNER",
+                                native = "DefaultNative",
+                                appOpenAd = ""
+                            )
+                        )
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "second_group",
+                                interstitial = "SecondInterstitial",
+                                rewarded = "SecondRewardedVideo",
+                                banner = "SecondBanner",
+                                mrec = "Second_MREC_BANNER",
+                                native = "SecondNative",
+                                appOpenAd = ""
+                            )
+                        )
+                    },
                     true, true, true, true
                 )
             )
@@ -103,10 +162,26 @@ class MyApplication : MultiDexApplication() {
                 true, true, true, true
             )
         )*/
-        adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,admob,startapp")
-        adManager.setAdPlatformSortByAdFormatStr("banner", "admob,ironsource,startapp")
-        adManager.setAdPlatformSortByAdFormatStr("rewarded", "ironsource,admob,startapp")
-        adManager.setAdPlatformSortByAdFormatStr("mrec", "admob,startapp,ironsource")
+        /*adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "ironsource,admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob,ironsource,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,ironsource,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp,ironsource")*/
+
+        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp")
+
+        /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "startapp,ironsource,admob")
+        adManager.setAdPlatformSortByAdFormatStr(1, "banner", "startapp,ironsource,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(1, "rewarded", "startapp,ironsource,admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(1, "mrec", "startapp,admob,startapp,ironsource")*/
+
+        adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "admob")
+        adManager.setAdPlatformSortByAdFormatStr(1, "banner", "startapp,admob")
+        adManager.setAdPlatformSortByAdFormatStr(1, "rewarded", "admob")
+        adManager.setAdPlatformSortByAdFormatStr(1, "mrec", "admob,startapp")
+
 
 
         adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {
