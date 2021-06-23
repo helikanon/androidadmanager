@@ -44,7 +44,7 @@ class MyApplication : MultiDexApplication() {
             }
         )
 
-        admobAppOpenAdManager?.excludedActivities?.add(JavaSampleActivity@this.javaClass.simpleName)
+        admobAppOpenAdManager?.excludedActivities?.add(JavaSampleActivity::class.java.simpleName)
         admobAppOpenAdManager?.minElapsedSecondsToNextShow = 10
     }
 
