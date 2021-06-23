@@ -341,15 +341,11 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         adLoader = AdLoader.Builder(activity, placementName)
             .forNativeAd { nativeAd ->
 
-                if (activity.isDestroyed) {
-                    nativeAd.destroy()
-                } else {
-                    nativeAds.add(nativeAd)
-                    viewIntances.put(placementName, nativeAds)
+                nativeAds.add(nativeAd)
+                viewIntances.put(placementName, nativeAds)
 
-                    if (!adLoader.isLoading) {
-                        listener?.onLoaded(platform)
-                    }
+                if (!adLoader.isLoading) {
+                    listener?.onLoaded(platform)
                 }
             }
             .withAdListener(object : AdListener() {
