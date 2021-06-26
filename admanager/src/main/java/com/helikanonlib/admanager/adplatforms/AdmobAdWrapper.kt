@@ -9,7 +9,6 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
-import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.helikanonlib.admanager.*
@@ -127,13 +126,14 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         viewIntances.put(placementName, null)
 
         RewardedAd.load(
-            activity, placementName, AdRequest.Builder()
-                .build(), object : RewardedAdLoadCallback() {
+            activity, placementName, AdRequest.Builder().build(),
+            object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(p0: RewardedAd) {
                     viewIntances[placementName] = p0
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
+                    viewIntances[placementName] = null
                     listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded load >> error code=${adError.code} / ${adError.message}", platform)
                 }
             })
@@ -157,19 +157,17 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onAdShowedFullScreenContent() {
                 listener?.onDisplayed(platform)
-                viewIntances[placementName] = null
             }
 
             override fun onAdDismissedFullScreenContent() {
+                viewIntances[placementName] = null
                 listener?.onClosed(platform)
             }
 
         }
 
-        rewardedAd?.show(activity, OnUserEarnedRewardListener() {
-            fun onUserEarnedReward(rewardItem: RewardItem) {
-                listener?.onRewarded(rewardItem.type, rewardItem.amount, platform)
-            }
+        rewardedAd?.show(activity, OnUserEarnedRewardListener { rewardItem ->
+            listener?.onRewarded(rewardItem.type, rewardItem.amount, platform)
         })
     }
 

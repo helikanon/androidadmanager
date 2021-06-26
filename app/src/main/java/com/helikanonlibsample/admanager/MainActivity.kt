@@ -128,7 +128,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnShowRewarded.setOnClickListener {
-            MyApplication.adManager.showRewarded(this) // if autoload mode is false it will load and show
+            MyApplication.adManager.showRewarded(this, object: AdPlatformShowListener() {
+                override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum?) {
+                    super.onRewarded(type, amount, adPlatformEnum)
+                }
+            }) // if autoload mode is false it will load and show
         }
 
         binding.btnShowInterstitialForTimeStrategy.setOnClickListener {

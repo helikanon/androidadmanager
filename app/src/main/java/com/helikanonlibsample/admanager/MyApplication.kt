@@ -171,7 +171,7 @@ class MyApplication : MultiDexApplication() {
 
         adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "ironsource,admob,startapp")
         adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob,ironsource,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "ironsource,admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,ironsource,startapp")
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp")
 
         /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "startapp,ironsource,admob")
