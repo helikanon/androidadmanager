@@ -9,13 +9,13 @@ apply plugin: 'kotlin-android-extensions'*/
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 26
-        versionName "3.002"
+        versionCode 27
+        versionName "3.003"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"

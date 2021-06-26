@@ -77,7 +77,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         val placementName = "interstitial_" + getPlacementGroupByIndex(placementGroupIndex).groupName
-        val startAppAd = viewIntances[placementName] as StartAppAd
+        val startAppAd = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
 
         startAppAd?.loadAd(object : AdEventListener {
             override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
@@ -94,8 +94,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         if (!isInterstitialLoaded(placementGroupIndex)) return
 
         val placementName = "interstitial_" + getPlacementGroupByIndex(placementGroupIndex).groupName
-        val startAppAd = viewIntances[placementName] as StartAppAd
-
+		val startAppAd = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
 
         startAppAd?.showAd(object : AdDisplayListener {
             override fun adHidden(p0: com.startapp.sdk.adsbase.Ad?) {
@@ -130,7 +129,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         val placementName = "rewarded_" + getPlacementGroupByIndex(placementGroupIndex).groupName
-        val startAppAdRewarded = viewIntances[placementName] as StartAppAd
+        val startAppAdRewarded = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
 
         startAppAdRewarded?.loadAd(StartAppAd.AdMode.REWARDED_VIDEO, object : AdEventListener {
             override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
@@ -150,7 +149,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         val placementName = "rewarded_" + getPlacementGroupByIndex(placementGroupIndex).groupName
-        val startAppAdRewarded = viewIntances[placementName] as StartAppAd
+        val startAppAdRewarded = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
 
         startAppAdRewarded?.setVideoListener(object : VideoListener {
             override fun onVideoCompleted() {
