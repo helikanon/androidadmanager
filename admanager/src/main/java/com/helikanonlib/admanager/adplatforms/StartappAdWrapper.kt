@@ -15,6 +15,7 @@ import com.startapp.sdk.adsbase.StartAppSDK
 import com.startapp.sdk.adsbase.VideoListener
 import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener
 import com.startapp.sdk.adsbase.adlisteners.AdEventListener
+import com.startapp.sdk.adsbase.model.AdPreferences
 
 
 /**
@@ -58,10 +59,10 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         //startAppAd = StartAppAd(context)
         // startAppAdRewarded = StartAppAd(context)
 
-        for (group in placementGroups) {
+        /*for (group in placementGroups) {
             viewIntances.put("interstitial_${group.groupName}", StartAppAd(context))
             viewIntances.put("rewarded_${group.groupName}", StartAppAd(context))
-        }
+        }*/
 
         isInitialized = true
     }
@@ -77,14 +78,18 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         val placementName = "interstitial_" + getPlacementGroupByIndex(placementGroupIndex).groupName
-        val startAppAd = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
+        // val startAppAd = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
+        val startAppAd = StartAppAd(activity.applicationContext)
+        viewIntances.put(placementName, null)
 
         startAppAd?.loadAd(object : AdEventListener {
             override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
+                viewIntances.put(placementName, null)
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
+                viewIntances.put(placementName, startAppAd)
                 listener?.onLoaded(platform)
             }
         })
@@ -94,10 +99,11 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         if (!isInterstitialLoaded(placementGroupIndex)) return
 
         val placementName = "interstitial_" + getPlacementGroupByIndex(placementGroupIndex).groupName
-		val startAppAd = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
+        val startAppAd = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
 
         startAppAd?.showAd(object : AdDisplayListener {
             override fun adHidden(p0: com.startapp.sdk.adsbase.Ad?) {
+                viewIntances[placementName] = null
                 listener?.onClosed(platform)
             }
 
@@ -106,6 +112,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun adNotDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
+                viewIntances[placementName] = null
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorMessage ?: ""}", platform)
             }
 
@@ -129,14 +136,18 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         val placementName = "rewarded_" + getPlacementGroupByIndex(placementGroupIndex).groupName
-        val startAppAdRewarded = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
+        // val startAppAdRewarded = if (viewIntances.containsKey(placementName)) viewIntances[placementName] as StartAppAd? else null
+        val startAppAdRewarded = StartAppAd(activity.applicationContext)
+        viewIntances.put(placementName, null)
 
         startAppAdRewarded?.loadAd(StartAppAd.AdMode.REWARDED_VIDEO, object : AdEventListener {
             override fun onFailedToReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
+                viewIntances.put(placementName, null)
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
+                viewIntances.put(placementName, startAppAdRewarded)
                 listener?.onLoaded(platform)
             }
         })
@@ -158,6 +169,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         })
         startAppAdRewarded?.showAd(object : AdDisplayListener {
             override fun adHidden(p0: com.startapp.sdk.adsbase.Ad?) {
+                viewIntances[placementName] = null
                 listener?.onClosed(platform)
             }
 
@@ -166,6 +178,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun adNotDisplayed(p0: com.startapp.sdk.adsbase.Ad?) {
+                viewIntances[placementName] = null
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}", platform)
             }
 

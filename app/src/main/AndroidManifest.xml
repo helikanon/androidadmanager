@@ -27,13 +27,16 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".JavaSampleActivity"
-            android:label="Java Samples"></activity>
+            android:label="Java Samples"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".EmptyActivity"
-            android:label="Empty Activity" />
+            android:label="Empty Activity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
-            android:label="Ad Manager">
+            android:label="Ad Manager"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -112,7 +115,7 @@
             android:name="com.applovin.adview.AppLovinInterstitialActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:hardwareAccelerated="true"
-            android:screenOrientation="behind"/>
+            android:screenOrientation="behind" />
 
         <activity
             android:name="com.applovin.adview.AppLovinFullscreenActivity"
@@ -120,11 +123,11 @@
             android:exported="false"
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
-            android:screenOrientation="behind"/>
+            android:screenOrientation="behind" />
 
         <activity
             android:name="com.applovin.sdk.AppLovinWebViewActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"/>
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode" />
 
         <!--<meta-data android:name="applovin.sdk.key"
             android:value="pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP"  />-->
@@ -133,10 +136,10 @@
         <!--chartboost-->
         <activity
             android:name="com.chartboost.sdk.CBImpressionActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:excludeFromRecents="true"
-            android:hardwareAccelerated="true"/>
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
         <!--chartboost-->
     </application>
 

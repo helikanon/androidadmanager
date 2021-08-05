@@ -70,11 +70,12 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             activity, placementName, AdRequest.Builder()
                 .build(), object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                    listener?.onLoaded(platform)
                     viewIntances.put(placementName, interstitialAd)
+                    listener?.onLoaded(platform)
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
+                    viewIntances.put(placementName, null)
                     listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> error code=${adError.code} / ${adError.message}", platform)
                 }
             })
@@ -92,16 +93,16 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         interstitial?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial show >> error code=${adError.code} / ${adError.message}", platform)
                 viewIntances[placementName] = null
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial show >> error code=${adError.code} / ${adError.message}", platform)
             }
 
             override fun onAdShowedFullScreenContent() {
                 listener?.onDisplayed(platform)
-                viewIntances[placementName] = null
             }
 
             override fun onAdDismissedFullScreenContent() {
+                viewIntances[placementName] = null
                 listener?.onClosed(platform)
             }
 
@@ -133,7 +134,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
-                    viewIntances[placementName] = null
+                    viewIntances.put(placementName, null)
                     listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded load >> error code=${adError.code} / ${adError.message}", platform)
                 }
             })

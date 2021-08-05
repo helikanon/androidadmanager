@@ -24,9 +24,9 @@ class MainActivity : AppCompatActivity() {
 
         initAds()
         initViews()
-
+        
         Handler(Looper.getMainLooper()).postDelayed({
-            MyApplication.admobAppOpenAdManager?.show(this@MainActivity, null)
+            // MyApplication.admobAppOpenAdManager?.show(this@MainActivity, null)
 
             val ap = MyApplication.adManager?.getAdPlatformByType(AdPlatformTypeEnum.ADMOB)
             ap?.platformInstance?.loadNativeAds(this@MainActivity, 4, object : AdPlatformLoadListener() {
@@ -55,6 +55,8 @@ class MainActivity : AppCompatActivity() {
                     Log.d("MyApplication.adManager", "[NATIVE] ${errorMode?.name} / $errorMessage / ${adPlatformEnum?.name}")
                 }
             })
+
+            MyApplication.admobAppOpenAdManager?.isEnable = true
         }, 2000)
 
 

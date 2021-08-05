@@ -45,14 +45,15 @@ class MyApplication : MultiDexApplication() {
         )
 
         admobAppOpenAdManager?.excludedActivities?.add(JavaSampleActivity::class.java.simpleName)
-        admobAppOpenAdManager?.minElapsedSecondsToNextShow = 10
+        admobAppOpenAdManager?.minElapsedSecondsToNextShow = 30
+        admobAppOpenAdManager?.disable()
     }
 
     fun initAdManager() {
         adManager = AdManager().apply {
             showAds = true
             autoLoad = true
-            autoLoadDelay = 15 // seconds
+            autoLoadDelay = 11 // seconds
             interstitialMinElapsedSecondsToNextShow = 60 // seconds
             randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
             testMode = BuildConfig.DEBUG
