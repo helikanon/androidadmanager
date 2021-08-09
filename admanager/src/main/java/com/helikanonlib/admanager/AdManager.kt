@@ -69,7 +69,6 @@ class AdManager {
 
             autoloadInterstitialHandler = Handler(handlerThread!!.looper)
             autoloadRewardedHandler = Handler(handlerThread!!.looper)
-            Log.d("adManager", "admanager-bg-thread >> initHandlers >> handlerThread == null >> start")
         }
     }
 
