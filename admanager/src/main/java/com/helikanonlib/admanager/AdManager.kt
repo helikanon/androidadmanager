@@ -69,7 +69,7 @@ class AdManager {
 
             autoloadInterstitialHandler = Handler(handlerThread!!.looper)
             autoloadRewardedHandler = Handler(handlerThread!!.looper)
-            Log.d("adManager","admanager-bg-thread >> initHandlers >> handlerThread == null >> start")
+            Log.d("adManager", "admanager-bg-thread >> initHandlers >> handlerThread == null >> start")
         }
     }
 
@@ -328,6 +328,7 @@ class AdManager {
                 }
                 globalInterstitialShowListener?.onClosed(adPlatformEnum)
                 listener?.onClosed(adPlatformEnum)
+                saveLastShowDate(AdFormatEnum.INTERSTITIAL)
             }
 
             override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
