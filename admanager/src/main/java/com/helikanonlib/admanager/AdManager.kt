@@ -67,6 +67,8 @@ class AdManager {
             handlerThread = HandlerThread("admanager-bg-thread")
             handlerThread?.start()
 
+            hasWorkingAutoloadInterstitialHandler = false
+            hasWorkingAutoloadRewardedHandler = false
             autoloadInterstitialHandler = Handler(handlerThread!!.looper)
             autoloadRewardedHandler = Handler(handlerThread!!.looper)
         }

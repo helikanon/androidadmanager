@@ -14,6 +14,7 @@ enum class AdPlatformTypeEnum {
     ADINCUBE,
     IRONSOURCE,
     MOPUB,
+    UNITY_ADS
 }
 
 enum class AdFormatEnum {
