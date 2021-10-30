@@ -85,10 +85,10 @@ class AdManager {
         if (!showAds) return
 
         adPlatforms.forEach forEach@{ platform ->
-            platform.platformInstance.initialize(activity)
+            platform.platformInstance.initialize(activity, testMode)
 
             if (testMode) {
-                platform.platformInstance.enableTestMode(deviceId)
+                platform.platformInstance.enableTestMode(activity.applicationContext, deviceId)
             }
         }
     }
@@ -97,10 +97,10 @@ class AdManager {
         if (!showAds) return
 
         adPlatforms.forEach forEach@{ platform ->
-            platform.platformInstance.initialize(context)
+            platform.platformInstance.initialize(context, testMode)
 
             if (testMode) {
-                platform.platformInstance.enableTestMode(deviceId)
+                platform.platformInstance.enableTestMode(context, deviceId)
             }
         }
     }
@@ -115,14 +115,14 @@ class AdManager {
         }
     }
 
-    fun enableTestMode(deviceId: String) {
+    fun enableTestMode(activity: Activity, deviceId: String) {
 
         this.testMode = true
         this.deviceId = deviceId
 
         adPlatforms.forEach forEach@{ platform ->
             if (testMode) {
-                platform.platformInstance.enableTestMode(deviceId)
+                platform.platformInstance.enableTestMode(activity.applicationContext, deviceId)
             }
         }
     }

@@ -24,9 +24,9 @@ abstract class AdPlatformWrapper(open var appId: String) {
     var nativePlacementId: String? = null
     var appOpenAdPlacementId: String? = null*/
 
-    abstract fun initialize(activity: Activity)
-    abstract fun initialize(context: Context)
-    abstract fun enableTestMode(deviceId: String? = null)
+    abstract fun initialize(activity: Activity, testMode: Boolean = false)
+    abstract fun initialize(context: Context, testMode: Boolean = false)
+    abstract fun enableTestMode(context: Context, deviceId: String? = null)
 
     abstract fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0)
     abstract fun showInterstitial(activity: Activity, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)

@@ -1,6 +1,5 @@
 package com.helikanonlib.admanager.adplatforms
 
-/*
 import android.app.Activity
 import android.content.Context
 import android.widget.RelativeLayout
@@ -19,14 +18,14 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         var isInitialized = false
     }
 
-    override var platform = AdPlatformTypeEnum.UNITY_ADS
+    override var platform = AdPlatformTypeEnum.UNITYADS
     var viewIntances: MutableMap<String, Any?> = mutableMapOf()
 
 
-    override fun initialize(activity: Activity) {
+    override fun initialize(activity: Activity, testMode: Boolean) {
     }
 
-    override fun initialize(context: Context) {
+    override fun initialize(context: Context, testMode: Boolean) {
         if (isInitialized) return
 
         UnityAds.addListener(object : IUnityAdsListener {
@@ -46,22 +45,21 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             }
         })
-        UnityAds.initialize(context, appId, true)
+        UnityAds.initialize(context, appId, testMode)
 
         isInitialized = true
     }
 
-    override fun enableTestMode(deviceId: String?) {
-
-        */
-/*for (group in placementGroups) {
+    override fun enableTestMode(context: Context, deviceId: String?) {
+        UnityAds.initialize(context, appId, true)
+        /*for (group in placementGroups) {
             group.interstitial = "ca-app-pub-3940256099942544/1033173712"
             group.banner = "ca-app-pub-3940256099942544/6300978111"
             group.rewarded = "ca-app-pub-3940256099942544/5224354917"
             group.mrec = "ca-app-pub-3940256099942544/6300978111"
             group.native = "ca-app-pub-3940256099942544/2247696110"
             group.appOpenAd = "ca-app-pub-3940256099942544/3419835294"
-        }*//*
+        }*/
 
 
     }
@@ -142,6 +140,8 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         bannerAdView.listener = object : BannerView.IListener {
             override fun onBannerLoaded(bannerAdView: BannerView?) {
                 activity.runOnUiThread {
+                    viewIntances[placementName] = bannerAdView
+
                     _removeBannerViewIfExists(bannerAdView)
                     containerView.addView(bannerAdView, lp)
                     listener?.onDisplayed(platform)
@@ -162,15 +162,44 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         }
         bannerAdView.load()
-        viewIntances[placementName] = bannerAdView
+
     }
 
     override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
-
+        if (isRewardedLoaded(placementGroupIndex)) {
+            listener?.onLoaded(platform)
+            return
+        } else {
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> unityads rewarded load error", platform)
+            return
+        }
     }
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+        if (!isRewardedLoaded(placementGroupIndex)) {
+            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded", platform)
+            return
+        }
 
+        val placementName = getPlacementGroupByIndex(placementGroupIndex).rewarded
+        UnityAds.show(activity, placementName, object : IUnityAdsShowListener {
+            override fun onUnityAdsShowFailure(placementId: String?, error: UnityAds.UnityAdsShowError?, message: String?) {
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded [$placementId] >> ${error?.name ?: ""}", platform)
+            }
+
+            override fun onUnityAdsShowStart(placementId: String?) {
+                listener?.onDisplayed(platform)
+            }
+
+            override fun onUnityAdsShowClick(placementId: String?) {
+                listener?.onClicked(platform)
+            }
+
+            override fun onUnityAdsShowComplete(placementId: String?, state: UnityAds.UnityAdsShowCompletionState?) {
+                listener?.onClosed(platform)
+            }
+
+        })
     }
 
     override fun isRewardedLoaded(placementGroupIndex: Int): Boolean {
@@ -209,6 +238,8 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         bannerAdView.listener = object : BannerView.IListener {
             override fun onBannerLoaded(bannerAdView: BannerView?) {
                 activity.runOnUiThread {
+                    viewIntances[placementName] = bannerAdView
+
                     _removeBannerViewIfExists(bannerAdView)
                     containerView.addView(bannerAdView, lp)
                     listener?.onDisplayed(platform)
@@ -229,7 +260,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         }
         bannerAdView.load()
-        viewIntances[placementName] = bannerAdView
+
     }
 
     override fun isNativeLoaded(placementGroupIndex: Int): Boolean {
@@ -237,7 +268,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
-
+        listener?.onError(AdErrorMode.PLATFORM, "unity ads not support native ads", platform)
     }
 
     override fun showNative(activity: Activity, pos: Int, listener: AdPlatformShowListener?, placementGroupIndex: Int): NativeAd? {
@@ -304,4 +335,4 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
 
-}*/
+}

@@ -6,6 +6,7 @@ import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper
 import com.helikanonlib.admanager.adplatforms.IronSourceAdWrapper
 import com.helikanonlib.admanager.adplatforms.StartAppAdWrapper
+import com.helikanonlib.admanager.adplatforms.UnityAdsAdWrapper
 
 class MyApplication : MultiDexApplication() {
 
@@ -150,6 +151,22 @@ class MyApplication : MultiDexApplication() {
                         )*/
                     },
                     true, true, true, true
+                ),
+                AdPlatformModel(
+                    UnityAdsAdWrapper("4428087").apply {
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "default",
+                                interstitial = "Interstitial_Android",
+                                rewarded = "Rewarded_Android",
+                                banner = "Banner_Android",
+                                mrec = "BannerMrec_Android",
+                                native = "DefaultNative",
+                                appOpenAd = ""
+                            )
+                        )
+                    },
+                    true, true, true, true
                 )
             )
         }
@@ -170,9 +187,9 @@ class MyApplication : MultiDexApplication() {
         adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,ironsource,startapp")
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp,ironsource")*/
 
-        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "ironsource,admob,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob,ironsource,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,ironsource,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "unityads,ironsource,admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "unityads,admob,ironsource,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,unityads,admob,ironsource,startapp")
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp")
 
         /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "startapp,ironsource,admob")

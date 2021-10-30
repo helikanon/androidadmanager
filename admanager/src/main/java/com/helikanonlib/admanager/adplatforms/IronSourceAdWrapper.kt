@@ -26,18 +26,18 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         var isInitialized = false
     }
 
-    override fun initialize(activity: Activity) {
+    override fun initialize(activity: Activity, testMode: Boolean) {
         if (isInitialized) return
         //IntegrationHelper.validateIntegration(activity);
         IronSource.init(activity, appId, IronSource.AD_UNIT.INTERSTITIAL, IronSource.AD_UNIT.BANNER, IronSource.AD_UNIT.REWARDED_VIDEO)
         isInitialized = true
     }
 
-    override fun initialize(context: Context) {
+    override fun initialize(context: Context, testMode: Boolean) {
 
     }
 
-    override fun enableTestMode(deviceId: String?) {
+    override fun enableTestMode(context: Context, deviceId: String?) {
 
     }
 

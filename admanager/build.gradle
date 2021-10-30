@@ -14,8 +14,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 32
-        versionName "3.008"
+        versionCode 33
+        versionName "3.100"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -71,7 +71,7 @@ dependencies {
     implementation 'com.startapp:inapp-sdk:4.8.+'
 
     // unityads
-    // implementation 'com.unity3d.ads:unity-ads:3.7.5'
+    implementation 'com.unity3d.ads:unity-ads:3.7.5'
 
     // mopub
     /*implementation('com.mopub:mopub-sdk:+@aar') {

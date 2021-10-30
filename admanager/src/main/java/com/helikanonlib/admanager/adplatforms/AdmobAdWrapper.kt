@@ -34,17 +34,21 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         var isInitialized = false
     }
 
-    override fun initialize(activity: Activity) {
+    override fun initialize(activity: Activity, testMode: Boolean) {
     }
 
-    override fun initialize(context: Context) {
+    override fun initialize(context: Context, testMode: Boolean) {
         if (isInitialized) return
 
         MobileAds.initialize(context)
         isInitialized = true
+
+        if (testMode) {
+            enableTestMode(context, null)
+        }
     }
 
-    override fun enableTestMode(deviceId: String?) {
+    override fun enableTestMode(context: Context, deviceId: String?) {
 
         for (group in placementGroups) {
             group.interstitial = "ca-app-pub-3940256099942544/1033173712"
@@ -240,6 +244,8 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onAdLoaded() {
                 super.onAdLoaded()
                 activity.runOnUiThread {
+                    viewIntances[placementName] = bannerAdView
+
                     _removeBannerViewIfExists(bannerAdView)
                     containerView.addView(bannerAdView, lp)
                     listener?.onDisplayed(platform)
@@ -251,8 +257,6 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
         }
         bannerAdView?.loadAd(AdRequest.Builder().build())
-        viewIntances[placementName] = bannerAdView
-
     }
 
     override fun isMrecLoaded(placementGroupIndex: Int): Boolean {
@@ -297,6 +301,8 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onAdLoaded() {
                 super.onAdLoaded()
                 activity.runOnUiThread {
+                    viewIntances[instanceKeyName] = mrecAdView
+
                     _removeBannerViewIfExists(mrecAdView)
                     containerView.addView(mrecAdView, lp)
                     listener?.onDisplayed(platform)
@@ -308,7 +314,6 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
         }
         mrecAdView?.loadAd(AdRequest.Builder().build())
-        viewIntances[instanceKeyName] = mrecAdView
 
     }
 

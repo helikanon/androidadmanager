@@ -38,11 +38,11 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         var isInitialized = false
     }
 
-    override fun initialize(activity: Activity) {
+    override fun initialize(activity: Activity, testMode: Boolean) {
 
     }
 
-    override fun initialize(context: Context) {
+    override fun initialize(context: Context, testMode: Boolean) {
         if (isInitialized) return
 
         StartAppSDK.init(context, appId, false);
@@ -65,9 +65,13 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }*/
 
         isInitialized = true
+
+        if (testMode) {
+            enableTestMode(context, null)
+        }
     }
 
-    override fun enableTestMode(deviceId: String?) {
+    override fun enableTestMode(context: Context, deviceId: String?) {
         StartAppSDK.setTestAdsEnabled(true);
     }
 
