@@ -17,8 +17,8 @@ android {
         applicationId "com.helikanonlibsample.admanager"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 33
-        versionName "3.100"
+        versionCode 34
+        versionName "3.101"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -104,7 +104,7 @@ dependencies {
 
     // Add UnityAds Network
     implementation 'com.ironsource.adapters:unityadsadapter:4.3.14'
-    implementation 'com.unity3d.ads:unity-ads:3.7.5'
+    // implementation 'com.unity3d.ads:unity-ads:3.7.5'
 
     // Add Vungle Network
     implementation 'com.ironsource.adapters:vungleadapter:4.3.11'

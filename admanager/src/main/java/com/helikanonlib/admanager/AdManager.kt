@@ -148,16 +148,20 @@ class AdManager {
      * adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,facebook,admob,startapp,mopub")
      */
     fun setAdPlatformSortByAdFormatStr(placementGroupIndex: Int, adFormatName: String, adPlatformsStr: String) {
-        val _afPlatformsArr = adPlatformsStr.splitIgnoreEmpty(",").map {
-            if (!it.isNullOrEmpty()) {
-                AdPlatformTypeEnum.valueOf(it.trim().uppercase(Locale.ENGLISH))
-            } else {
-                AdPlatformTypeEnum.valueOf(it.trim().uppercase(Locale.ENGLISH))
+        try {
+            val _afPlatformsArr = adPlatformsStr.splitIgnoreEmpty(",").map {
+                if (!it.isNullOrEmpty()) {
+                    AdPlatformTypeEnum.valueOf(it.trim().uppercase(Locale.ENGLISH))
+                } else {
+                    AdPlatformTypeEnum.valueOf(it.trim().uppercase(Locale.ENGLISH))
+                }
             }
+            adPlatformSortByAdFormat.put(
+                adFormatName.uppercase(Locale.ENGLISH) + "__" + getPlacementGroupNameByIndex(placementGroupIndex), _afPlatformsArr
+            )
+        } catch (e: Exception) {
+            Log.e("AdManager", "setAdPlatformSortByAdFormatStr >> ${e.message}")
         }
-        adPlatformSortByAdFormat.put(
-            adFormatName.uppercase(Locale.ENGLISH) + "__" + getPlacementGroupNameByIndex(placementGroupIndex), _afPlatformsArr
-        )
     }
 
 

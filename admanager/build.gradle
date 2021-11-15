@@ -14,8 +14,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 33
-        versionName "3.100"
+        versionCode 34
+        versionName "3.101"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -58,7 +58,7 @@ dependencies {
     // implementation project(path: ':nativetemplates')
 
     // ironsource
-    implementation 'com.ironsource.sdk:mediationsdk:7.1.11.1'
+    implementation 'com.ironsource.sdk:mediationsdk:7.1.12.1'
 
     // facebook
 	implementation 'com.ironsource.adapters:facebookadapter:4.3.31'
