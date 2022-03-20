@@ -289,7 +289,8 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         mrecAdView = AdView(activity.applicationContext)
-        mrecAdView?.adSize = AdSize.MEDIUM_RECTANGLE
+        // mrecAdView?.adSize = AdSize.MEDIUM_RECTANGLE
+        mrecAdView?.adSize = getMrecBannerAdaptiveSize(activity, containerView)
         mrecAdView?.adUnitId = placementName
         mrecAdView?.adListener = object : AdListener() {
             override fun onAdFailedToLoad(error: LoadAdError) {
@@ -315,6 +316,23 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
         mrecAdView?.loadAd(AdRequest.Builder().build())
 
+    }
+
+    fun getMrecBannerAdaptiveSize(activity: Activity, containerView: RelativeLayout): AdSize {
+        val display = activity.windowManager.defaultDisplay
+        val outMetrics = DisplayMetrics()
+        display.getMetrics(outMetrics)
+
+        val density = outMetrics.density
+
+        var adWidthPixels = containerView.width.toFloat()
+        if (adWidthPixels == 0f) {
+            adWidthPixels = outMetrics.widthPixels.toFloat()
+        }
+
+        val adWidth = (adWidthPixels / density).toInt()
+
+        return AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(activity, adWidth)
     }
 
     override fun isNativeLoaded(placementGroupIndex: Int): Boolean {

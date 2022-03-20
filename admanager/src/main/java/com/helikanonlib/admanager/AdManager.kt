@@ -9,7 +9,6 @@ import android.util.Log
 import android.widget.RelativeLayout
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
 
 // TODO ADD AD LOADING WARNING LAYOUT >> var a = (activity.findViewById<ViewGroup>(R.id.content)).getChildAt(0) as ViewGroup
 // TODO FUTURE = add native ads support

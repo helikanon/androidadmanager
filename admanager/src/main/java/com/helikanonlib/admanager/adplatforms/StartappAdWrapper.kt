@@ -15,7 +15,6 @@ import com.startapp.sdk.adsbase.StartAppSDK
 import com.startapp.sdk.adsbase.VideoListener
 import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener
 import com.startapp.sdk.adsbase.adlisteners.AdEventListener
-import com.startapp.sdk.adsbase.model.AdPreferences
 
 
 /**
