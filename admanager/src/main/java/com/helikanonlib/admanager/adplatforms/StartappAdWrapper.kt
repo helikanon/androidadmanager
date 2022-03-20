@@ -92,7 +92,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> ${p0?.errorMessage ?: ""}", platform)
             }
 
-            override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
+            override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad) {
                 viewIntances.put(placementName, startAppAd)
                 listener?.onLoaded(platform)
             }
@@ -150,7 +150,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> ${p0?.errorMessage ?: ""}", platform)
             }
 
-            override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad?) {
+            override fun onReceiveAd(p0: com.startapp.sdk.adsbase.Ad) {
                 viewIntances.put(placementName, startAppAdRewarded)
                 listener?.onLoaded(platform)
             }

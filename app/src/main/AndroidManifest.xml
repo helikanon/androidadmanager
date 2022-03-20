@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Ironsource içinde gerekli -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /><!--for chartboost-->
+    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />--><!--for chartboost-->
 
     <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -28,13 +28,14 @@
         <activity
             android:name=".JavaSampleActivity"
             android:label="Java Samples"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".EmptyActivity"
             android:label="Empty Activity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
+            android:exported="true"
             android:label="Ad Manager"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -66,8 +67,9 @@
             android:authorities="${applicationId}.IronsourceLifecycleProvider" />-->
         <!--ironsource-->
 
+
         <!--unityads-->
-        <activity
+        <!--<activity
             android:name="com.unity3d.services.ads.adunit.AdUnitActivity"
             android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
             android:hardwareAccelerated="true"
@@ -86,7 +88,7 @@
             android:name="com.unity3d.services.ads.adunit.AdUnitSoftwareActivity"
             android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
             android:hardwareAccelerated="false"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />-->
         <!--unity ads-->
 
         <!--adcolony-->
@@ -102,20 +104,20 @@
         <!--adcolony-->
 
         <!--inmobi-->
-        <activity
+        <!--<activity
             android:name="com.inmobi.ads.rendering.InMobiAdActivity"
             android:configChanges="keyboardHidden|orientation|keyboard|smallestScreenSize|screenSize|screenLayout|locale|fontScale|uiMode"
             android:hardwareAccelerated="true"
             android:theme="@android:style/Theme.NoTitleBar"
-            tools:ignore="UnusedAttribute" />
+            tools:ignore="UnusedAttribute" />-->
         <!--inmobi-->
 
         <!--applovin-->
-        <activity
+        <!--<activity
             android:name="com.applovin.adview.AppLovinInterstitialActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|uiMode"
             android:hardwareAccelerated="true"
-            android:screenOrientation="behind" />
+            android:screenOrientation="behind"/>-->
 
         <activity
             android:name="com.applovin.adview.AppLovinFullscreenActivity"
@@ -123,26 +125,28 @@
             android:exported="false"
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"
-            android:screenOrientation="behind" />
+            android:screenOrientation="behind"/>
 
         <activity
             android:name="com.applovin.sdk.AppLovinWebViewActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|uiMode" />
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"/>
+        <!--applovin-->
 
         <!--<meta-data android:name="applovin.sdk.key"
             android:value="pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP"  />-->
         <!--applovin-->
 
         <!--chartboost-->
-        <activity
+        <!--<activity
             android:name="com.chartboost.sdk.CBImpressionActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:excludeFromRecents="true"
             android:hardwareAccelerated="true"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />-->
         <!--chartboost-->
     </application>
 
+    <!-- add networks-->
     <queries>
         <intent>
             <action android:name="android.support.customtabs.action.CustomTabsService" />
@@ -158,5 +162,6 @@
             <data android:scheme="http" />
         </intent>
     </queries>
+    <!-- add networks-->
 
 </manifest>

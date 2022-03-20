@@ -1,14 +1,15 @@
 package com.helikanonlibsample.admanager
 
+import android.app.Application
 import android.util.Log
-import androidx.multidex.MultiDexApplication
+// import androidx.multidex.MultiDexApplication
 import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper
 import com.helikanonlib.admanager.adplatforms.IronSourceAdWrapper
 import com.helikanonlib.admanager.adplatforms.StartAppAdWrapper
 import com.helikanonlib.admanager.adplatforms.UnityAdsAdWrapper
 
-class MyApplication : MultiDexApplication() {
+class MyApplication : Application() {
 
 
     companion object {

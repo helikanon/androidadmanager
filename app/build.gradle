@@ -10,15 +10,15 @@ apply plugin: 'kotlin-android-extensions'*/
 //apply plugin: 'com.google.gms.google-services'  // if admob active enable this line and add app/google-services.json
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdkVersion 31
+    buildToolsVersion "31.0.0"
 
     defaultConfig {
         applicationId "com.helikanonlibsample.admanager"
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 34
-        versionName "3.101"
+        targetSdkVersion 31
+        versionCode 35
+        versionName "3.105"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -57,16 +57,16 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
+    // implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
 
-    implementation 'androidx.multidex:multidex:2.0.1'
+    // implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
     // lifecycle
@@ -75,7 +75,7 @@ dependencies {
 
     // admob
     //implementation 'com.google.android.gms:play-services-ads:19.7.0'
-    implementation 'com.google.android.gms:play-services-ads:20.4.0'
+    implementation 'com.google.android.gms:play-services-ads:20.6.0'
     implementation project(path: ':nativetemplates')
 
     implementation project(path: ':admanager')
@@ -83,32 +83,33 @@ dependencies {
 
 
     // for ironsource and inmobi
-    implementation 'com.google.android.gms:play-services-ads-identifier:17.1.0'
-    implementation 'com.google.android.gms:play-services-basement:17.6.0'
+    implementation 'com.google.android.gms:play-services-appset:16.0.2'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
+    implementation 'com.google.android.gms:play-services-basement:18.0.0'
 
     // ///////////////////////////////////////////////////////////////////////////////////////// ADS
     // ///////////////////////////////////////////////////////////////////////////////////////// ADS
     // ///////////////////////////////////////////////////////////////////////////////////////// ADS
 
     // Add AdColony Network
-    implementation 'com.ironsource.adapters:adcolonyadapter:4.3.9'
-    implementation 'com.adcolony:sdk:4.5.0'
+    implementation 'com.ironsource.adapters:adcolonyadapter:4.3.10'
+    implementation 'com.adcolony:sdk:4.6.5'
 
     // Add Applovin Network
-    implementation 'com.ironsource.adapters:applovinadapter:4.3.28'
-    implementation 'com.applovin:applovin-sdk:10.3.2'
+    implementation 'com.ironsource.adapters:applovinadapter:4.3.30'
+    implementation 'com.applovin:applovin-sdk:11.2.2'
 
     // Add Chartboost Network
-    implementation 'com.ironsource.adapters:chartboostadapter:4.3.7'
-    implementation 'com.chartboost:chartboost-sdk:8.2.1'
+    //implementation 'com.ironsource.adapters:chartboostadapter:4.3.7'
+    //implementation 'com.chartboost:chartboost-sdk:8.2.1'
 
     // Add UnityAds Network
-    implementation 'com.ironsource.adapters:unityadsadapter:4.3.14'
+    implementation 'com.ironsource.adapters:unityadsadapter:4.3.20'
     // implementation 'com.unity3d.ads:unity-ads:3.7.5'
 
     // Add Vungle Network
-    implementation 'com.ironsource.adapters:vungleadapter:4.3.11'
-    implementation 'com.vungle:publisher-sdk-android:6.10.2'
+    implementation 'com.ironsource.adapters:vungleadapter:4.3.16'
+    implementation 'com.vungle:publisher-sdk-android:6.10.5'
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////

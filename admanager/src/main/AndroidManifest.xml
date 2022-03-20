@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.Ad_ID" />
 
     <!-- For startapp better performance -->
     <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -33,49 +34,50 @@
             android:name="com.ironsource.sdk.controller.ControllerActivity"
             android:configChanges="orientation|screenSize"
             android:hardwareAccelerated="true" />
-		<activity
-		            android:name="com.ironsource.sdk.controller.InterstitialActivity"
-		            android:configChanges="orientation|screenSize"
-		            android:hardwareAccelerated="true"
-		            android:theme="@android:style/Theme.Translucent" />
-		<activity
-		            android:name="com.ironsource.sdk.controller.OpenUrlActivity"
-		            android:configChanges="orientation|screenSize"
-		            android:hardwareAccelerated="true"
-		            android:theme="@android:style/Theme.Translucent" />
-		<provider
-		            android:authorities="${applicationId}.IronsourceLifecycleProvider"
-		            android:name="com.ironsource.lifecycle.IronsourceLifecycleProvider" />
+        <activity
+            android:name="com.ironsource.sdk.controller.InterstitialActivity"
+            android:configChanges="orientation|screenSize"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent" />
+        <activity
+            android:name="com.ironsource.sdk.controller.OpenUrlActivity"
+            android:configChanges="orientation|screenSize"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent" />
+
+        <provider
+            android:name="com.ironsource.lifecycle.IronsourceLifecycleProvider"
+            android:authorities="${applicationId}.IronsourceLifecycleProvider" />
         <!-- Ironsource -->
 
         <!--facebook-->
         <activity
             android:name="com.facebook.ads.AudienceNetworkActivity"
-            android:hardwareAccelerated="true"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:hardwareAccelerated="true" />
         <!--facebook-->
 
-		<!-- unityads -->
-		<activity
-			android:name="com.unity3d.services.ads.adunit.AdUnitActivity"
-			android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
-			android:hardwareAccelerated="true"
-			android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
-		<activity
-			android:name="com.unity3d.services.ads.adunit.AdUnitTransparentActivity"
-			android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
-			android:hardwareAccelerated="true"
-			android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
-		<activity
-			android:name="com.unity3d.services.ads.adunit.AdUnitTransparentSoftwareActivity"
-			android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
-			android:hardwareAccelerated="false"
-			android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
-		<activity
-			android:name="com.unity3d.services.ads.adunit.AdUnitSoftwareActivity"
-			android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
-			android:hardwareAccelerated="false"
-			android:theme="@android:style/Theme.NoTitleBar.Fullscreen" /> <!-- unity ads -->
+        <!-- unityads -->
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitActivity"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitTransparentActivity"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitTransparentSoftwareActivity"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
+            android:hardwareAccelerated="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitSoftwareActivity"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
+            android:hardwareAccelerated="false"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" /> <!-- unity ads -->
 
         <!-- ADS -->
     </application>
