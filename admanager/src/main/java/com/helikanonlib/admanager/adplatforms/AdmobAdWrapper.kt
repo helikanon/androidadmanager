@@ -261,7 +261,8 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun isMrecLoaded(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).mrec
-        val mrecAdView: AdView? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as AdView? else null
+        val instanceKeyName = placementName + "_mrec"
+        val mrecAdView: AdView? = if (viewIntances.containsKey(instanceKeyName)) viewIntances.get(instanceKeyName) as AdView? else null
         return _isBannerLoaded(mrecAdView)
     }
 

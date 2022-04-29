@@ -193,6 +193,12 @@ class MyApplication : Application() {
         adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,unityads,admob,ironsource,startapp")
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp")
 
+
+        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "admob")
+        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob")
+        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob")
+        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob")
+
         /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "startapp,ironsource,admob")
         adManager.setAdPlatformSortByAdFormatStr(1, "banner", "startapp,ironsource,startapp")
         adManager.setAdPlatformSortByAdFormatStr(1, "rewarded", "startapp,ironsource,admob,startapp")
