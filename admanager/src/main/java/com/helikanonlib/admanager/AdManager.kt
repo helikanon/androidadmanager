@@ -21,6 +21,7 @@ class AdManager {
     var randomInterval: Int = 40
     var interstitialMinElapsedSecondsToNextShow: Int = 40
     var rewardedMinElapsedSecondsToNextShow: Int = 40
+    var isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode = true
 
     var adPlatforms: MutableList<AdPlatformModel> = mutableListOf<AdPlatformModel>()
 
@@ -108,7 +109,7 @@ class AdManager {
         if (autoLoad) {
             placementGroups.forEachIndexed { index, pgName ->
                 if (index > 0) return@forEachIndexed
-                loadInterstitial(activity, listener = null, platform = null, parallel = true, placementGroupIndex = getPlacementGroupIndexByName(pgName))
+                loadInterstitial(activity, listener = null, platform = null, parallel = false, placementGroupIndex = getPlacementGroupIndexByName(pgName))
                 loadRewarded(activity, null, null, true, getPlacementGroupIndexByName(pgName))
             }
         }
@@ -286,7 +287,10 @@ class AdManager {
     }
 
     @JvmOverloads
-    fun showInterstitialForTimeStrategy(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
+    fun showInterstitialForTimeStrategy(
+        activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
+        placementGroupIndex: Int = 0, loadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = true
+    ) {
         if (!showAds) return
 
         var isAvailableToShow = true
@@ -300,20 +304,26 @@ class AdManager {
         }
 
         if (isAvailableToShow) {
-            showInterstitial(activity, listener, platform, placementGroupIndex)
+            showInterstitial(activity, listener, platform, placementGroupIndex, loadAndShowIfNotExistsAdsOnAutoloadMode)
         }
     }
 
     @JvmOverloads
-    fun showInterstitial(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
+    fun showInterstitial(
+        activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
+        placementGroupIndex: Int = 0, loadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = true
+    ) {
         if (!showAds) return
 
         if (autoLoad) {
             val isShowed = _showInterstitial(activity, listener, platform, placementGroupIndex)
-            /*if (!isShowed) {
-                stopAutoloadInterstitialHandler()
-                loadAndShowInterstitial(activity, listener, platform, placementGroupIndex)
-            }*/
+
+            if (isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode) {
+                if (!isShowed && loadAndShowIfNotExistsAdsOnAutoloadMode) {
+                    stopAutoloadInterstitialHandler()
+                    loadAndShowInterstitial(activity, listener, platform, placementGroupIndex)
+                }
+            }
         } else {
             loadAndShowInterstitial(activity, listener, platform, placementGroupIndex)
         }
@@ -418,7 +428,7 @@ class AdManager {
                 activity.runOnUiThread {
                     placementGroups.forEachIndexed { index, pgName ->
                         if (index < 1) {
-                            loadInterstitial(activity, listener, platform, true, getPlacementGroupIndexByName(pgName))
+                            loadInterstitial(activity, listener, platform, false, getPlacementGroupIndexByName(pgName))
                         }
                     }
 
@@ -667,14 +677,20 @@ class AdManager {
     }
 
     @JvmOverloads
-    fun showRewarded(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
+    fun showRewarded(
+        activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
+        placementGroupIndex: Int = 0, loadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = true
+    ) {
         if (!showAds) return
 
         if (autoLoad) {
             val isShowed = _showRewarded(activity, listener, platform, placementGroupIndex)
-            if (!isShowed) {
-                //stopAutoloadRewardedHandler()
-                //loadAndShowRewarded(activity, listener, platform, placementGroupIndex)
+
+            if (isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode) {
+                if (!isShowed && loadAndShowIfNotExistsAdsOnAutoloadMode) {
+                    stopAutoloadRewardedHandler()
+                    loadAndShowRewarded(activity, listener, platform, placementGroupIndex)
+                }
             }
         } else {
             loadAndShowRewarded(activity, listener, platform, placementGroupIndex)
@@ -927,7 +943,8 @@ class AdManager {
         var randomInterval: Int = 40,
         var interstitialMinSeconds: Int = 40,
         var rewardedMinSeconds: Int = 40,
-        val adPlatforms: MutableList<AdPlatformModel> = mutableListOf<AdPlatformModel>()
+        val adPlatforms: MutableList<AdPlatformModel> = mutableListOf<AdPlatformModel>(),
+        var isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = true
         //var adPlatforms: String = "facebook[interstitial,banner,rewarded],admob[interstitial,banner,rewarded],startapp[interstitial,banner,rewarded]"
 
     ) {
@@ -948,6 +965,14 @@ class AdManager {
             platforms.forEach {
                 this.addAdPlatform(it)
             }
+        }
+
+        fun enableLoadAndShowIfNotExistsAdsOnAutoloadMode() {
+            this.isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode = true
+        }
+
+        fun disableLoadAndShowIfNotExistsAdsOnAutoloadMode() {
+            this.isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode = false
         }
 
         fun build() = AdManager(this)

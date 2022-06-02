@@ -17,8 +17,8 @@ android {
         applicationId "com.helikanonlibsample.admanager"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 35
-        versionName "3.105"
+        versionCode 36
+        versionName "3.106"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -85,26 +85,26 @@ dependencies {
     // for ironsource and inmobi
     implementation 'com.google.android.gms:play-services-appset:16.0.2'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
-    implementation 'com.google.android.gms:play-services-basement:18.0.0'
+    implementation 'com.google.android.gms:play-services-basement:18.0.1'
 
     // ///////////////////////////////////////////////////////////////////////////////////////// ADS
     // ///////////////////////////////////////////////////////////////////////////////////////// ADS
     // ///////////////////////////////////////////////////////////////////////////////////////// ADS
 
     // Add AdColony Network
-    implementation 'com.ironsource.adapters:adcolonyadapter:4.3.10'
-    implementation 'com.adcolony:sdk:4.6.5'
+    implementation 'com.ironsource.adapters:adcolonyadapter:4.3.11'
+    implementation 'com.adcolony:sdk:4.7.1'
 
     // Add Applovin Network
-    implementation 'com.ironsource.adapters:applovinadapter:4.3.30'
-    implementation 'com.applovin:applovin-sdk:11.2.2'
+    implementation 'com.ironsource.adapters:applovinadapter:4.3.31'
+    implementation 'com.applovin:applovin-sdk:11.3.3'
 
     // Add Chartboost Network
     //implementation 'com.ironsource.adapters:chartboostadapter:4.3.7'
     //implementation 'com.chartboost:chartboost-sdk:8.2.1'
 
     // Add UnityAds Network
-    implementation 'com.ironsource.adapters:unityadsadapter:4.3.20'
+    implementation 'com.ironsource.adapters:unityadsadapter:4.3.21'
     // implementation 'com.unity3d.ads:unity-ads:3.7.5'
 
     // Add Vungle Network
