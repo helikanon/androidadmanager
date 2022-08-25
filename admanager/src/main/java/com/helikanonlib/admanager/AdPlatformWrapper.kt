@@ -5,6 +5,8 @@ import android.content.Context
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.google.android.gms.ads.nativead.NativeAd
+import java.util.*
+import kotlin.collections.ArrayList
 
 abstract class AdPlatformWrapper(open var appId: String) {
 
@@ -72,6 +74,92 @@ abstract class AdPlatformWrapper(open var appId: String) {
 
         return false
     }
+
+
+
+
+
+
+    var lastLoadedInterstitialsDateByAdPlatform = mutableMapOf<String, Date>()
+    var lastLoadedRewardedDateByAdPlatform = mutableMapOf<String, Date>()
+    var lastLoadedBannerDateByAdPlatform = mutableMapOf<String, Date>()
+    var lastLoadedMrecDateByAdPlatform = mutableMapOf<String, Date>()
+    var loadedInterstitialAvailableDuration = 60 * 6
+    var loadedRewardedAvailableDuration = 60 * 6
+    var loadedBannerAvailableDuration = 60 * 2
+    var loadedMrecAvailableDuration = 60 * 2
+
+    fun updateLastLoadInterstitialDateByAdPlatform(adPlatformEnum: AdPlatformTypeEnum) {
+        lastLoadedInterstitialsDateByAdPlatform[adPlatformEnum.name] = Date()
+    }
+
+    fun isValidLoadedInterstitial(adPlatformEnum: AdPlatformTypeEnum): Boolean {
+        var isValid = true
+
+        val lastLoadedDate = lastLoadedInterstitialsDateByAdPlatform.get(adPlatformEnum.name)
+        if (lastLoadedDate != null) {
+            val now = Date()
+            val elapsedSeconds = (now.time - lastLoadedDate.time) / 1000
+            isValid = elapsedSeconds < loadedInterstitialAvailableDuration
+        }
+
+        return isValid
+    }
+
+    fun updateLastLoadRewardedDateByAdPlatform(adPlatformEnum: AdPlatformTypeEnum) {
+        lastLoadedRewardedDateByAdPlatform[adPlatformEnum.name] = Date()
+    }
+
+    fun isValidLoadedRewarded(adPlatformEnum: AdPlatformTypeEnum): Boolean {
+        var isValid = true
+
+        val lastLoadedDate = lastLoadedRewardedDateByAdPlatform.get(adPlatformEnum.name)
+        if (lastLoadedDate != null) {
+            val now = Date()
+            val elapsedSeconds = (now.time - lastLoadedDate.time) / 1000
+            isValid = elapsedSeconds < loadedRewardedAvailableDuration
+        }
+
+        return isValid
+    }
+
+
+    fun updateLastLoadBannerDateByAdPlatform(adPlatformEnum: AdPlatformTypeEnum) {
+        lastLoadedBannerDateByAdPlatform[adPlatformEnum.name] = Date()
+    }
+
+    fun isValidLoadedBanner(adPlatformEnum: AdPlatformTypeEnum): Boolean {
+        var isValid = true
+
+        val lastLoadedDate = lastLoadedBannerDateByAdPlatform.get(adPlatformEnum.name)
+        if (lastLoadedDate != null) {
+            val now = Date()
+            val elapsedSeconds = (now.time - lastLoadedDate.time) / 1000
+            isValid = elapsedSeconds < loadedBannerAvailableDuration
+        }
+
+        return isValid
+    }
+
+
+    fun updateLastLoadMrecDateByAdPlatform(adPlatformEnum: AdPlatformTypeEnum) {
+        lastLoadedMrecDateByAdPlatform[adPlatformEnum.name] = Date()
+    }
+
+    fun isValidLoadedMrec(adPlatformEnum: AdPlatformTypeEnum): Boolean {
+        var isValid = true
+
+        val lastLoadedDate = lastLoadedMrecDateByAdPlatform.get(adPlatformEnum.name)
+        if (lastLoadedDate != null) {
+            val now = Date()
+            val elapsedSeconds = (now.time - lastLoadedDate.time) / 1000
+            isValid = elapsedSeconds < loadedMrecAvailableDuration
+        }
+
+        return isValid
+    }
+
+
 }
 
 

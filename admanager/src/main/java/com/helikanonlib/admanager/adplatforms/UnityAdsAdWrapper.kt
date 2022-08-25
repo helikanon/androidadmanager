@@ -101,6 +101,8 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onUnityAdsAdLoaded(placementId: String?) {
                 viewIntances.put(placementName, placementId)
                 listener?.onLoaded(platform)
+
+                updateLastLoadInterstitialDateByAdPlatform(platform)
             }
 
             override fun onUnityAdsFailedToLoad(placementId: String?, error: UnityAds.UnityAdsLoadError?, message: String?) {
@@ -145,13 +147,29 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun isInterstitialLoaded(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).interstitial
-        return viewIntances.containsKey(placementName) && viewIntances[placementName] != null
+        // return viewIntances.containsKey(placementName) && viewIntances[placementName] != null
+
+        var isLoaded = viewIntances.containsKey(placementName) && viewIntances[placementName] != null
+        if (isLoaded && !isValidLoadedInterstitial(platform)) {
+            viewIntances.put(placementName, null)
+            isLoaded = false
+        }
+
+        return isLoaded
     }
 
     override fun isBannerLoaded(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).banner
         val bannerAdView: BannerView? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as BannerView? else null
-        return _isBannerLoaded(bannerAdView)
+
+        var isLoaded = _isBannerLoaded(bannerAdView)
+        if (isLoaded && !isValidLoadedBanner(platform)) {
+            _removeBannerViewIfExists(bannerAdView)
+            viewIntances[placementName] = null
+            isLoaded = false
+        }
+
+        return isLoaded
     }
 
     override fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
@@ -222,6 +240,8 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onUnityAdsAdLoaded(placementId: String?) {
                 viewIntances.put(placementName, placementId)
                 listener?.onLoaded(platform)
+
+                updateLastLoadRewardedDateByAdPlatform(platform)
             }
 
             override fun onUnityAdsFailedToLoad(placementId: String?, error: UnityAds.UnityAdsLoadError?, message: String?) {
@@ -263,13 +283,28 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun isRewardedLoaded(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).rewarded
-        return viewIntances.containsKey(placementName) && viewIntances[placementName] != null
+
+        var isLoaded = viewIntances.containsKey(placementName) && viewIntances[placementName] != null
+        if (isLoaded && !isValidLoadedRewarded(platform)) {
+            viewIntances[placementName] = null
+            isLoaded = false
+        }
+
+        return isLoaded
     }
 
     override fun isMrecLoaded(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).mrec
-        val bannerAdView: BannerView? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as BannerView? else null
-        return _isBannerLoaded(bannerAdView)
+        val mrecAdView: BannerView? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as BannerView? else null
+
+        var isLoaded = _isBannerLoaded(mrecAdView)
+        if (isLoaded && !isValidLoadedBanner(platform)) {
+            _removeBannerViewIfExists(mrecAdView)
+            viewIntances[placementName] = null
+            isLoaded = false
+        }
+
+        return isLoaded
     }
 
     override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?, placementGroupIndex: Int) {

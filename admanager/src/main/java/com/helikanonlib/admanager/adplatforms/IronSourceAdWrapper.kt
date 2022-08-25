@@ -66,6 +66,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
 
             override fun onInterstitialAdReady() {
                 listener?.onLoaded(platform)
+                updateLastLoadInterstitialDateByAdPlatform(platform)
             }
 
             override fun onInterstitialAdOpened() {
@@ -124,7 +125,16 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
     override fun isBannerLoaded(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).banner
         val bannerAdView: IronSourceBannerLayout? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as IronSourceBannerLayout? else null
-        return _isBannerLoaded(bannerAdView)
+
+        var isLoaded = _isBannerLoaded(bannerAdView)
+        if (isLoaded && !isValidLoadedBanner(platform)) {
+            _removeBannerViewIfExists(bannerAdView)
+            viewIntances[placementName] = null
+            isLoaded = false
+        }
+
+        return isLoaded
+
     }
 
     override fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
@@ -253,7 +263,14 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         val placementName = getPlacementGroupByIndex(placementGroupIndex).mrec
         val mrecAdView: IronSourceBannerLayout? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as IronSourceBannerLayout? else null
 
-        return _isBannerLoaded(mrecAdView)
+        var isLoaded = _isBannerLoaded(mrecAdView)
+        if (isLoaded && !isValidLoadedBanner(platform)) {
+            _removeBannerViewIfExists(mrecAdView)
+            viewIntances[placementName] = null
+            isLoaded = false
+        }
+
+        return isLoaded
     }
 
     override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?, placementGroupIndex: Int) {

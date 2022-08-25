@@ -76,6 +76,8 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     viewIntances.put(placementName, interstitialAd)
                     listener?.onLoaded(platform)
+
+                    updateLastLoadInterstitialDateByAdPlatform(platform)
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -118,7 +120,14 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun isInterstitialLoaded(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).interstitial
         val interstitial: InterstitialAd? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as InterstitialAd? else null
-        return interstitial != null
+
+        var isLoaded = interstitial != null
+        if (isLoaded && !isValidLoadedInterstitial(platform)) {
+            viewIntances.put(placementName, null)
+            isLoaded = false
+        }
+
+        return isLoaded
     }
 
     override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
@@ -135,6 +144,9 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(p0: RewardedAd) {
                     viewIntances[placementName] = p0
+                    listener?.onLoaded(platform)
+
+                    updateLastLoadRewardedDateByAdPlatform(platform)
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -179,14 +191,29 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun isRewardedLoaded(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).rewarded
         val rewardedAd: RewardedAd? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as RewardedAd? else null
-        return rewardedAd != null
+
+        var isLoaded = rewardedAd != null
+        if (isLoaded && !isValidLoadedRewarded(platform)) {
+            viewIntances[placementName] = null
+            isLoaded = false
+        }
+
+        return isLoaded
     }
 
 
     override fun isBannerLoaded(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).banner
         val bannerAdView: AdView? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as AdView? else null
-        return _isBannerLoaded(bannerAdView)
+
+        var isLoaded = _isBannerLoaded(bannerAdView)
+        if (isLoaded && !isValidLoadedBanner(platform)) {
+            _removeBannerViewIfExists(bannerAdView)
+            viewIntances[placementName] = null
+            isLoaded = false
+        }
+
+        return isLoaded
     }
 
     fun getBannerAdaptiveSize(activity: Activity, containerView: RelativeLayout): AdSize {
@@ -263,7 +290,16 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).mrec
         val instanceKeyName = placementName + "_mrec"
         val mrecAdView: AdView? = if (viewIntances.containsKey(instanceKeyName)) viewIntances.get(instanceKeyName) as AdView? else null
-        return _isBannerLoaded(mrecAdView)
+
+
+        var isLoaded = _isBannerLoaded(mrecAdView)
+        if (isLoaded && !isValidLoadedBanner(platform)) {
+            _removeBannerViewIfExists(mrecAdView)
+            viewIntances[placementName] = null
+            isLoaded = false
+        }
+
+        return isLoaded
     }
 
     override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
