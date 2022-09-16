@@ -110,7 +110,9 @@ class AdmobAppOpenAdManager(
         if (isShowing) return
 
         appOpenAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-            override fun onAdFailedToShowFullScreenContent(error: AdError?) {
+
+            override fun onAdFailedToShowFullScreenContent(error: AdError) {
+                super.onAdFailedToShowFullScreenContent(error)
                 showListener?.onError(AdErrorMode.PLATFORM, error?.message ?: "", platform)
             }
 
@@ -128,6 +130,7 @@ class AdmobAppOpenAdManager(
                 isShowing = false
                 load(null)
             }
+
         }
         appOpenAd?.show(activity)
     }

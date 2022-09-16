@@ -243,7 +243,7 @@ class AdManager {
 
     private fun _loadInterstitialFromFirstAvailable(activity: Activity, listener: AdPlatformLoadListener? = null, index: Int = 0, placementGroupIndex: Int) {
         val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL, placementGroupIndex)
-        if (interstitialAdPlatforms.size == 0) {
+        if (index >= interstitialAdPlatforms.size) {
             return
         }
         val platform = interstitialAdPlatforms[index]
@@ -546,7 +546,7 @@ class AdManager {
 
     private fun _showBannerFromFirstAvailable(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null, platformIndex: Int = 0, placementGroupIndex: Int) {
         val bannerAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.BANNER, placementGroupIndex)
-        if (bannerAdPlatforms.size == 0) {
+        if (platformIndex >= bannerAdPlatforms.size) {
             return
         }
 
@@ -669,7 +669,7 @@ class AdManager {
     private fun _loadRewardedFromFirstAvailable(activity: Activity, listener: AdPlatformLoadListener? = null, index: Int = 0, placementGroupIndex: Int) {
 
         val rewardedAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.REWARDED, placementGroupIndex)
-        if (rewardedAdPlatforms.size == 0) {
+        if (index >= rewardedAdPlatforms.size) {
             return
         }
         val platform = rewardedAdPlatforms[index]
@@ -840,7 +840,7 @@ class AdManager {
 
     private fun _showMrecFromFirstAvailable(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null, index: Int = 0, placementGroupIndex: Int) {
         val mrecAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.MREC, placementGroupIndex)
-        if (mrecAdPlatforms.size == 0) {
+        if (index >= mrecAdPlatforms.size) {
             return
         }
         val platform = mrecAdPlatforms[index]

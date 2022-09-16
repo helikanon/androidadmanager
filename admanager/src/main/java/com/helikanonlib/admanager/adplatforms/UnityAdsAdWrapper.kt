@@ -142,6 +142,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
         })
+        viewIntances[placementName] = null
 
     }
 

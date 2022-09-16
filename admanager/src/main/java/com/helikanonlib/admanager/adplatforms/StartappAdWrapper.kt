@@ -125,6 +125,7 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 listener?.onClicked(platform)
             }
         })
+        viewIntances[placementName] = null
     }
 
     override fun isInterstitialLoaded(placementGroupIndex: Int): Boolean {

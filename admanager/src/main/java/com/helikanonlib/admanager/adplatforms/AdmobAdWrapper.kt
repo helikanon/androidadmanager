@@ -115,6 +115,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         interstitial?.show(activity)
+        viewIntances[placementName] = null
     }
 
     override fun isInterstitialLoaded(placementGroupIndex: Int): Boolean {
@@ -256,9 +257,10 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         bannerAdView = AdView(activity.applicationContext)
         // bannerAdView?.adSize = AdSize.SMART_BANNER
-        bannerAdView?.adSize = getBannerAdaptiveSize(activity, containerView)
-        bannerAdView?.adUnitId = placementName
-        bannerAdView?.adListener = object : AdListener() {
+
+        bannerAdView.setAdSize(getBannerAdaptiveSize(activity, containerView))
+        bannerAdView.adUnitId = placementName
+        bannerAdView.adListener = object : AdListener() {
             override fun onAdFailedToLoad(error: LoadAdError) {
                 super.onAdFailedToLoad(error)
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=${error.code} / ${error.message}", platform)
@@ -327,9 +329,9 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         mrecAdView = AdView(activity.applicationContext)
         // mrecAdView?.adSize = AdSize.MEDIUM_RECTANGLE
-        mrecAdView?.adSize = getMrecBannerAdaptiveSize(activity, containerView)
-        mrecAdView?.adUnitId = placementName
-        mrecAdView?.adListener = object : AdListener() {
+        mrecAdView.setAdSize(getMrecBannerAdaptiveSize(activity, containerView))
+        mrecAdView.adUnitId = placementName
+        mrecAdView.adListener = object : AdListener() {
             override fun onAdFailedToLoad(error: LoadAdError) {
                 super.onAdFailedToLoad(error)
 
@@ -351,7 +353,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 listener?.onClicked(platform)
             }
         }
-        mrecAdView?.loadAd(AdRequest.Builder().build())
+        mrecAdView.loadAd(AdRequest.Builder().build())
 
     }
 

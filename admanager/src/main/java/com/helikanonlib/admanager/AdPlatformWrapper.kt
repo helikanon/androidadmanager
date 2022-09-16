@@ -8,6 +8,7 @@ import com.google.android.gms.ads.nativead.NativeAd
 import java.util.*
 import kotlin.collections.ArrayList
 
+
 abstract class AdPlatformWrapper(open var appId: String) {
 
     abstract val platform: AdPlatformTypeEnum

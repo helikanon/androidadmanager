@@ -4,10 +4,7 @@ import android.app.Application
 import android.util.Log
 // import androidx.multidex.MultiDexApplication
 import com.helikanonlib.admanager.*
-import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper
-import com.helikanonlib.admanager.adplatforms.IronSourceAdWrapper
-import com.helikanonlib.admanager.adplatforms.StartAppAdWrapper
-import com.helikanonlib.admanager.adplatforms.UnityAdsAdWrapper
+import com.helikanonlib.admanager.adplatforms.*
 
 class MyApplication : Application() {
 
@@ -54,8 +51,10 @@ class MyApplication : Application() {
     fun initAdManager() {
         adManager = AdManager().apply {
             showAds = true
-            autoLoad = true
+            autoLoad = false
+            autoLoadForRewarded = true
             autoLoadDelay = 11 // seconds
+            isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode = true
             interstitialMinElapsedSecondsToNextShow = 60 // seconds
             randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
             testMode = BuildConfig.DEBUG
@@ -168,6 +167,22 @@ class MyApplication : Application() {
                         )
                     },
                     true, true, true, true
+                ),
+                AdPlatformModel(
+                    AdmostAdWrapper("92a6be1f-26bb-4f75-95b3-19184ead58c8").apply {
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "default",
+                                interstitial = "9ebbcea6-de3c-44cd-bfcf-7afe1332f583",
+                                rewarded = "3ea43e3a-e0e5-454b-9422-4266d61aacef",
+                                banner = "01aa2daa-9128-4ebf-9410-3c60584f5bd5",
+                                mrec = "0369b5ce-5a3a-4b53-b89f-9fd251fc035b",
+                                native = "",
+                                appOpenAd = ""
+                            )
+                        )
+                    },
+                    true, true, true, true
                 )
             )
         }
@@ -194,10 +209,10 @@ class MyApplication : Application() {
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp")
 
 
-        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "admob")
-        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob")
-        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob")
-        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob")
+        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "admost")
+        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admost")
+        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admost")
+        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admost")
 
         /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "startapp,ironsource,admob")
         adManager.setAdPlatformSortByAdFormatStr(1, "banner", "startapp,ironsource,startapp")
