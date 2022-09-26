@@ -51,12 +51,17 @@ class MyApplication : Application() {
     fun initAdManager() {
         adManager = AdManager().apply {
             showAds = true
-            autoLoad = false
-            autoLoadForRewarded = true
-            autoLoadDelay = 11 // seconds
+            autoLoadForInterstitial = false
             isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode = true
-            interstitialMinElapsedSecondsToNextShow = 60 // seconds
+            autoLoadDelay = 11 // seconds
+
+            autoLoadForRewarded = true
+
             randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
+            interstitialMinElapsedSecondsToNextShow = 30
+            rewardedMinElapsedSecondsToNextShow = 30
+
+
             testMode = BuildConfig.DEBUG
             deviceId = "47088e48-5195-4757-90b2-0da94116befd" // necessary if testmode enabled
             placementGroups = arrayListOf("default")
@@ -168,16 +173,32 @@ class MyApplication : Application() {
                     },
                     true, true, true, true
                 ),
-                AdPlatformModel(
-                    AdmostAdWrapper("92a6be1f-26bb-4f75-95b3-19184ead58c8").apply {
+                /*AdPlatformModel(
+                    AdmostAdWrapper("6cc8e89a-b52a-4e9a-bb8c-579f7ec538fe").apply {
                         placementGroups.add(
                             AdPlacementGroupModel(
                                 groupName = "default",
-                                interstitial = "9ebbcea6-de3c-44cd-bfcf-7afe1332f583",
-                                rewarded = "3ea43e3a-e0e5-454b-9422-4266d61aacef",
-                                banner = "01aa2daa-9128-4ebf-9410-3c60584f5bd5",
-                                mrec = "0369b5ce-5a3a-4b53-b89f-9fd251fc035b",
+                                interstitial = "f99e409b-f9ab-4a2e-aa9a-4d143e6809ae",
+                                rewarded = "88cfcfd0-2f8c-4aba-9f36-cc0ac99ab140",
+                                banner = "86644357-21d0-45a4-906a-37262461df65",
+                                mrec = "86644357-21d0-45a4-906a-37262461df65",
                                 native = "",
+                                appOpenAd = ""
+                            )
+                        )
+                    },
+                    true, true, true, true
+                ),*/
+                AdPlatformModel(
+                    ApplovinAdWrapper("noneed").apply {
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "default",
+                                interstitial = "7c4a01242eaee289",
+                                rewarded = "f2f5534658a6b4ab",
+                                banner = "609a039e1d803bea",
+                                mrec = "851a6927fdae17d5",
+                                native = "2b1686bf9db060d3",
                                 appOpenAd = ""
                             )
                         )
@@ -207,12 +228,13 @@ class MyApplication : Application() {
         adManager.setAdPlatformSortByAdFormatStr(0, "banner", "unityads,admob,ironsource,startapp")
         adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,unityads,admob,ironsource,startapp")
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp")
+        adManager.setAdPlatformSortByAdFormatStr(0, "native", "admob")
 
 
-        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "admost")
-        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admost")
-        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admost")
-        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admost")
+        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "applovin")
 
         /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "startapp,ironsource,admob")
         adManager.setAdPlatformSortByAdFormatStr(1, "banner", "startapp,ironsource,startapp")

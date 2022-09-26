@@ -4,15 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.google.android.gms.ads.nativead.NativeAd
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 abstract class AdPlatformWrapper(open var appId: String) {
 
     abstract val platform: AdPlatformTypeEnum
-    var placementGroups: ArrayList<AdPlacementGroupModel> = ArrayList()
+    var placementGroups: java.util.ArrayList<AdPlacementGroupModel> = java.util.ArrayList()
     protected fun getPlacementGroupByIndex(placementGroupIndex: Int): AdPlacementGroupModel {
         /*if (index >= placementGroups.size) {
             return null
@@ -47,12 +45,12 @@ abstract class AdPlatformWrapper(open var appId: String) {
 
 
     // val nativeAds: ArrayList<Any> = arrayListOf()
-    abstract fun isNativeLoaded(placementGroupIndex: Int = 0): Boolean
+    abstract fun hasLoadedNative(placementGroupIndex: Int = 0): Boolean
     abstract fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0)
 
     // adSize >> [small,medium]
-    abstract fun showNative(activity: Activity, pos: Int, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0): NativeAd?
-    abstract fun getNativeAds(activity: Activity, placementGroupIndex: Int = 0): ArrayList<Any>
+    abstract fun showNative(activity: Activity, adSize: String, containerView: ViewGroup, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0): Boolean
+    abstract fun getNativeAds(activity: Activity, placementGroupIndex: Int = 0): java.util.ArrayList<Any>
 
     abstract fun destroy(activity: Activity)
     abstract fun destroyBanner(activity: Activity)
@@ -67,25 +65,29 @@ abstract class AdPlatformWrapper(open var appId: String) {
         return bannerAdView != null && bannerAdView.parent != null
     }
 
-    protected fun _removeBannerViewIfExists(bannerAdView: ViewGroup?): Boolean {
+    protected fun _removeBannerViewIfExists(bannerAdView: ViewGroup?, containerView: RelativeLayout? = null): Boolean {
         if (_isBannerLoaded(bannerAdView)) {
             (bannerAdView?.parent as ViewGroup).removeView(bannerAdView)
             return true
+        }
+
+        containerView?.let {
+            try {
+                containerView.removeAllViews()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
         return false
     }
 
 
-
-
-
-
     var lastLoadedInterstitialsDateByAdPlatform = mutableMapOf<String, Date>()
     var lastLoadedRewardedDateByAdPlatform = mutableMapOf<String, Date>()
     var lastLoadedBannerDateByAdPlatform = mutableMapOf<String, Date>()
     var lastLoadedMrecDateByAdPlatform = mutableMapOf<String, Date>()
-    var loadedInterstitialAvailableDuration = 60 * 6
+    var loadedInterstitialAvailableDuration = 60 * 2
     var loadedRewardedAvailableDuration = 60 * 6
     var loadedBannerAvailableDuration = 60 * 2
     var loadedMrecAvailableDuration = 60 * 2

@@ -2,6 +2,7 @@ package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
 import android.content.Context
+import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.google.android.gms.ads.nativead.NativeAd
 import com.helikanonlib.admanager.*
@@ -100,9 +101,9 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         UnityAds.load(placementName, object : IUnityAdsLoadListener {
             override fun onUnityAdsAdLoaded(placementId: String?) {
                 viewIntances.put(placementName, placementId)
-                listener?.onLoaded(platform)
-
                 updateLastLoadInterstitialDateByAdPlatform(platform)
+
+                listener?.onLoaded(platform)
             }
 
             override fun onUnityAdsFailedToLoad(placementId: String?, error: UnityAds.UnityAdsLoadError?, message: String?) {
@@ -240,9 +241,9 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         UnityAds.load(placementName, object : IUnityAdsLoadListener {
             override fun onUnityAdsAdLoaded(placementId: String?) {
                 viewIntances.put(placementName, placementId)
-                listener?.onLoaded(platform)
-
                 updateLastLoadRewardedDateByAdPlatform(platform)
+
+                listener?.onLoaded(platform)
             }
 
             override fun onUnityAdsFailedToLoad(placementId: String?, error: UnityAds.UnityAdsLoadError?, message: String?) {
@@ -358,7 +359,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     }
 
-    override fun isNativeLoaded(placementGroupIndex: Int): Boolean {
+    override fun hasLoadedNative(placementGroupIndex: Int): Boolean {
         return false
     }
 
@@ -366,8 +367,8 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         listener?.onError(AdErrorMode.PLATFORM, "unity ads not support native ads", platform)
     }
 
-    override fun showNative(activity: Activity, pos: Int, listener: AdPlatformShowListener?, placementGroupIndex: Int): NativeAd? {
-        return null
+    override fun showNative(activity: Activity, adSize: String, containerView: ViewGroup, listener: AdPlatformShowListener?, placementGroupIndex: Int): Boolean {
+        return false
     }
 
     override fun getNativeAds(activity: Activity, placementGroupIndex: Int): ArrayList<Any> {

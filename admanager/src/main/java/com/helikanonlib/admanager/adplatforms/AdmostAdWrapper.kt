@@ -1,5 +1,6 @@
 package com.helikanonlib.admanager.adplatforms
 
+/*
 import admost.sdk.AdMostInterstitial
 import admost.sdk.AdMostView
 import admost.sdk.base.AdMostConfiguration
@@ -432,4 +433,4 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun onStop(activity: Activity) {}
     override fun onResume(activity: Activity) {}
 
-}
+}*/

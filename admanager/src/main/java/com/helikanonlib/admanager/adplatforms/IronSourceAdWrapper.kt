@@ -3,6 +3,7 @@ package com.helikanonlib.admanager.adplatforms
 import android.app.Activity
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.google.android.gms.ads.nativead.NativeAd
 import com.helikanonlib.admanager.*
@@ -65,8 +66,8 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             }
 
             override fun onInterstitialAdReady() {
-                listener?.onLoaded(platform)
                 updateLastLoadInterstitialDateByAdPlatform(platform)
+                listener?.onLoaded(platform)
             }
 
             override fun onInterstitialAdOpened() {
@@ -331,7 +332,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         viewIntances[placementName] = mrecAdView
     }
 
-    override fun isNativeLoaded(placementGroupIndex: Int): Boolean {
+    override fun hasLoadedNative(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).native
         val nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
         return nativeAds.size > 0
@@ -341,9 +342,8 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 
-    override fun showNative(activity: Activity, pos: Int, listener: AdPlatformShowListener?, placementGroupIndex: Int): NativeAd? {
-        listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
-        return null
+    override fun showNative(activity: Activity, adSize: String, containerView: ViewGroup, listener: AdPlatformShowListener?, placementGroupIndex: Int): Boolean {
+        return false
     }
 
     override fun getNativeAds(activity: Activity, placementGroupIndex: Int): ArrayList<Any> {

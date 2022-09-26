@@ -3,7 +3,11 @@ package com.helikanonlib.admanager.adplatforms
 import android.app.Activity
 import android.content.Context
 import android.util.DisplayMetrics
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.RelativeLayout
+import com.google.android.ads.nativetemplates.NativeTemplateStyle
+import com.google.android.ads.nativetemplates.TemplateView
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -11,8 +15,16 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.helikanonlib.admanager.*
-
+import com.helikanonlib.admanager.adplatforms.*
+import com.helikanonlib.admanager.AdPlatformLoadListener
+import com.helikanonlib.admanager.AdPlatformShowListener
+import com.helikanonlib.admanager.AdErrorMode
+import com.helikanonlib.admanager.AdPlatformTypeEnum
+import com.helikanonlib.admanager.AdFormatEnum
+import com.helikanonlib.admanager.AdPlatformModel
+import com.helikanonlib.admanager.AdPlatformWrapper
+import com.helikanonlib.admanager.AdsLoadingCustomView
+import com.helikanonlib.admanager.R
 
 /**
  * *************************************************************************************************
@@ -75,9 +87,9 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 .build(), object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     viewIntances.put(placementName, interstitialAd)
-                    listener?.onLoaded(platform)
-
                     updateLastLoadInterstitialDateByAdPlatform(platform)
+
+                    listener?.onLoaded(platform)
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -85,7 +97,6 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                     listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> error code=${adError.code} / ${adError.message}", platform)
                 }
             })
-
     }
 
     override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
@@ -145,9 +156,9 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(p0: RewardedAd) {
                     viewIntances[placementName] = p0
-                    listener?.onLoaded(platform)
-
                     updateLastLoadRewardedDateByAdPlatform(platform)
+
+                    listener?.onLoaded(platform)
                 }
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -374,7 +385,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         return AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(activity, adWidth)
     }
 
-    override fun isNativeLoaded(placementGroupIndex: Int): Boolean {
+    override fun hasLoadedNative(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).native
         val nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
         return nativeAds.size > 0
@@ -432,40 +443,44 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         adLoader.loadAds(AdRequest.Builder().build(), count)
     }
 
-    override fun showNative(activity: Activity, pos: Int, listener: AdPlatformShowListener?, placementGroupIndex: Int): NativeAd? {
+    private var lastLoadedNativeAdPosition = -1
+    override fun showNative(activity: Activity, adSize: String, containerView: ViewGroup, listener: AdPlatformShowListener?, placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).native
         val nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
+        val showPositionAt = if (lastLoadedNativeAdPosition == -1) 0 else lastLoadedNativeAdPosition + 1
 
-        if (nativeAds.size < (pos + 1)) {
-            return null
+        if (nativeAds.size < (showPositionAt + 1)) {
+            return false
         }
 
-        //val nativeAd: NativeAd = nativeAds[pos] as NativeAd
-        return nativeAds[pos] as NativeAd
+        val nativeAd = nativeAds[showPositionAt] as NativeAd
 
-        /*val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val v = inflater.inflate(
+        val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val nativeView = inflater.inflate(
             if (adSize == "small") {
-                R.layout.admob_native_small_template
+                R.layout.admob_native_small
             } else {
-                R.layout.admob_native_medium_template
+                R.layout.admob_native_medium
             }, null
         )
 
-        val template = v.findViewById<TemplateView>(
+
+        val template = nativeView.findViewById<TemplateView>(
             if (adSize == "small") {
                 R.id.admanager_native_small
             } else {
                 R.id.admanager_native_medium
             }
-        )*/
+        )
 
-        /*val styles = NativeTemplateStyle.Builder().build()
+        val styles = NativeTemplateStyle.Builder().build()
         template.setStyles(styles)
         template.setNativeAd(nativeAd)
-        containerView.addView(template.parent as ViewGroup)*/
 
+        containerView.removeAllViews()
+        containerView.addView(template.parent as ViewGroup)
 
+        return true
     }
 
     override fun getNativeAds(activity: Activity, placementGroupIndex: Int): ArrayList<Any> {

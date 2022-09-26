@@ -195,22 +195,20 @@ public class JavaSampleActivity extends AppCompatActivity {
         ironsourceAdWrapper.setMrecPlacementId("MREC_BANNER");*/
 
 
-        adManager = new AdManager
-                .Builder()
-                .autoLoad(true)
-                .autoLoadDelay(20)
-                .interstitialMinElapsedSecondsToNextShow(60)
-                .randomInterval(30)
-                .showAds(true)
-                .testMode(BuildConfig.DEBUG)
-                .deviceId("47088e48-5195-4757-90b2-0da94116befd") // necessary if test mode enabled
-                .addAdPlatforms(
-                        // new AdPlatformModel(facebookAdWrapper, true, true, true, true),
-                        new AdPlatformModel(admobAdWrapper, true, false, true, true),
-                        new AdPlatformModel(startappAdWrapper, true, true, true, true),
-                        new AdPlatformModel(ironsourceAdWrapper, true, true, true, false)
-                )
-                .build();
+        adManager = new AdManager();
+
+        adManager.setAutoLoadForInterstitial(false);
+        adManager.setAutoLoadDelay(20);
+        adManager.setInterstitialMinElapsedSecondsToNextShow(60);
+        adManager.setRandomInterval(30);
+        adManager.setShowAds(true);
+        adManager.setTestMode(BuildConfig.DEBUG);
+        adManager.setDeviceId("47088e48-5195-4757-90b2-0da94116befd"); // necessary if test mode enabled
+        adManager.addAdPlatform(new AdPlatformModel(admobAdWrapper, true, false, true, true));
+        adManager.addAdPlatform(new AdPlatformModel(startappAdWrapper, true, true, true, true));
+        adManager.addAdPlatform(new AdPlatformModel(ironsourceAdWrapper, true, true, true, false));
+
+
 
         adManager.setGlobalRewardedShowListener(new AdPlatformShowListener() {
             @Override
