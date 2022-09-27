@@ -61,8 +61,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-process:2.5.1"
 
 
-
-
     // google service
     implementation 'com.google.android.gms:play-services-ads:21.2.0'
     implementation 'com.google.android.gms:play-services-appset:16.0.2'
@@ -106,15 +104,14 @@ dependencies {
 
 
     // APPLOVIN
-    implementation 'com.applovin:applovin-sdk:11.4.4'
+    implementation 'com.applovin:applovin-sdk:+'
     implementation 'com.applovin.mediation:adcolony-adapter:+'
     implementation 'com.applovin.mediation:google-adapter:+'
     implementation 'com.applovin.mediation:ironsource-adapter:+'
     implementation 'com.applovin.mediation:facebook-adapter:+'
-    implementation 'com.applovin.mediation:mintegral-adapter:+'
+    implementation 'com.applovin.mediation:mintegral-adapter:+' // admostla beraber sorun çıkıyor
     implementation 'com.applovin.mediation:bytedance-adapter:+'
     implementation 'com.applovin.mediation:unityads-adapter:+'
     implementation 'com.applovin.mediation:vungle-adapter:+'
-
 
 }

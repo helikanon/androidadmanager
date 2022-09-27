@@ -207,6 +207,7 @@ class AdManager {
                 if (index > 0) return@forEachIndexed
                 loadInterstitial(activity, listener = null, platform = null, parallel = false, placementGroupIndex = getPlacementGroupIndexByName(pgName))
             }
+
         }
 
         if (autoLoadForRewarded) {
@@ -282,6 +283,8 @@ class AdManager {
                     AdFormatEnum.BANNER -> adPlatform.showBanner
                     AdFormatEnum.REWARDED -> adPlatform.showRewarded
                     AdFormatEnum.MREC -> adPlatform.showMrec
+                    AdFormatEnum.NATIVE -> adPlatform.showNative
+                    AdFormatEnum.NATIVE_MEDIUM -> adPlatform.showNative
                     else -> false
                 }
 
@@ -465,6 +468,10 @@ class AdManager {
 
                 globalInterstitialShowListener?.onDisplayed(adPlatformEnum)
                 listener?.onDisplayed(adPlatformEnum)
+
+                activity.runOnUiThread {
+                    removeLoadingViewFromActivity(activity)
+                }
             }
 
             override fun onClicked(adPlatformEnum: AdPlatformTypeEnum?) {
@@ -706,16 +713,21 @@ class AdManager {
 
         val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL, placementGroupIndex)
         run breaker@{
-            interstitialAdPlatforms.forEach forEach@{ _platform ->
-                if (platform != null && _platform.platformInstance.platform != platform.platformInstance.platform) {
-                    return@forEach
-                }
 
-                if (_platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
-                    hasLoaded = true
-                    return@breaker
+            run breaker@{
+                interstitialAdPlatforms.forEach forEach@{ _platform ->
+                    if (platform != null && _platform.platformInstance.platform != platform.platformInstance.platform) {
+                        return@breaker
+                    }
+
+                    if (_platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
+                        hasLoaded = true
+                        return@breaker
+                    }
                 }
             }
+
+
         }
 
         return hasLoaded
@@ -937,12 +949,16 @@ class AdManager {
     @JvmOverloads
     fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
         if (!showAds) return
+        val mrecAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.MREC, placementGroupIndex)
+
+        if (mrecAdPlatforms.size == 0) {
+            listener?.onError(AdErrorMode.MANAGER, "no networks for medium banner", null)
+        }
 
         if (platform == null) {
             var startFrom = 0
 
             // if already mrec banner loaded, start from this platform
-            val mrecAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.MREC, placementGroupIndex)
             if (mrecAdPlatforms.size > 0) {
                 run breaker@{
                     mrecAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
@@ -1107,14 +1123,28 @@ class AdManager {
 
 
     @JvmOverloads
-    fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0) {
+    fun loadSmallNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0) {
         if (!showAds) return
 
-        _loadNativeFromAllNetworks(activity, count, listener, placementGroupIndex)
+        _loadNativeFromAllNetworks(activity, AdFormatEnum.NATIVE, count, listener, placementGroupIndex)
     }
 
-    private fun _loadNativeFromAllNetworks(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int) {
-        val nativeAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.NATIVE, placementGroupIndex)
+    @JvmOverloads
+    fun loadMediumNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0) {
+        if (!showAds) return
+
+        _loadNativeFromAllNetworks(activity, AdFormatEnum.NATIVE_MEDIUM, count, listener, placementGroupIndex)
+    }
+
+    @JvmOverloads
+    fun loadNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0) {
+        if (!showAds) return
+
+        _loadNativeFromAllNetworks(activity, nativeAdFormat, count, listener, placementGroupIndex)
+    }
+
+    private fun _loadNativeFromAllNetworks(activity: Activity, nativeAdFormat: AdFormatEnum, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int) {
+        val nativeAdPlatforms = _getAdPlatformsWithSortedByAdFormat(nativeAdFormat, placementGroupIndex)
         if (nativeAdPlatforms.size == 0) {
             return
         }
@@ -1130,27 +1160,28 @@ class AdManager {
         }
 
         nativeAdPlatforms.forEach { platform ->
-            platform.platformInstance.loadNativeAds(activity, count, _listener, placementGroupIndex)
+            platform.platformInstance.loadNativeAds(activity, nativeAdFormat, count, _listener, placementGroupIndex)
         }
 
     }
 
-    fun showNative(activity: Activity, adSize: String, containerView: ViewGroup, listener: AdPlatformShowListener? = null, placementGroupIndex: Int=0): Boolean {
-        val nativeAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.NATIVE, placementGroupIndex)
+    fun showNative(activity: Activity, nativeAdFormat: AdFormatEnum, containerView: ViewGroup, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0): Boolean {
+        val nativeAdPlatforms = _getAdPlatformsWithSortedByAdFormat(nativeAdFormat, placementGroupIndex)
         if (nativeAdPlatforms.size == 0) {
             return false
         }
 
         var showed = false
-        nativeAdPlatforms.forEach { platform ->
-
-            val hasLoadedNative = platform.platformInstance.hasLoadedNative()
+        for (i in 0 until nativeAdPlatforms.size) {
+            val platform = nativeAdPlatforms[i]
+            val hasLoadedNative = platform.platformInstance.hasLoadedNative(nativeAdFormat)
 
             if (hasLoadedNative) {
-                platform.platformInstance.showNative(activity, adSize, containerView, listener, placementGroupIndex)
+                platform.platformInstance.showNative(activity, nativeAdFormat, containerView, listener, placementGroupIndex)
                 showed = true
-                return@forEach
             }
+
+            if (showed) break
 
         }
 
@@ -1160,5 +1191,25 @@ class AdManager {
 
 
         return showed
+    }
+
+
+    fun hasLoadedNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, placementGroupIndex: Int = 0): Boolean {
+        return getLoadedNativeAdsCount(activity, nativeAdFormat) > 0
+    }
+
+    fun getLoadedNativeAdsCount(activity: Activity, nativeAdFormat: AdFormatEnum, placementGroupIndex: Int = 0): Int {
+        var count = 0
+        val nativeAdPlatforms = _getAdPlatformsWithSortedByAdFormat(nativeAdFormat, placementGroupIndex)
+        if (nativeAdPlatforms.size == 0) {
+            return count
+        }
+
+        nativeAdPlatforms.forEach { platform ->
+            count += platform.platformInstance.getNativeAds(activity, nativeAdFormat).size
+        }
+
+        return count
+
     }
 }

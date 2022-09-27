@@ -20,4 +20,5 @@ class AdsLoadingCustomView(context: Context, attrs: AttributeSet?) : RelativeLay
             (this@AdsLoadingCustomView.parent as ViewGroup).removeView(this@AdsLoadingCustomView)
         }
     }
+
 }

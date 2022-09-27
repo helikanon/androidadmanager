@@ -85,7 +85,8 @@ class MyApplication : Application() {
                                 banner = "ca-app-pub-3940256099942544/6300978111",
                                 mrec = "ca-app-pub-3940256099942544/6300978112",
                                 native = "ca-app-pub-3940256099942544/2247696110",
-                                appOpenAd = "ca-app-pub-3940256099942544/3419835294"
+                                appOpenAd = "ca-app-pub-3940256099942544/3419835294",
+                                nativeMedium = ""
                             )
                         )
                         /*placementGroups.add(
@@ -113,7 +114,9 @@ class MyApplication : Application() {
                                 banner = "DefaultBanner",
                                 mrec = "MREC_BANNER",
                                 native = "DefaultNative",
-                                appOpenAd = ""
+                                appOpenAd = "",
+                                nativeMedium = ""
+
                             )
                         )
                         /*placementGroups.add(
@@ -140,7 +143,8 @@ class MyApplication : Application() {
                                 banner = "DefaultBanner",
                                 mrec = "MREC_BANNER",
                                 native = "DefaultNative",
-                                appOpenAd = ""
+                                appOpenAd = "",
+                                nativeMedium = ""
                             )
                         )
                         /*placementGroups.add(
@@ -167,7 +171,8 @@ class MyApplication : Application() {
                                 banner = "Banner_Android",
                                 mrec = "BannerMrec_Android",
                                 native = "DefaultNative",
-                                appOpenAd = ""
+                                appOpenAd = "",
+                                nativeMedium = ""
                             )
                         )
                     },
@@ -199,7 +204,8 @@ class MyApplication : Application() {
                                 banner = "609a039e1d803bea",
                                 mrec = "851a6927fdae17d5",
                                 native = "2b1686bf9db060d3",
-                                appOpenAd = ""
+                                appOpenAd = "",
+                                nativeMedium = ""
                             )
                         )
                     },
@@ -229,12 +235,14 @@ class MyApplication : Application() {
         adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,unityads,admob,ironsource,startapp")
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp")
         adManager.setAdPlatformSortByAdFormatStr(0, "native", "admob")
+        adManager.setAdPlatformSortByAdFormatStr(0, "native_medium", "")
 
 
         adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "applovin")
         adManager.setAdPlatformSortByAdFormatStr(0, "banner", "applovin")
         adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "applovin")
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "native_medium", "")
 
         /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "startapp,ironsource,admob")
         adManager.setAdPlatformSortByAdFormatStr(1, "banner", "startapp,ironsource,startapp")

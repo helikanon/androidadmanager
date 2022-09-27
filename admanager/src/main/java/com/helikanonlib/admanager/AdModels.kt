@@ -1,6 +1,8 @@
 package com.helikanonlib.admanager
 
 
+
+
 enum class AdErrorMode {
     MANAGER,
     PLATFORM
@@ -25,6 +27,7 @@ enum class AdFormatEnum {
     REWARDED,
     MREC,
     NATIVE,
+    NATIVE_MEDIUM,
 }
 
 
@@ -33,7 +36,8 @@ data class AdPlatformModel @JvmOverloads constructor(
     var showInterstitial: Boolean = false,
     var showBanner: Boolean = false,
     var showRewarded: Boolean = false,
-    var showMrec: Boolean = false
+    var showMrec: Boolean = false,
+    var showNative: Boolean = false
 )
 
 
@@ -45,6 +49,8 @@ data class AdPlacementGroupModel @JvmOverloads constructor(
     var mrec: String = "",
     var native: String = "",
     var appOpenAd: String = "",
+    var nativeMedium: String = ""
+
 
     /*var interstitialSort: ArrayList<AdPlatformTypeEnum>,
     var rewardedSort: ArrayList<AdPlatformTypeEnum>,

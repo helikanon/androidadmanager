@@ -339,21 +339,21 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         viewIntances[placementName] = mrecAdView
     }
 
-    override fun hasLoadedNative(placementGroupIndex: Int): Boolean {
+    override fun hasLoadedNative(nativeAdFormat: AdFormatEnum, placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).native
         val nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
         return nativeAds.size > 0
     }
 
-    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
+    override fun loadNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, count: Int, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 
-    override fun showNative(activity: Activity, adSize: String, containerView: ViewGroup, listener: AdPlatformShowListener?, placementGroupIndex: Int): Boolean {
+    override fun showNative(activity: Activity, nativeAdFormat: AdFormatEnum, containerView: ViewGroup, listener: AdPlatformShowListener?, placementGroupIndex: Int): Boolean {
         return false
     }
 
-    override fun getNativeAds(activity: Activity, placementGroupIndex: Int): ArrayList<Any> {
+    override fun getNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, placementGroupIndex: Int): ArrayList<Any> {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).native
         return ArrayList<Any>()
     }
@@ -404,6 +404,5 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun onPause(activity: Activity) {}
     override fun onStop(activity: Activity) {}
     override fun onResume(activity: Activity) {}
-
 }
 

@@ -45,12 +45,12 @@ abstract class AdPlatformWrapper(open var appId: String) {
 
 
     // val nativeAds: ArrayList<Any> = arrayListOf()
-    abstract fun hasLoadedNative(placementGroupIndex: Int = 0): Boolean
-    abstract fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0)
+    abstract fun hasLoadedNative(nativeAdFormat: AdFormatEnum, placementGroupIndex: Int = 0): Boolean
+    abstract fun loadNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0)
 
     // adSize >> [small,medium]
-    abstract fun showNative(activity: Activity, adSize: String, containerView: ViewGroup, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0): Boolean
-    abstract fun getNativeAds(activity: Activity, placementGroupIndex: Int = 0): java.util.ArrayList<Any>
+    abstract fun showNative(activity: Activity, nativeAdFormat: AdFormatEnum, containerView: ViewGroup, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0): Boolean
+    abstract fun getNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, placementGroupIndex: Int = 0): java.util.ArrayList<Any>
 
     abstract fun destroy(activity: Activity)
     abstract fun destroyBanner(activity: Activity)
@@ -65,7 +65,7 @@ abstract class AdPlatformWrapper(open var appId: String) {
         return bannerAdView != null && bannerAdView.parent != null
     }
 
-    protected fun _removeBannerViewIfExists(bannerAdView: ViewGroup?, containerView: RelativeLayout? = null): Boolean {
+    protected fun _removeBannerViewIfExists(bannerAdView: ViewGroup?, containerView: ViewGroup? = null): Boolean {
         if (_isBannerLoaded(bannerAdView)) {
             (bannerAdView?.parent as ViewGroup).removeView(bannerAdView)
             return true
@@ -80,6 +80,25 @@ abstract class AdPlatformWrapper(open var appId: String) {
         }
 
         return false
+    }
+
+    protected fun _removeViewIfExists(view: ViewGroup?, containerView: ViewGroup? = null) {
+
+        try {
+            if (view?.parent != null) {
+                (view.parent as ViewGroup).removeView(view)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        containerView?.let {
+            try {
+                containerView.removeAllViews()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
 
@@ -161,6 +180,7 @@ abstract class AdPlatformWrapper(open var appId: String) {
 
         return isValid
     }
+
 
 
 }

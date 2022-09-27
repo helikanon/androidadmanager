@@ -57,7 +57,8 @@
         <meta-data
             android:name="applovin.sdk.key"
             android:value="pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP" /><!--admost için-->
-        <activity
+        <!--TODO applovin max kaldırılınca aşağıdaki iki activity eklenecek geri manifeste-->
+        <!--<activity
             android:name="com.applovin.adview.AppLovinFullscreenActivity"
             android:configChanges="keyboard|keyboardHidden|locale|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:exported="false"
@@ -66,7 +67,7 @@
             android:screenOrientation="behind" />
         <activity
             android:name="com.applovin.sdk.AppLovinWebViewActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize|uiMode" />
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode" />-->
         <!-- applovin -->
 
         <!-- adcolony -->

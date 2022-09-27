@@ -167,16 +167,16 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             }
 
             override fun onBannerAdLoadFailed(p0: IronSourceError?) {
+                viewIntances[placementName] = null
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(bannerAdView, containerView)
+                }
+
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onBannerAdLoaded() {
-                activity.runOnUiThread {
-                    _removeBannerViewIfExists(bannerAdView)
-                    containerView.addView(bannerAdView, lp)
-                    bannerAdView?.visibility = View.VISIBLE
-                    listener?.onDisplayed(platform)
-                }
+                bannerAdView?.visibility = View.VISIBLE
             }
 
             override fun onBannerAdLeftApplication() {
@@ -188,12 +188,17 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             }
 
             override fun onBannerAdScreenPresented() {
-
+                listener?.onDisplayed(platform)
             }
         }
 
-        IronSource.loadBanner(bannerAdView, placementName)
         viewIntances[placementName] = bannerAdView
+        _removeBannerViewIfExists(bannerAdView, containerView)
+        containerView.addView(bannerAdView, lp)
+
+
+        IronSource.loadBanner(bannerAdView, placementName)
+
     }
 
     override fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
@@ -303,16 +308,17 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             }
 
             override fun onBannerAdLoadFailed(p0: IronSourceError?) {
+                viewIntances[placementName] = null
+                activity.runOnUiThread {
+                    _removeBannerViewIfExists(mrecAdView, containerView)
+                }
+
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ${p0?.errorCode ?: ""} - ${p0?.errorMessage ?: ""}", platform)
             }
 
             override fun onBannerAdLoaded() {
-                activity.runOnUiThread {
-                    _removeBannerViewIfExists(mrecAdView)
-                    containerView.addView(mrecAdView, lp)
-                    mrecAdView?.visibility = View.VISIBLE
-                    listener?.onDisplayed(platform)
-                }
+                mrecAdView?.visibility = View.VISIBLE
+
             }
 
             override fun onBannerAdLeftApplication() {
@@ -320,7 +326,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             }
 
             override fun onBannerAdScreenDismissed() {
-
+                listener?.onDisplayed(platform)
             }
 
             override fun onBannerAdScreenPresented() {
@@ -328,25 +334,29 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
             }
         }
 
-        IronSource.loadBanner(mrecAdView, placementName)
         viewIntances[placementName] = mrecAdView
+        _removeBannerViewIfExists(mrecAdView, containerView)
+        containerView.addView(mrecAdView, lp)
+
+        IronSource.loadBanner(mrecAdView, placementName)
+
     }
 
-    override fun hasLoadedNative(placementGroupIndex: Int): Boolean {
+    override fun hasLoadedNative(nativeAdFormat: AdFormatEnum, placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).native
         val nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
         return nativeAds.size > 0
     }
 
-    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
+    override fun loadNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, count: Int, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
         listener?.onError(AdErrorMode.PLATFORM, "not supported native ad >> ${platform.name}", platform)
     }
 
-    override fun showNative(activity: Activity, adSize: String, containerView: ViewGroup, listener: AdPlatformShowListener?, placementGroupIndex: Int): Boolean {
+    override fun showNative(activity: Activity, nativeAdFormat: AdFormatEnum, containerView: ViewGroup, listener: AdPlatformShowListener?, placementGroupIndex: Int): Boolean {
         return false
     }
 
-    override fun getNativeAds(activity: Activity, placementGroupIndex: Int): ArrayList<Any> {
+    override fun getNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, placementGroupIndex: Int): ArrayList<Any> {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).native
         return ArrayList<Any>()
     }

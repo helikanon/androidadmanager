@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
 
         Handler(Looper.getMainLooper()).postDelayed({
-            MyApplication.adManager?.showNative(this@MainActivity, "medium", binding.nativeContainer)
+            MyApplication.adManager?.showNative(this@MainActivity, AdFormatEnum.NATIVE, binding.nativeContainer)
         }, 5000)
 
 
@@ -180,7 +180,18 @@ class MainActivity : AppCompatActivity() {
     fun initAds() {
         MyApplication.adManager.initializePlatformsWithActivity(this)
         MyApplication.adManager.start(this)
-        MyApplication.adManager.loadNativeAds(this, 3, object : AdPlatformLoadListener() {
+        MyApplication.adManager.loadNativeAds(this, AdFormatEnum.NATIVE, 3, object : AdPlatformLoadListener() {
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                super.onLoaded(adPlatformEnum)
+            }
+
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                super.onError(errorMode, errorMessage, adPlatformEnum)
+            }
+
+        })
+
+        MyApplication.adManager.loadNativeAds(this, AdFormatEnum.NATIVE_MEDIUM, 3, object : AdPlatformLoadListener() {
             override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
                 super.onLoaded(adPlatformEnum)
             }

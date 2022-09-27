@@ -257,3 +257,8 @@
 -keep class com.google.android.gms.internal.** { *; }
 -dontwarn com.google.android.gms.ads.identifier.**
 # ----------- vungle -----------
+
+
+-keep class com.bytedance.sdk.openadsdk.*{ public *; }
+-keep class com.bytedance.sdk.** { *; }
+-keep class com.pgl.sys.ces.* {*;}

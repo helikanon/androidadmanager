@@ -13,7 +13,6 @@ import com.unity3d.ads.UnityAds
 import com.unity3d.services.banners.BannerErrorInfo
 import com.unity3d.services.banners.BannerView
 import com.unity3d.services.banners.UnityBannerSize
-
 class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     companion object {
@@ -310,7 +309,10 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
-        val placementName = getPlacementGroupByIndex(placementGroupIndex).mrec
+        listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> unityads mrec not supported", platform)
+
+
+        /*val placementName = getPlacementGroupByIndex(placementGroupIndex).mrec
         var bannerAdView: BannerView? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as BannerView? else null
 
         val lp = RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT)
@@ -324,7 +326,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded", platform)
+                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ismrecloaded", platform)
             }
             return
         }
@@ -355,23 +357,23 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
         }
-        bannerAdView.load()
+        bannerAdView.load()*/
 
     }
 
-    override fun hasLoadedNative(placementGroupIndex: Int): Boolean {
+    override fun hasLoadedNative(nativeAdFormat: AdFormatEnum, placementGroupIndex: Int): Boolean {
         return false
     }
 
-    override fun loadNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
+    override fun loadNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, count: Int, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
         listener?.onError(AdErrorMode.PLATFORM, "unity ads not support native ads", platform)
     }
 
-    override fun showNative(activity: Activity, adSize: String, containerView: ViewGroup, listener: AdPlatformShowListener?, placementGroupIndex: Int): Boolean {
+    override fun showNative(activity: Activity, nativeAdFormat: AdFormatEnum, containerView: ViewGroup, listener: AdPlatformShowListener?, placementGroupIndex: Int): Boolean {
         return false
     }
 
-    override fun getNativeAds(activity: Activity, placementGroupIndex: Int): ArrayList<Any> {
+    override fun getNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, placementGroupIndex: Int): ArrayList<Any> {
         return ArrayList<Any>()
     }
 
