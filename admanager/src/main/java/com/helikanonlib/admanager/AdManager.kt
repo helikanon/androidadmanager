@@ -1122,6 +1122,7 @@ class AdManager {
     }
 
 
+
     @JvmOverloads
     fun loadSmallNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0) {
         if (!showAds) return
@@ -1165,19 +1166,53 @@ class AdManager {
 
     }
 
+    var lastShowedAdNetworkForNativeAds: MutableMap<String, AdPlatformModel> = mutableMapOf()
+
     fun showNative(activity: Activity, nativeAdFormat: AdFormatEnum, containerView: ViewGroup, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0): Boolean {
         val nativeAdPlatforms = _getAdPlatformsWithSortedByAdFormat(nativeAdFormat, placementGroupIndex)
         if (nativeAdPlatforms.size == 0) {
             return false
         }
 
+
+        // set current show ad network
+        var currentShowAdNetwork: AdPlatformModel? = null
+        try {
+            val nativeAdPlatformsHasLoadedNativeAds: List<AdPlatformModel> = nativeAdPlatforms.filter {
+                it.platformInstance.hasLoadedNative(nativeAdFormat)
+            }
+            if (nativeAdPlatformsHasLoadedNativeAds.size > 1) {
+                if (lastShowedAdNetworkForNativeAds[nativeAdFormat.name] != null) {
+                    val lastShowedIndex = nativeAdPlatformsHasLoadedNativeAds.indexOf(lastShowedAdNetworkForNativeAds[nativeAdFormat.name])
+
+                    // eğer son öğeyse
+                    if (lastShowedIndex == (nativeAdPlatformsHasLoadedNativeAds.size - 1)) {
+                        currentShowAdNetwork = nativeAdPlatformsHasLoadedNativeAds[0]
+                    } else {
+                        currentShowAdNetwork = nativeAdPlatformsHasLoadedNativeAds[lastShowedIndex + 1]
+                    }
+
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+
         var showed = false
         for (i in 0 until nativeAdPlatforms.size) {
             val platform = nativeAdPlatforms[i]
             val hasLoadedNative = platform.platformInstance.hasLoadedNative(nativeAdFormat)
 
+            if (currentShowAdNetwork != null) {
+                if (currentShowAdNetwork != platform) {
+                    continue
+                }
+            }
+
             if (hasLoadedNative) {
                 platform.platformInstance.showNative(activity, nativeAdFormat, containerView, listener, placementGroupIndex)
+                lastShowedAdNetworkForNativeAds[nativeAdFormat.name] = platform
                 showed = true
             }
 
