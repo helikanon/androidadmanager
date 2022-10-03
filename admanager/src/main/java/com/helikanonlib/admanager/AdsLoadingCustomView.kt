@@ -19,6 +19,18 @@ class AdsLoadingCustomView(context: Context, attrs: AttributeSet?) : RelativeLay
 
             (this@AdsLoadingCustomView.parent as ViewGroup).removeView(this@AdsLoadingCustomView)
         }
+
+        binding.progressBarAds.setOnClickListener {
+            binding.textViewCloseAdsLoading.performClick()
+        }
+
+        binding.textViewShowingAds.setOnClickListener {
+            binding.textViewCloseAdsLoading.performClick()
+        }
+
+        binding.cardViewContainer.setOnClickListener {
+            binding.textViewCloseAdsLoading.performClick()
+        }
     }
 
 }
