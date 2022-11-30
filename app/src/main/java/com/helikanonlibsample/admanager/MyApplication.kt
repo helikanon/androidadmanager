@@ -133,7 +133,7 @@ class MyApplication : Application() {
                     },
                     true, true, true, true
                 ),
-                AdPlatformModel(
+                /*AdPlatformModel(
                     StartAppAdWrapper("207754325").apply {
                         placementGroups.add(
                             AdPlacementGroupModel(
@@ -147,7 +147,7 @@ class MyApplication : Application() {
                                 nativeMedium = ""
                             )
                         )
-                        /*placementGroups.add(
+                        placementGroups.add(
                             AdPlacementGroupModel(
                                 groupName = "second_group",
                                 interstitial = "SecondInterstitial",
@@ -157,10 +157,10 @@ class MyApplication : Application() {
                                 native = "SecondNative",
                                 appOpenAd = ""
                             )
-                        )*/
+                        )
                     },
                     true, true, true, true
-                ),
+                ),*/
                 AdPlatformModel(
                     UnityAdsAdWrapper("4428087").apply {
                         placementGroups.add(
@@ -205,7 +205,7 @@ class MyApplication : Application() {
                                 mrec = "851a6927fdae17d5",
                                 native = "2b1686bf9db060d3",
                                 appOpenAd = "",
-                                nativeMedium = ""
+                                nativeMedium = "96454048eeffaad2"
                             )
                         )
                     },
@@ -225,35 +225,14 @@ class MyApplication : Application() {
                 true, true, true, true
             )
         )*/
-        /*adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "ironsource,admob,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob,ironsource,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,ironsource,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp,ironsource")*/
-
-        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "unityads,ironsource,admob,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "unityads,admob,ironsource,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,unityads,admob,ironsource,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(0, "native", "admob")
-        adManager.setAdPlatformSortByAdFormatStr(0, "native_medium", "")
 
 
-        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "applovin")
-        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "applovin")
-        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "applovin")
-        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "applovin")
-        adManager.setAdPlatformSortByAdFormatStr(0, "native_medium", "")
-
-        /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "startapp,ironsource,admob")
-        adManager.setAdPlatformSortByAdFormatStr(1, "banner", "startapp,ironsource,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(1, "rewarded", "startapp,ironsource,admob,startapp")
-        adManager.setAdPlatformSortByAdFormatStr(1, "mrec", "startapp,admob,startapp,ironsource")*/
-
-        /*adManager.setAdPlatformSortByAdFormatStr(1, "interstitial", "admob")
-        adManager.setAdPlatformSortByAdFormatStr(1, "banner", "startapp,admob")
-        adManager.setAdPlatformSortByAdFormatStr(1, "rewarded", "admob")
-        adManager.setAdPlatformSortByAdFormatStr(1, "mrec", "admob,startapp")*/
-
+        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "applovin,admob,ironsource")
+        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob,applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "ironsource,applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "native", "admob,applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "native_medium", "applovin")
 
 
         adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {

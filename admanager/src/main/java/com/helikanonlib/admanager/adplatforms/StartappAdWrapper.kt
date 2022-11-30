@@ -1,6 +1,7 @@
 package com.helikanonlib.admanager.adplatforms
 
 
+/*
 import android.app.Activity
 import android.content.Context
 import android.view.View
@@ -18,20 +19,24 @@ import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener
 import com.startapp.sdk.adsbase.adlisteners.AdEventListener
 
 
+*/
 /**
  * *************************************************************************************************
  * STARTAPP ADS HELPER
  * *************************************************************************************************
- */
+ *//*
+
 class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override val platform = AdPlatformTypeEnum.STARTAPP
 
     var viewIntances: MutableMap<String, Any?> = mutableMapOf()
 
-    /*var startAppAd: StartAppAd? = null
+    */
+/*var startAppAd: StartAppAd? = null
     var bannerAdView: Banner? = null
     var startAppAdRewarded: StartAppAd? = null
-    var mrecAdView: Mrec? = null*/
+    var mrecAdView: Mrec? = null*//*
+
 
 
     companion object {
@@ -49,20 +54,24 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         StartAppAd.disableSplash();
         StartAppAd.disableAutoInterstitial()
 
-        /*StartAppSDK.setUserConsent(
+        */
+/*StartAppSDK.setUserConsent(
             context,
             "pas",
             System.currentTimeMillis(),
             true
-        );*/
+        );*//*
+
 
         //startAppAd = StartAppAd(context)
         // startAppAdRewarded = StartAppAd(context)
 
-        /*for (group in placementGroups) {
+        */
+/*for (group in placementGroups) {
             viewIntances.put("interstitial_${group.groupName}", StartAppAd(context))
             viewIntances.put("rewarded_${group.groupName}", StartAppAd(context))
-        }*/
+        }*//*
+
 
         isInitialized = true
 
@@ -405,4 +414,5 @@ class StartAppAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun onStop(activity: Activity) {}
     override fun onResume(activity: Activity) {}
 }
+*/
 

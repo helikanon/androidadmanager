@@ -28,10 +28,10 @@
             android:value="${admobAppId}" />
 
         <!-- Startapp -->
-        <provider
+        <!--<provider
             android:name="com.startapp.sdk.adsbase.StartAppInitProvider"
             android:authorities="${applicationId}.startappinitprovider"
-            tools:node="remove" />
+            tools:node="remove" />-->
 
         <!-- Ironsource -->
         <activity

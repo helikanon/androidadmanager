@@ -39,6 +39,9 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+
+            /*shrinkResources true
+            minifyEnabled true*/
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -50,9 +53,9 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.cardview:cardview:1.0.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    //testImplementation 'junit:junit:4.13.2'
+    //androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    //androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
@@ -62,18 +65,19 @@ dependencies {
 
 
     // google service
-    implementation 'com.google.android.gms:play-services-ads:21.2.0'
+    implementation 'com.google.android.gms:play-services-ads:21.3.0'
     implementation 'com.google.android.gms:play-services-appset:16.0.2'
     implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
 
     implementation project(path: ':nativetemplates')
 
     // startapp
-    implementation 'com.startapp:inapp-sdk:4.10.2'
+    // implementation 'com.startapp:inapp-sdk:4.10.2'
 
     // IRONSOURCE
-    implementation 'com.ironsource.sdk:mediationsdk:7.2.4.1'
+    // implementation 'com.ironsource.sdk:mediationsdk:7.2.5'
 
+    /*
     // Add AdColony Network
     implementation 'com.ironsource.adapters:adcolonyadapter:4.3.13'
     implementation 'com.adcolony:sdk:4.8.0'
@@ -101,11 +105,12 @@ dependencies {
     // Add Vungle Network
     implementation 'com.ironsource.adapters:vungleadapter:4.3.18'
     implementation 'com.vungle:publisher-sdk-android:6.12.0'
-
+*/
 
     // APPLOVIN
     implementation 'com.applovin:applovin-sdk:+'
     implementation 'com.applovin.mediation:adcolony-adapter:+'
+    implementation 'com.applovin.mediation:fyber-adapter:+'
     implementation 'com.applovin.mediation:google-adapter:+'
     implementation 'com.applovin.mediation:ironsource-adapter:+'
     implementation 'com.applovin.mediation:facebook-adapter:+'

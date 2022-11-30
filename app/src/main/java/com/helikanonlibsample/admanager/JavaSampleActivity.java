@@ -20,7 +20,7 @@ import com.helikanonlib.admanager.AdPlatformTypeEnum;
 import com.helikanonlib.admanager.AdPlatformWrapper;
 import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper;
 import com.helikanonlib.admanager.adplatforms.IronSourceAdWrapper;
-import com.helikanonlib.admanager.adplatforms.StartAppAdWrapper;
+// import com.helikanonlib.admanager.adplatforms.StartAppAdWrapper;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -167,7 +167,7 @@ public class JavaSampleActivity extends AppCompatActivity {
         admobAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/5224354917");
         // facebookAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/6300978111");*/
 
-        AdPlatformWrapper startappAdWrapper = new StartAppAdWrapper("207754325");
+        /*AdPlatformWrapper startappAdWrapper = new StartAppAdWrapper("207754325");
         startappAdWrapper.getPlacementGroups().add(new AdPlacementGroupModel(
                 "default",
                 "DefaultInterstitial",
@@ -176,7 +176,7 @@ public class JavaSampleActivity extends AppCompatActivity {
                 "MREC_BANNER",
                 "DefaultNative",
                 ""
-        ));
+        ));*/
 
         AdPlatformWrapper ironsourceAdWrapper = new IronSourceAdWrapper("a1a67f75");
         ironsourceAdWrapper.getPlacementGroups().add(new AdPlacementGroupModel(
@@ -205,9 +205,8 @@ public class JavaSampleActivity extends AppCompatActivity {
         adManager.setTestMode(BuildConfig.DEBUG);
         adManager.setDeviceId("47088e48-5195-4757-90b2-0da94116befd"); // necessary if test mode enabled
         adManager.addAdPlatform(new AdPlatformModel(admobAdWrapper, true, false, true, true));
-        adManager.addAdPlatform(new AdPlatformModel(startappAdWrapper, true, true, true, true));
+        // adManager.addAdPlatform(new AdPlatformModel(startappAdWrapper, true, true, true, true));
         adManager.addAdPlatform(new AdPlatformModel(ironsourceAdWrapper, true, true, true, false));
-
 
 
         adManager.setGlobalRewardedShowListener(new AdPlatformShowListener() {
