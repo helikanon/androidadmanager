@@ -49,8 +49,9 @@ class AdManager {
 
     var lastShowDateByAdFormat = mutableMapOf<AdFormatEnum, Date>()
 
-
+    var isEnableShowLoadingViewForInterstitial = true
     var loadingView: AdsLoadingCustomView? = null
+
     fun initLoadingView(activity: Activity, rootView: ViewGroup? = null) {
         if (loadingView != null) {
             // loadingView?.findViewById<TextView>(R.id.textViewCloseAdsLoading)?.visibility = View.VISIBLE
@@ -117,8 +118,11 @@ class AdManager {
     }
 
     fun addLoadingViewToActivity(activity: Activity) {
-        try {
+        if (!isEnableShowLoadingViewForInterstitial){
+            return
+        }
 
+        try {
             val activityRootView = activity.findViewById<ViewGroup>(android.R.id.content)
                 .getChildAt(0) as ViewGroup
 
@@ -372,9 +376,12 @@ class AdManager {
     @JvmOverloads
     fun loadAndShowInterstitial(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
 
-        activity.runOnUiThread {
-            addLoadingViewToActivity(activity)
+        if (isEnableShowLoadingViewForInterstitial){
+            activity.runOnUiThread {
+                addLoadingViewToActivity(activity)
+            }
         }
+
         val loadListener: AdPlatformLoadListener = object : AdPlatformLoadListener() {
             override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
                 // this listener will trigger just one time after firt load any platform
