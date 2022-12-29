@@ -1,6 +1,5 @@
 package com.helikanonlibsample.admanager
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -165,7 +164,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnLoadAppOpenAd.setOnClickListener {
-            MyApplication.admobAppOpenAdManager?.show(this, null)
+            MyApplication.admobAppOpenAdManager?.showAdmob(this, null)
 
             //MyApplication.admobAppOpenAdManager?.disable()
         }

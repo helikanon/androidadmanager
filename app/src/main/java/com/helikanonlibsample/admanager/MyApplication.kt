@@ -11,7 +11,7 @@ class MyApplication : Application() {
 
     companion object {
         lateinit var adManager: AdManager
-        var admobAppOpenAdManager: AdmobAppOpenAdManager? = null
+        var admobAppOpenAdManager: AppOpenAdManager? = null
     }
 
 
@@ -19,7 +19,14 @@ class MyApplication : Application() {
         super.onCreate()
 
         initAdManager()
-        admobAppOpenAdManager = AdmobAppOpenAdManager(this, "ca-app-pub-3940256099942544/3419835294",
+        admobAppOpenAdManager = AppOpenAdManager(
+            this,
+            mutableMapOf(
+                AdPlatformTypeEnum.ADMOB to "ca-app-pub-3940256099942544/3419835294",
+                AdPlatformTypeEnum.APPLOVIN to "dd9249369deec4ec",
+            ),
+            "applovin,admob",
+
             object : AdPlatformShowListener() {
                 override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
                     Log.e("adManager", "AdmobAppOpenAdManager >>> success display")
@@ -44,7 +51,7 @@ class MyApplication : Application() {
         )
 
         admobAppOpenAdManager?.excludedActivities?.add(JavaSampleActivity::class.java.simpleName)
-        admobAppOpenAdManager?.minElapsedSecondsToNextShow = 30
+        admobAppOpenAdManager?.minElapsedSecondsToNextShow = 10
         admobAppOpenAdManager?.disable()
     }
 
@@ -204,7 +211,7 @@ class MyApplication : Application() {
                                 banner = "609a039e1d803bea",
                                 mrec = "851a6927fdae17d5",
                                 native = "2b1686bf9db060d3",
-                                appOpenAd = "",
+                                appOpenAd = "dd9249369deec4ec",
                                 nativeMedium = "96454048eeffaad2"
                             )
                         )
