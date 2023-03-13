@@ -22,8 +22,8 @@ android {
         applicationId "com.helikanonlibsample.admanager"
         minSdkVersion 23
         targetSdkVersion 32
-        versionCode 46
-        versionName "4.006"
+        versionCode 47
+        versionName "4.047"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
