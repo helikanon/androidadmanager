@@ -15,15 +15,15 @@ apply plugin: 'kotlin-android-extensions'*/
 //apply plugin: 'com.google.gms.google-services'  // if admob active enable this line and add app/google-services.json
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 32
     // buildToolsVersion "31.0.0"
 
     defaultConfig {
         applicationId "com.helikanonlibsample.admanager"
         minSdkVersion 23
-        targetSdkVersion 33
-        versionCode 45
-        versionName "4.005"
+        targetSdkVersion 32
+        versionCode 46
+        versionName "4.006"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -68,7 +68,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     // implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     //testImplementation 'junit:junit:4.13.2'

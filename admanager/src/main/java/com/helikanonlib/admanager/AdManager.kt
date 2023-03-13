@@ -118,7 +118,7 @@ class AdManager {
     }
 
     fun addLoadingViewToActivity(activity: Activity) {
-        if (!isEnableShowLoadingViewForInterstitial){
+        if (!isEnableShowLoadingViewForInterstitial) {
             return
         }
 
@@ -376,7 +376,7 @@ class AdManager {
     @JvmOverloads
     fun loadAndShowInterstitial(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
 
-        if (isEnableShowLoadingViewForInterstitial){
+        if (isEnableShowLoadingViewForInterstitial) {
             activity.runOnUiThread {
                 addLoadingViewToActivity(activity)
             }
@@ -687,12 +687,12 @@ class AdManager {
             }
 
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
                 if ((platformIndex + 1) < bannerAdPlatforms.size) {
                     activity.runOnUiThread { _showBannerFromFirstAvailable(activity, containerView, listener, platformIndex + 1, placementGroupIndex) }
                 } else {
                     listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum) // there is no banner ads. Tried on all platforms
                 }
-                listener?.onError(errorMode, errorMessage, adPlatformEnum)
             }
         }
 
@@ -720,21 +720,16 @@ class AdManager {
 
         val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL, placementGroupIndex)
         run breaker@{
+            interstitialAdPlatforms.forEach forEach@{ _platform ->
+                if (platform != null && _platform.platformInstance.platform != platform.platformInstance.platform) {
+                    return@breaker
+                }
 
-            run breaker@{
-                interstitialAdPlatforms.forEach forEach@{ _platform ->
-                    if (platform != null && _platform.platformInstance.platform != platform.platformInstance.platform) {
-                        return@breaker
-                    }
-
-                    if (_platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
-                        hasLoaded = true
-                        return@breaker
-                    }
+                if (_platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
+                    hasLoaded = true
+                    return@breaker
                 }
             }
-
-
         }
 
         return hasLoaded
@@ -997,12 +992,14 @@ class AdManager {
             }
 
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
+
                 if ((index + 1) < mrecAdPlatforms.size) {
                     activity.runOnUiThread { _showMrecFromFirstAvailable(activity, containerView, listener, index + 1, placementGroupIndex) }
                 } else {
                     listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum) // not found any ads in all platforms
                 }
-                listener?.onError(errorMode, errorMessage, adPlatformEnum)
+
             }
         }, placementGroupIndex)
     }
@@ -1127,7 +1124,6 @@ class AdManager {
     fun randInt(min: Int, max: Int): Int {
         return Random().nextInt(max - min + 1) + min
     }
-
 
 
     @JvmOverloads

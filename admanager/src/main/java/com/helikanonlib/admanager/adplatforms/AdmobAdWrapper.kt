@@ -15,15 +15,12 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.helikanonlib.admanager.adplatforms.*
 import com.helikanonlib.admanager.AdPlatformLoadListener
 import com.helikanonlib.admanager.AdPlatformShowListener
 import com.helikanonlib.admanager.AdErrorMode
 import com.helikanonlib.admanager.AdPlatformTypeEnum
 import com.helikanonlib.admanager.AdFormatEnum
-import com.helikanonlib.admanager.AdPlatformModel
 import com.helikanonlib.admanager.AdPlatformWrapper
-import com.helikanonlib.admanager.AdsLoadingCustomView
 import com.helikanonlib.admanager.R
 
 /**
@@ -298,7 +295,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
         }
         _removeBannerViewIfExists(bannerAdView, containerView)
-        containerView.addView(bannerAdView)
+        containerView.addView(bannerAdView, lp)
 
         bannerAdView?.loadAd(AdRequest.Builder().build())
     }
@@ -368,7 +365,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
         }
         _removeBannerViewIfExists(mrecAdView, containerView)
-        containerView.addView(mrecAdView)
+        containerView.addView(mrecAdView, lp)
 
         mrecAdView.loadAd(AdRequest.Builder().build())
 
