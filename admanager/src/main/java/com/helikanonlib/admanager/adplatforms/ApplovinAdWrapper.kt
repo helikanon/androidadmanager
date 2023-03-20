@@ -306,9 +306,13 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         bannerAdView = MaxAdView(placementName, activity)
+        // bannerAdView.id = ViewCompat.generateViewId()
+        //val heightDp = MaxAdFormat.BANNER.getAdaptiveSize(activity).height
+        //val heightPx = AppLovinSdkUtils.dpToPx(activity, heightDp)
 
-        val heightDp = MaxAdFormat.BANNER.getAdaptiveSize(activity).height
-        val heightPx = AppLovinSdkUtils.dpToPx(activity, heightDp)
+        val isTablet = AppLovinSdkUtils.isTablet(activity)
+        val heightPx = AppLovinSdkUtils.dpToPx(activity, if (isTablet) 90 else 50)
+
         bannerAdView.layoutParams = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)
             .apply {
                 addRule(RelativeLayout.CENTER_HORIZONTAL)

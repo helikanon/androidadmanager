@@ -383,7 +383,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             adWidthPixels = outMetrics.widthPixels.toFloat()
         }
 
-        val adWidth = (adWidthPixels / density).toInt()
+        val adWidth = (adWidthPixels / density).toInt() - 24
 
         return AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(activity, adWidth)
     }
