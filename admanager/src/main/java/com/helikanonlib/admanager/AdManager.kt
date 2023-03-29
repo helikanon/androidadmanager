@@ -17,7 +17,14 @@ import androidx.core.view.ViewCompat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+
 class AdManager {
+
+    companion object {
+        var DEFAULT_PLACEMENT_GROUPCODE = "default"
+        var DEFAULT_INTERSTITIAL_SHOWN_WHERE_NAME = "defaultPlace"
+    }
+
     var testMode: Boolean = false
     var deviceId: String = ""
     var showAds: Boolean = true
@@ -49,9 +56,78 @@ class AdManager {
 
     var lastShowDateByAdFormat = mutableMapOf<AdFormatEnum, Date>()
 
+    constructor() {
+        initHandlers()
+    }
+
+    private fun initHandlers() {
+        if (handlerThread == null) {
+            handlerThread = HandlerThread("admanager-bg-thread")
+            handlerThread?.start()
+
+            hasWorkingAutoloadInterstitialHandler = false
+            hasWorkingAutoloadRewardedHandler = false
+            autoloadInterstitialHandler = Handler(handlerThread!!.looper)
+            autoloadRewardedHandler = Handler(handlerThread!!.looper)
+        }
+    }
+
+    fun initializePlatformsWithActivity(activity: Activity) {
+        if (!showAds) return
+
+        adPlatforms.forEach forEach@{ platform ->
+            platform.platformInstance.initialize(activity, testMode)
+
+            if (testMode) {
+                platform.platformInstance.enableTestMode(activity.applicationContext, deviceId)
+            }
+        }
+    }
+
+    fun initializePlatforms(context: Context) {
+        if (!showAds) return
+
+        adPlatforms.forEach forEach@{ platform ->
+            platform.platformInstance.initialize(context, testMode)
+
+            if (testMode) {
+                platform.platformInstance.enableTestMode(context, deviceId)
+            }
+        }
+    }
+
+    fun start(activity: Activity) {
+        if (autoLoadForInterstitial) {
+            placementGroups.forEachIndexed { index, pgName ->
+                if (index > 0) return@forEachIndexed
+                loadInterstitial(activity, listener = null, platform = null, parallel = false, placementGroupIndex = getPlacementGroupIndexByName(pgName))
+            }
+
+        }
+
+        if (autoLoadForRewarded) {
+            placementGroups.forEachIndexed { index, pgName ->
+                if (index > 0) return@forEachIndexed
+                loadRewarded(activity, null, null, false, getPlacementGroupIndexByName(pgName))
+            }
+        }
+    }
+
+    fun enableTestMode(activity: Activity, deviceId: String) {
+
+        this.testMode = true
+        this.deviceId = deviceId
+
+        adPlatforms.forEach forEach@{ platform ->
+            if (testMode) {
+                platform.platformInstance.enableTestMode(activity.applicationContext, deviceId)
+            }
+        }
+    }
+
+
     var isEnableShowLoadingViewForInterstitial = true
     var loadingView: AdsLoadingCustomView? = null
-
     fun initLoadingView(activity: Activity, rootView: ViewGroup? = null) {
         if (loadingView != null) {
             // loadingView?.findViewById<TextView>(R.id.textViewCloseAdsLoading)?.visibility = View.VISIBLE
@@ -123,6 +199,7 @@ class AdManager {
         }
 
         try {
+
             val activityRootView = activity.findViewById<ViewGroup>(android.R.id.content)
                 .getChildAt(0) as ViewGroup
 
@@ -162,75 +239,6 @@ class AdManager {
 
         } catch (e: Exception) {
             e.printStackTrace()
-        }
-    }
-
-    constructor() {
-        initHandlers()
-    }
-
-    private fun initHandlers() {
-        if (handlerThread == null) {
-            handlerThread = HandlerThread("admanager-bg-thread")
-            handlerThread?.start()
-
-            hasWorkingAutoloadInterstitialHandler = false
-            hasWorkingAutoloadRewardedHandler = false
-            autoloadInterstitialHandler = Handler(handlerThread!!.looper)
-            autoloadRewardedHandler = Handler(handlerThread!!.looper)
-        }
-    }
-
-    fun initializePlatformsWithActivity(activity: Activity) {
-        if (!showAds) return
-
-        adPlatforms.forEach forEach@{ platform ->
-            platform.platformInstance.initialize(activity, testMode)
-
-            if (testMode) {
-                platform.platformInstance.enableTestMode(activity.applicationContext, deviceId)
-            }
-        }
-    }
-
-    fun initializePlatforms(context: Context) {
-        if (!showAds) return
-
-        adPlatforms.forEach forEach@{ platform ->
-            platform.platformInstance.initialize(context, testMode)
-
-            if (testMode) {
-                platform.platformInstance.enableTestMode(context, deviceId)
-            }
-        }
-    }
-
-    fun start(activity: Activity) {
-        if (autoLoadForInterstitial) {
-            placementGroups.forEachIndexed { index, pgName ->
-                if (index > 0) return@forEachIndexed
-                loadInterstitial(activity, listener = null, platform = null, parallel = false, placementGroupIndex = getPlacementGroupIndexByName(pgName))
-            }
-
-        }
-
-        if (autoLoadForRewarded) {
-            placementGroups.forEachIndexed { index, pgName ->
-                if (index > 0) return@forEachIndexed
-                loadRewarded(activity, null, null, false, getPlacementGroupIndexByName(pgName))
-            }
-        }
-    }
-
-    fun enableTestMode(activity: Activity, deviceId: String) {
-
-        this.testMode = true
-        this.deviceId = deviceId
-
-        adPlatforms.forEach forEach@{ platform ->
-            if (testMode) {
-                platform.platformInstance.enableTestMode(activity.applicationContext, deviceId)
-            }
         }
     }
 
@@ -374,18 +382,15 @@ class AdManager {
     we wants call listener?.onError by _showInterstitial
      */
     @JvmOverloads
-    fun loadAndShowInterstitial(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
+    fun loadAndShowInterstitial(activity: Activity, shownWhere: String = DEFAULT_INTERSTITIAL_SHOWN_WHERE_NAME, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
 
-        if (isEnableShowLoadingViewForInterstitial) {
-            activity.runOnUiThread {
-                addLoadingViewToActivity(activity)
-            }
+        activity.runOnUiThread {
+            addLoadingViewToActivity(activity)
         }
-
         val loadListener: AdPlatformLoadListener = object : AdPlatformLoadListener() {
             override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
                 // this listener will trigger just one time after firt load any platform
-                _showInterstitial(activity, listener, platform, placementGroupIndex, false)
+                _showInterstitial(activity, shownWhere, listener, platform, placementGroupIndex, false)
             }
 
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
@@ -393,7 +398,7 @@ class AdManager {
                 // after try all platforms
                 // _showInterstitial will trigger user listener
                 if (errorMode == AdErrorMode.MANAGER) {
-                    _showInterstitial(activity, listener, platform, placementGroupIndex, false)
+                    _showInterstitial(activity, shownWhere, listener, platform, placementGroupIndex, false)
                 }
 
 
@@ -404,7 +409,7 @@ class AdManager {
 
     @JvmOverloads
     fun showInterstitialForTimeStrategy(
-        activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
+        activity: Activity, shownWhere: String = DEFAULT_INTERSTITIAL_SHOWN_WHERE_NAME, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
         placementGroupIndex: Int = 0, loadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = true
     ) {
         if (!showAds) return
@@ -420,31 +425,31 @@ class AdManager {
         }
 
         if (isAvailableToShow) {
-            showInterstitial(activity, listener, platform, placementGroupIndex, loadAndShowIfNotExistsAdsOnAutoloadMode)
+            showInterstitial(activity, shownWhere, listener, platform, placementGroupIndex, loadAndShowIfNotExistsAdsOnAutoloadMode)
         }
     }
 
     @JvmOverloads
     fun showInterstitial(
-        activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
+        activity: Activity, shownWhere: String = DEFAULT_INTERSTITIAL_SHOWN_WHERE_NAME, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
         placementGroupIndex: Int = 0, loadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = true
     ) {
         if (!showAds) return
 
         if (autoLoadForInterstitial) {
-            val isShowed = _showInterstitial(activity, listener, platform, placementGroupIndex, loadAndShowIfNotExistsAdsOnAutoloadMode)
+            val isShowed = _showInterstitial(activity, shownWhere, listener, platform, placementGroupIndex, loadAndShowIfNotExistsAdsOnAutoloadMode)
         } else {
 
             activity.runOnUiThread {
                 addLoadingViewToActivity(activity)
             }
-            loadAndShowInterstitial(activity, listener, platform, placementGroupIndex)
+            loadAndShowInterstitial(activity, shownWhere, listener, platform, placementGroupIndex)
         }
     }
 
     // load edilmiş reklamı göstermeye çalışır.
     private fun _showInterstitial(
-        activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int,
+        activity: Activity, shownWhere: String, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int,
         loadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = false
     ): Boolean {
         if (!showAds) return true
@@ -499,7 +504,7 @@ class AdManager {
                 if (autoLoadForInterstitial) {
                     if (isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode && loadAndShowIfNotExistsAdsOnAutoloadMode) {
                         stopAutoloadInterstitialHandler()
-                        loadAndShowInterstitial(activity, listener, platform, placementGroupIndex)
+                        loadAndShowInterstitial(activity, shownWhere, listener, platform, placementGroupIndex)
                     } else {
                         _autoloadInterstitialByHandler(activity, null, platform)
 
@@ -520,14 +525,14 @@ class AdManager {
         var hasLoadedInterstitial = false
         if (platform != null) {
             if (platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
-                platform.platformInstance.showInterstitial(activity, _listener, placementGroupIndex)
+                platform.platformInstance.showInterstitial(activity, shownWhere, _listener, placementGroupIndex)
                 hasLoadedInterstitial = true
             }
         } else {
             run breaker@{
                 interstitialAdPlatforms.forEach forEach@{ platform ->
                     if (platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
-                        platform.platformInstance.showInterstitial(activity, _listener, placementGroupIndex)
+                        platform.platformInstance.showInterstitial(activity, shownWhere, _listener, placementGroupIndex)
                         hasLoadedInterstitial = true
                         return@breaker
                         //return@forEach
@@ -687,12 +692,12 @@ class AdManager {
             }
 
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                listener?.onError(errorMode, errorMessage, adPlatformEnum)
                 if ((platformIndex + 1) < bannerAdPlatforms.size) {
                     activity.runOnUiThread { _showBannerFromFirstAvailable(activity, containerView, listener, platformIndex + 1, placementGroupIndex) }
                 } else {
                     listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum) // there is no banner ads. Tried on all platforms
                 }
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
             }
         }
 
@@ -720,16 +725,21 @@ class AdManager {
 
         val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL, placementGroupIndex)
         run breaker@{
-            interstitialAdPlatforms.forEach forEach@{ _platform ->
-                if (platform != null && _platform.platformInstance.platform != platform.platformInstance.platform) {
-                    return@breaker
-                }
 
-                if (_platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
-                    hasLoaded = true
-                    return@breaker
+            run breaker@{
+                interstitialAdPlatforms.forEach forEach@{ _platform ->
+                    if (platform != null && _platform.platformInstance.platform != platform.platformInstance.platform) {
+                        return@breaker
+                    }
+
+                    if (_platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
+                        hasLoaded = true
+                        return@breaker
+                    }
                 }
             }
+
+
         }
 
         return hasLoaded
@@ -992,14 +1002,12 @@ class AdManager {
             }
 
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                listener?.onError(errorMode, errorMessage, adPlatformEnum)
-
                 if ((index + 1) < mrecAdPlatforms.size) {
                     activity.runOnUiThread { _showMrecFromFirstAvailable(activity, containerView, listener, index + 1, placementGroupIndex) }
                 } else {
                     listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum) // not found any ads in all platforms
                 }
-
+                listener?.onError(errorMode, errorMessage, adPlatformEnum)
             }
         }, placementGroupIndex)
     }

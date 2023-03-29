@@ -2,10 +2,10 @@ package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.google.android.gms.ads.nativead.NativeAd
 import com.helikanonlib.admanager.*
 import com.ironsource.mediationsdk.ISBannerSize
 import com.ironsource.mediationsdk.IronSource
@@ -81,7 +81,7 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
         IronSource.loadInterstitial()
     }
 
-    override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+    override fun showInterstitial(activity: Activity, shownWhere: String, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         if (!isInterstitialLoaded(placementGroupIndex)) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noadsloaded", platform)
             return
@@ -362,29 +362,36 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
     }
 
     override fun destroy(activity: Activity) {
-        destroyBanner(activity)
-        destroyMrec(activity)
+        try {
+            destroyBanner(activity)
+            destroyMrec(activity)
+        } catch (e: Exception) {
+            Log.e("Ironsource", e.message ?: "")
+        }
     }
 
     override fun destroyBanner(activity: Activity) {
+        try {
+            for (i in 0 until placementGroups.size) {
+                val pg = placementGroups[i]
+                var bannerAdView: IronSourceBannerLayout? = if (viewIntances.containsKey(pg.banner)) viewIntances.get(pg.banner) as IronSourceBannerLayout? else null
 
-        for (i in 0 until placementGroups.size) {
-            val pg = placementGroups[i]
-            var bannerAdView: IronSourceBannerLayout? = if (viewIntances.containsKey(pg.banner)) viewIntances.get(pg.banner) as IronSourceBannerLayout? else null
-
-            if (_isBannerLoaded(bannerAdView) && !bannerAdView!!.isDestroyed) {
-                try {
-                    _removeBannerViewIfExists(bannerAdView)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                if (_isBannerLoaded(bannerAdView) && !bannerAdView!!.isDestroyed) {
+                    try {
+                        _removeBannerViewIfExists(bannerAdView)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
-            }
 
-            bannerAdView?.let {
-                IronSource.destroyBanner(bannerAdView)
-                bannerAdView = null
-            }
+                bannerAdView?.let {
+                    IronSource.destroyBanner(bannerAdView)
+                    bannerAdView = null
+                }
 
+            }
+        } catch (e: Exception) {
+            Log.e("Ironsource", e.message ?: "")
         }
 
 
@@ -392,23 +399,27 @@ class IronSourceAdWrapper(override var appId: String) : AdPlatformWrapper(appId)
 
 
     override fun destroyMrec(activity: Activity) {
-        for (i in 0 until placementGroups.size) {
-            val pg = placementGroups[i]
-            var mrecAdView: IronSourceBannerLayout? = if (viewIntances.containsKey(pg.mrec)) viewIntances.get(pg.mrec) as IronSourceBannerLayout? else null
+        try {
+            for (i in 0 until placementGroups.size) {
+                val pg = placementGroups[i]
+                var mrecAdView: IronSourceBannerLayout? = if (viewIntances.containsKey(pg.mrec)) viewIntances.get(pg.mrec) as IronSourceBannerLayout? else null
 
-            if (_isBannerLoaded(mrecAdView) && !mrecAdView!!.isDestroyed) {
-                try {
-                    _removeBannerViewIfExists(mrecAdView)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                if (_isBannerLoaded(mrecAdView) && !mrecAdView!!.isDestroyed) {
+                    try {
+                        _removeBannerViewIfExists(mrecAdView)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
-            }
 
-            mrecAdView?.let {
-                IronSource.destroyBanner(mrecAdView)
-                mrecAdView = null
-            }
+                mrecAdView?.let {
+                    IronSource.destroyBanner(mrecAdView)
+                    mrecAdView = null
+                }
 
+            }
+        } catch (e: Exception) {
+            Log.e("Ironsource", e.message ?: "")
         }
     }
 

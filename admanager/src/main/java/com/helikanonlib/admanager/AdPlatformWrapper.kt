@@ -30,7 +30,7 @@ abstract class AdPlatformWrapper(open var appId: String) {
     abstract fun enableTestMode(context: Context, deviceId: String? = null)
 
     abstract fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0)
-    abstract fun showInterstitial(activity: Activity, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
+    abstract fun showInterstitial(activity: Activity, shownWhere:String ,listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
     abstract fun isInterstitialLoaded(placementGroupIndex: Int = 0): Boolean
 
     abstract fun isBannerLoaded(placementGroupIndex: Int = 0): Boolean
@@ -67,7 +67,11 @@ abstract class AdPlatformWrapper(open var appId: String) {
 
     protected fun _removeBannerViewIfExists(bannerAdView: ViewGroup?, containerView: ViewGroup? = null): Boolean {
         if (_isBannerLoaded(bannerAdView)) {
-            (bannerAdView?.parent as ViewGroup).removeView(bannerAdView)
+            try {
+                (bannerAdView?.parent as ViewGroup).removeView(bannerAdView)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
             return true
         }
 

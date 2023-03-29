@@ -2,9 +2,9 @@ package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.google.android.gms.ads.nativead.NativeAd
 import com.helikanonlib.admanager.*
 import com.unity3d.ads.IUnityAdsInitializationListener
 import com.unity3d.ads.IUnityAdsLoadListener
@@ -13,6 +13,8 @@ import com.unity3d.ads.UnityAds
 import com.unity3d.services.banners.BannerErrorInfo
 import com.unity3d.services.banners.BannerView
 import com.unity3d.services.banners.UnityBannerSize
+
+
 class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     companion object {
@@ -115,7 +117,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     }
 
-    override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+    override fun showInterstitial(activity: Activity, shownWhere: String, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         if (!isInterstitialLoaded(placementGroupIndex)) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noadsloaded", platform)
             return
@@ -378,58 +380,67 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun destroy(activity: Activity) {
+        try {
+            for (i in 0 until placementGroups.size) {
+                val pg = placementGroups[i]
+                viewIntances.put(pg.interstitial, null)
+                viewIntances.put(pg.rewarded, null)
+            }
 
-        for (i in 0 until placementGroups.size) {
-            val pg = placementGroups[i]
-            viewIntances.put(pg.interstitial, null)
-            viewIntances.put(pg.rewarded, null)
+            destroyBanner(activity)
+            destroyMrec(activity)
+        } catch (e: Exception) {
+            Log.e("UnitAds", e.message ?: "")
         }
-
-        destroyBanner(activity)
-        destroyMrec(activity)
     }
 
     override fun destroyBanner(activity: Activity) {
+        try {
+            for (i in 0 until placementGroups.size) {
+                val pg = placementGroups[i]
 
-        for (i in 0 until placementGroups.size) {
-            val pg = placementGroups[i]
-
-            var bannerAdView: BannerView? = if (viewIntances.containsKey(pg.banner)) viewIntances.get(pg.banner) as BannerView? else null
-            if (_isBannerLoaded(bannerAdView)) {
-                try {
-                    _removeBannerViewIfExists(bannerAdView)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                var bannerAdView: BannerView? = if (viewIntances.containsKey(pg.banner)) viewIntances.get(pg.banner) as BannerView? else null
+                if (_isBannerLoaded(bannerAdView)) {
+                    try {
+                        _removeBannerViewIfExists(bannerAdView)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
-            }
 
-            bannerAdView?.destroy()
-            bannerAdView = null
-            viewIntances[pg.banner] = null
+                bannerAdView?.destroy()
+                bannerAdView = null
+                viewIntances[pg.banner] = null
+            }
+        } catch (e: Exception) {
+            Log.e("UnitAds", e.message ?: "")
         }
 
 
     }
 
     override fun destroyMrec(activity: Activity) {
+        try {
+            for (i in 0 until placementGroups.size) {
+                val pg = placementGroups[i]
 
-        for (i in 0 until placementGroups.size) {
-            val pg = placementGroups[i]
-
-            var mrecAdView: BannerView? = if (viewIntances.containsKey(pg.mrec)) viewIntances.get(pg.mrec) as BannerView? else null
-            if (_isBannerLoaded(mrecAdView)) {
-                try {
-                    _removeBannerViewIfExists(mrecAdView)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                var mrecAdView: BannerView? = if (viewIntances.containsKey(pg.mrec)) viewIntances.get(pg.mrec) as BannerView? else null
+                if (_isBannerLoaded(mrecAdView)) {
+                    try {
+                        _removeBannerViewIfExists(mrecAdView)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
+
+                mrecAdView?.destroy()
+                mrecAdView = null
+                viewIntances[pg.mrec] = null
             }
 
-            mrecAdView?.destroy()
-            mrecAdView = null
-            viewIntances[pg.mrec] = null
+        } catch (e: Exception) {
+            Log.e("UnitAds", e.message ?: "")
         }
-
     }
 
 

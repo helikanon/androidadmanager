@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
 
     fun initViews() {
         binding.btnShowInterstitial.setOnClickListener {
-            MyApplication.adManager.showInterstitial(this, object : AdPlatformShowListener() {
+            MyApplication.adManager.showInterstitial(this, "btnShowInterstitial" ,object : AdPlatformShowListener() {
                 override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
                     super.onDisplayed(adPlatformEnum)
                 }

@@ -105,7 +105,7 @@ public class JavaSampleActivity extends AppCompatActivity {
         btnShowInterstitial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.showInterstitial(JavaSampleActivity.this, null, null, placementGroupIndex);
+                adManager.showInterstitial(JavaSampleActivity.this, "javaBtnShowInterstitial",null, null, placementGroupIndex);
             }
         });
 
@@ -124,7 +124,7 @@ public class JavaSampleActivity extends AppCompatActivity {
         btnShowInterstitialForTimeStrategy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.showInterstitial(JavaSampleActivity.this, null, null, placementGroupIndex);
+                adManager.showInterstitial(JavaSampleActivity.this, "javaBtnShowInterstitialForTimeStrategy",null, null, placementGroupIndex);
             }
         });
 
@@ -132,7 +132,7 @@ public class JavaSampleActivity extends AppCompatActivity {
         btnLoadAndShowInterstitial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.loadAndShowInterstitial(JavaSampleActivity.this, null, null, placementGroupIndex);
+                adManager.loadAndShowInterstitial(JavaSampleActivity.this, "javaBtnLoadAndShowInterstitial",null, null, placementGroupIndex);
             }
         });
 

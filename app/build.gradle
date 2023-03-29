@@ -22,8 +22,8 @@ android {
         applicationId "com.helikanonlibsample.admanager"
         minSdkVersion 23
         targetSdkVersion 32
-        versionCode 47
-        versionName "4.047"
+        versionCode 48
+        versionName "4.048"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -85,7 +85,7 @@ dependencies {
 
     // admob
     //implementation 'com.google.android.gms:play-services-ads:19.7.0'
-    implementation 'com.google.android.gms:play-services-ads:21.3.0'
+    implementation 'com.google.android.gms:play-services-ads:21.5.0'
     implementation project(path: ':admanager')
 
 

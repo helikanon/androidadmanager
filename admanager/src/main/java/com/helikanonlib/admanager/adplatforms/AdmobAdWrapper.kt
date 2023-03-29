@@ -3,6 +3,7 @@ package com.helikanonlib.admanager.adplatforms
 import android.app.Activity
 import android.content.Context
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.RelativeLayout
@@ -15,12 +16,7 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.helikanonlib.admanager.AdPlatformLoadListener
-import com.helikanonlib.admanager.AdPlatformShowListener
-import com.helikanonlib.admanager.AdErrorMode
-import com.helikanonlib.admanager.AdPlatformTypeEnum
-import com.helikanonlib.admanager.AdFormatEnum
-import com.helikanonlib.admanager.AdPlatformWrapper
+import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.R
 
 /**
@@ -96,7 +92,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             })
     }
 
-    override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+    override fun showInterstitial(activity: Activity, shownWhere: String, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         if (!isInterstitialLoaded(placementGroupIndex)) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded", platform)
             return
@@ -518,76 +514,89 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun destroy(activity: Activity) {
 
-        for (i in 0 until placementGroups.size) {
-            val pg = placementGroups[i]
-            viewIntances.put(pg.interstitial, null)
-            viewIntances.put(pg.rewarded, null)
+        try {
+            for (i in 0 until placementGroups.size) {
+                val pg = placementGroups[i]
+                viewIntances.put(pg.interstitial, null)
+                viewIntances.put(pg.rewarded, null)
 
-            // destroy NATIVE ads
-            _destroyAllNativeAds(pg.native)
-            _destroyAllNativeAds(pg.nativeMedium)
+                // destroy NATIVE ads
+                _destroyAllNativeAds(pg.native)
+                _destroyAllNativeAds(pg.nativeMedium)
 
+            }
+
+            destroyBanner(activity)
+            destroyMrec(activity)
+        } catch (e: Exception) {
+            Log.e("Admob", e.message ?: "")
         }
-
-        destroyBanner(activity)
-        destroyMrec(activity)
     }
 
     private fun _destroyAllNativeAds(placementName: String) {
-
-        // destroy NATIVE ads
-        var nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
         try {
-            nativeAds.forEach {
-                (it as NativeAd).destroy()
+            // destroy NATIVE ads
+            var nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
+            try {
+                nativeAds.forEach {
+                    (it as NativeAd).destroy()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                nativeAds.clear()
+                viewIntances.put(placementName, nativeAds)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            nativeAds.clear()
-            viewIntances.put(placementName, nativeAds)
+            Log.e("Admob", e.message ?: "")
         }
     }
 
     override fun destroyBanner(activity: Activity) {
+        try {
+            for (i in 0 until placementGroups.size) {
+                val pg = placementGroups[i]
 
-        for (i in 0 until placementGroups.size) {
-            val pg = placementGroups[i]
-
-            var bannerAdView: AdView? = if (viewIntances.containsKey(pg.banner)) viewIntances.get(pg.banner) as AdView? else null
-            if (_isBannerLoaded(bannerAdView)) {
-                try {
-                    _removeBannerViewIfExists(bannerAdView)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                var bannerAdView: AdView? = if (viewIntances.containsKey(pg.banner)) viewIntances.get(pg.banner) as AdView? else null
+                if (_isBannerLoaded(bannerAdView)) {
+                    try {
+                        _removeBannerViewIfExists(bannerAdView)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
-            }
 
-            bannerAdView?.destroy()
-            bannerAdView = null
-            viewIntances[pg.banner] = null
+                bannerAdView?.destroy()
+                bannerAdView = null
+                viewIntances[pg.banner] = null
+            }
+        } catch (e: Exception) {
+            Log.e("Admob", e.message ?: "")
         }
 
 
     }
 
     override fun destroyMrec(activity: Activity) {
+        try {
+            for (i in 0 until placementGroups.size) {
+                val pg = placementGroups[i]
 
-        for (i in 0 until placementGroups.size) {
-            val pg = placementGroups[i]
-
-            var mrecAdView: AdView? = if (viewIntances.containsKey(pg.mrec)) viewIntances.get(pg.mrec) as AdView? else null
-            if (_isBannerLoaded(mrecAdView)) {
-                try {
-                    _removeBannerViewIfExists(mrecAdView)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                var mrecAdView: AdView? = if (viewIntances.containsKey(pg.mrec)) viewIntances.get(pg.mrec) as AdView? else null
+                if (_isBannerLoaded(mrecAdView)) {
+                    try {
+                        _removeBannerViewIfExists(mrecAdView)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
-            }
 
-            mrecAdView?.destroy()
-            mrecAdView = null
-            viewIntances[pg.mrec] = null
+                mrecAdView?.destroy()
+                mrecAdView = null
+                viewIntances[pg.mrec] = null
+            }
+        } catch (e: Exception) {
+            Log.e("Admob", e.message ?: "")
         }
 
     }
@@ -596,6 +605,5 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun onPause(activity: Activity) {}
     override fun onStop(activity: Activity) {}
     override fun onResume(activity: Activity) {}
-
 }
 

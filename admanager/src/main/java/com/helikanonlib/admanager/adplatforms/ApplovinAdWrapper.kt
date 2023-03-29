@@ -2,6 +2,7 @@ package com.helikanonlib.admanager.adplatforms
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.applovin.mediation.*
@@ -14,7 +15,6 @@ import com.applovin.mediation.nativeAds.MaxNativeAdView
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkConfiguration
 import com.applovin.sdk.AppLovinSdkUtils
-import com.google.android.gms.ads.nativead.NativeAd
 import com.helikanonlib.admanager.*
 
 class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
@@ -92,7 +92,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     }
 
-    override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
+    override fun showInterstitial(activity: Activity, shownWhere: String, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         if (!isInterstitialLoaded(placementGroupIndex)) {
             listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded", platform)
             return
@@ -130,7 +130,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
         })
-        interstitial?.showAd()
+        interstitial?.showAd(shownWhere)
         viewIntances[placementName] = null // gösterir göstermez boşalt
 
     }
@@ -306,12 +306,12 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         bannerAdView = MaxAdView(placementName, activity)
-        // bannerAdView.id = ViewCompat.generateViewId()
-        //val heightDp = MaxAdFormat.BANNER.getAdaptiveSize(activity).height
-        //val heightPx = AppLovinSdkUtils.dpToPx(activity, heightDp)
 
+        //val heightDp = MaxAdFormat.BANNER.getAdaptiveSize(activity).height
+        // val heightPx = AppLovinSdkUtils.dpToPx(activity, heightDp)
         val isTablet = AppLovinSdkUtils.isTablet(activity)
         val heightPx = AppLovinSdkUtils.dpToPx(activity, if (isTablet) 90 else 50)
+
 
         bannerAdView.layoutParams = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)
             .apply {
@@ -499,7 +499,10 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onNativeAdLoadFailed(adUnitId: String?, error: MaxError?) {
                 super.onNativeAdLoadFailed(adUnitId, error)
 
-                listener?.onError(AdErrorMode.PLATFORM, error?.message ?: "applovin native ad load error", platform)
+                listener?.onError(
+                    AdErrorMode.PLATFORM, error?.message
+                        ?: "applovin native ad load error", platform
+                )
             }
 
             override fun onNativeAdClicked(ad: MaxAd?) {
@@ -557,45 +560,57 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun destroy(activity: Activity) {
-        destroyBanner(activity)
-        destroyMrec(activity)
+        try {
+            destroyBanner(activity)
+            destroyMrec(activity)
+        } catch (e: Exception) {
+            Log.e("Applovin", e.message ?: "")
+        }
     }
 
     override fun destroyBanner(activity: Activity) {
-        for (i in 0 until placementGroups.size) {
-            val pg = placementGroups[i]
+        try {
+            for (i in 0 until placementGroups.size) {
+                val pg = placementGroups[i]
 
-            var bannerAdView: MaxAdView? = if (viewIntances.containsKey(pg.banner)) viewIntances.get(pg.banner) as MaxAdView? else null
-            if (_isBannerLoaded(bannerAdView)) {
-                try {
-                    _removeBannerViewIfExists(bannerAdView)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                var bannerAdView: MaxAdView? = if (viewIntances.containsKey(pg.banner)) viewIntances.get(pg.banner) as MaxAdView? else null
+                if (_isBannerLoaded(bannerAdView)) {
+                    try {
+                        _removeBannerViewIfExists(bannerAdView)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
-            }
 
-            bannerAdView?.destroy()
-            bannerAdView = null
-            viewIntances[pg.banner] = null
+                bannerAdView?.destroy()
+                bannerAdView = null
+                viewIntances[pg.banner] = null
+            }
+        } catch (e: Exception) {
+            Log.e("Applovin", e.message ?: "")
         }
     }
 
     override fun destroyMrec(activity: Activity) {
-        for (i in 0 until placementGroups.size) {
-            val pg = placementGroups[i]
+        try {
+            for (i in 0 until placementGroups.size) {
+                val pg = placementGroups[i]
 
-            var mrecAdView: MaxAdView? = if (viewIntances.containsKey(pg.mrec)) viewIntances.get(pg.mrec) as MaxAdView? else null
-            if (_isBannerLoaded(mrecAdView)) {
-                try {
-                    _removeBannerViewIfExists(mrecAdView)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                var mrecAdView: MaxAdView? = if (viewIntances.containsKey(pg.mrec)) viewIntances.get(pg.mrec) as MaxAdView? else null
+                if (_isBannerLoaded(mrecAdView)) {
+                    try {
+                        _removeBannerViewIfExists(mrecAdView)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
-            }
 
-            mrecAdView?.destroy()
-            mrecAdView = null
-            viewIntances[pg.mrec] = null
+                mrecAdView?.destroy()
+                mrecAdView = null
+                viewIntances[pg.mrec] = null
+            }
+        } catch (e: Exception) {
+            Log.e("Applovin", e.message ?: "")
         }
     }
 
