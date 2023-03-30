@@ -19,6 +19,7 @@ class MyApplication : Application() {
         super.onCreate()
 
         initAdManager()
+
         admobAppOpenAdManager = AppOpenAdManager(
             this,
             mutableMapOf(

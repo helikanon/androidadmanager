@@ -57,13 +57,14 @@ class AppOpenAdManager(
         }
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        load(null)
+        // load(null)
     }
 
     /*fun enableTestMode() {
         adOpenPlacementId = "ca-app-pub-3940256099942544/3419835294"
     }*/
 
+    // @OnLifecycleEvent(Lifecycle.Event.ON_START)
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public fun onStart() {
         if (!isEnable) return
@@ -283,15 +284,14 @@ class AppOpenAdManager(
     fun loadAdmob(listener: AdPlatformLoadListener?) {
         val platform = AdPlatformTypeEnum.ADMOB
 
-        if (!isEnable) return
-
         if (isAdmobAdLoaded()) {
             listener?.onLoaded(platform)
             return
         }
 
         val request: AdRequest = AdRequest.Builder().build();
-        AppOpenAd.load(application, admobPlacementId, request, AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT, object : AppOpenAd.AppOpenAdLoadCallback() {
+        // AppOpenAd.load(application, admobPlacementId, request, AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT, object : AppOpenAd.AppOpenAdLoadCallback() {
+        AppOpenAd.load(application, admobPlacementId, request, object : AppOpenAd.AppOpenAdLoadCallback() {
             override fun onAdLoaded(ad: AppOpenAd) {
                 admobAppOpenAd = ad
                 admobLoadTime = Date().time
