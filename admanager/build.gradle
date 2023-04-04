@@ -108,16 +108,16 @@ dependencies {
 */
 
     // APPLOVIN
-    implementation 'com.applovin:applovin-sdk:+'
-    implementation 'com.applovin.mediation:adcolony-adapter:+'
-    implementation 'com.applovin.mediation:fyber-adapter:+'
-    implementation 'com.applovin.mediation:google-ad-manager-adapter:+'
-    implementation 'com.applovin.mediation:google-adapter:+'
-    implementation 'com.applovin.mediation:ironsource-adapter:+'
-    implementation 'com.applovin.mediation:facebook-adapter:+'
-    implementation 'com.applovin.mediation:mintegral-adapter:+' // admostla beraber sorun çıkıyor
-    implementation 'com.applovin.mediation:bytedance-adapter:+'
-    implementation 'com.applovin.mediation:unityads-adapter:+'
-    implementation 'com.applovin.mediation:vungle-adapter:+'
+    implementation 'com.applovin:applovin-sdk:11.8.2'
+    implementation 'com.applovin.mediation:adcolony-adapter:4.8.0.3'
+    implementation 'com.applovin.mediation:fyber-adapter:8.2.2.0'
+    implementation 'com.applovin.mediation:google-adapter:22.0.0.1'
+    implementation 'com.applovin.mediation:google-ad-manager-adapter:22.0.0.1'
+    implementation 'com.applovin.mediation:ironsource-adapter:7.2.7.0.0'
+    implementation 'com.applovin.mediation:facebook-adapter:6.13.7.0'
+    implementation 'com.applovin.mediation:mintegral-adapter:16.4.21.0' // admostla beraber sorun çıkıyor
+    implementation 'com.applovin.mediation:bytedance-adapter:5.1.0.6.0'
+    implementation 'com.applovin.mediation:unityads-adapter:4.6.1.0'
+    implementation 'com.applovin.mediation:vungle-adapter:6.12.1.1'
 
 }
