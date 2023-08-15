@@ -210,6 +210,7 @@
                 android:background="@drawable/bg_primary_rounded"
                 android:gravity="center"
                 android:lines="1"
+                android:maxHeight="50dp"
                 android:text="Install"
                 android:textColor="@color/nativeAdBtnTextColor"
                 app:layout_constraintBottom_toBottomOf="parent"
