@@ -38,7 +38,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         AppLovinSdk.getInstance(context).mediationProvider = "max"
         AppLovinSdk.getInstance(context).initializeSdk { configuration: AppLovinSdkConfiguration ->
-
+            // AppLovinSdk.getInstance( context ).showMediationDebugger();
         }
         isInitialized = true
 

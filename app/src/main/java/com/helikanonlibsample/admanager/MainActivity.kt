@@ -7,6 +7,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.helikanonlib.admanager.*
+import com.helikanonlib.admanager.adplatforms.ApplovinAdWrapper
 import com.helikanonlibsample.admanager.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

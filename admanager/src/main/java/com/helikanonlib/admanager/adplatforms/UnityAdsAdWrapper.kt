@@ -208,6 +208,10 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 }
             }
 
+            override fun onBannerShown(bannerAdView: BannerView?) {
+
+            }
+
             override fun onBannerClick(bannerAdView: BannerView?) {
                 listener?.onClicked(platform)
             }
