@@ -200,28 +200,28 @@ class AppOpenAdManager(
         val platform = AdPlatformTypeEnum.APPLOVIN
 
         applovinAppOpenAd?.setListener(object : MaxAdListener {
-            override fun onAdLoaded(ad: MaxAd?) {
+            override fun onAdLoaded(ad: MaxAd) {
                 applovinLoadTime = Date().time
                 listener?.onLoaded(platform)
             }
 
-            override fun onAdDisplayed(ad: MaxAd?) {
+            override fun onAdDisplayed(ad: MaxAd) {
 
             }
 
-            override fun onAdHidden(ad: MaxAd?) {
+            override fun onAdHidden(ad: MaxAd) {
 
             }
 
-            override fun onAdClicked(ad: MaxAd?) {
+            override fun onAdClicked(ad: MaxAd) {
 
             }
 
-            override fun onAdLoadFailed(adUnitId: String?, error: MaxError?) {
+            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
                 listener?.onError(AdErrorMode.PLATFORM, error?.message, platform)
             }
 
-            override fun onAdDisplayFailed(ad: MaxAd?, error: MaxError?) {
+            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
 
             }
 
@@ -240,26 +240,26 @@ class AppOpenAdManager(
         }
 
         applovinAppOpenAd?.setListener(object : MaxAdListener {
-            override fun onAdLoaded(ad: MaxAd?) {
+            override fun onAdLoaded(ad: MaxAd) {
             }
 
-            override fun onAdDisplayed(ad: MaxAd?) {
+            override fun onAdDisplayed(ad: MaxAd) {
                 listener?.onDisplayed(platform)
             }
 
-            override fun onAdHidden(ad: MaxAd?) {
+            override fun onAdHidden(ad: MaxAd) {
                 listener?.onClosed(platform)
             }
 
-            override fun onAdClicked(ad: MaxAd?) {
+            override fun onAdClicked(ad: MaxAd) {
 
             }
 
-            override fun onAdLoadFailed(adUnitId: String?, error: MaxError?) {
+            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
 
             }
 
-            override fun onAdDisplayFailed(ad: MaxAd?, error: MaxError?) {
+            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
                 listener?.onError(AdErrorMode.PLATFORM, error?.message ?: "", platform)
             }
 

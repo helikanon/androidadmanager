@@ -1,4 +1,9 @@
--keep class androidx.** { *; }
+-keep class androidx.multidex.** { *; }
+-keep class androidx.browser.customtabs.CustomTabsIntent { *; }
+-keep class androidx.** { 
+*** startActivityForResult(***);
+*** startActivity(***);
+}
 -keep class android.support.multidex.** { *; }
 -keep class android.support.v4.app.** { *; }
 -keep class com.google.android.gms.location.FusedLocationProviderApi { *; }

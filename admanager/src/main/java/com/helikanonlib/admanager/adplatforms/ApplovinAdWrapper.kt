@@ -58,30 +58,30 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         val applovinInterstitialIns = MaxInterstitialAd(placementName, activity)
         applovinInterstitialIns.setListener(object : MaxAdListener {
-            override fun onAdLoaded(ad: MaxAd?) {
+            override fun onAdLoaded(ad: MaxAd) {
                 updateLastLoadInterstitialDateByAdPlatform(platform)
                 listener?.onLoaded(platform)
             }
 
 
-            override fun onAdLoadFailed(adUnitId: String?, error: MaxError?) {
+            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
                 viewIntances.put(placementName, null)
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> error code=${error?.code} / ${error?.message}", platform)
             }
 
-            override fun onAdDisplayed(ad: MaxAd?) {
+            override fun onAdDisplayed(ad: MaxAd) {
 
             }
 
-            override fun onAdHidden(ad: MaxAd?) {
+            override fun onAdHidden(ad: MaxAd) {
 
             }
 
-            override fun onAdClicked(ad: MaxAd?) {
+            override fun onAdClicked(ad: MaxAd) {
 
             }
 
-            override fun onAdDisplayFailed(ad: MaxAd?, error: MaxError?) {
+            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
 
             }
 
@@ -102,29 +102,29 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         val interstitial: MaxInterstitialAd? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as MaxInterstitialAd? else null
 
         interstitial?.setListener(object : MaxAdListener {
-            override fun onAdLoaded(ad: MaxAd?) {
+            override fun onAdLoaded(ad: MaxAd) {
 
             }
 
-            override fun onAdDisplayed(ad: MaxAd?) {
+            override fun onAdDisplayed(ad: MaxAd) {
                 listener?.onDisplayed(platform)
             }
 
-            override fun onAdHidden(ad: MaxAd?) {
+            override fun onAdHidden(ad: MaxAd) {
                 viewIntances[placementName] = null
                 listener?.onClosed(platform)
             }
 
-            override fun onAdClicked(ad: MaxAd?) {
+            override fun onAdClicked(ad: MaxAd) {
                 listener?.onClicked(platform)
             }
 
-            override fun onAdLoadFailed(adUnitId: String?, error: MaxError?) {
+            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
                 viewIntances[placementName] = null
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial show >> error code=${error?.code} / ${error?.message}", platform)
             }
 
-            override fun onAdDisplayFailed(ad: MaxAd?, error: MaxError?) {
+            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
                 viewIntances[placementName] = null
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial show >> error code=${error?.code} / ${error?.message}", platform)
             }
@@ -160,43 +160,43 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         val rewardedAd = MaxRewardedAd.getInstance(placementName, activity)
 
         rewardedAd?.setListener(object : MaxRewardedAdListener {
-            override fun onAdLoaded(ad: MaxAd?) {
+            override fun onAdLoaded(ad: MaxAd) {
                 updateLastLoadRewardedDateByAdPlatform(platform)
 
                 listener?.onLoaded(platform)
             }
 
-            override fun onAdLoadFailed(adUnitId: String?, error: MaxError?) {
+            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
                 viewIntances.put(placementName, null)
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded load >> error code=${error?.code} / ${error?.message}", platform)
             }
 
 
-            override fun onAdDisplayed(ad: MaxAd?) {
+            override fun onAdDisplayed(ad: MaxAd) {
 
             }
 
-            override fun onAdHidden(ad: MaxAd?) {
+            override fun onAdHidden(ad: MaxAd) {
 
             }
 
-            override fun onAdClicked(ad: MaxAd?) {
+            override fun onAdClicked(ad: MaxAd) {
 
             }
 
-            override fun onAdDisplayFailed(ad: MaxAd?, error: MaxError?) {
+            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
 
             }
 
-            override fun onRewardedVideoStarted(ad: MaxAd?) {
+            override fun onRewardedVideoStarted(ad: MaxAd) {
 
             }
 
-            override fun onRewardedVideoCompleted(ad: MaxAd?) {
+            override fun onRewardedVideoCompleted(ad: MaxAd) {
 
             }
 
-            override fun onUserRewarded(ad: MaxAd?, reward: MaxReward?) {
+            override fun onUserRewarded(ad: MaxAd, reward: MaxReward) {
 
             }
 
@@ -215,40 +215,40 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         val rewardedAd: MaxRewardedAd? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as MaxRewardedAd? else null
 
         rewardedAd?.setListener(object : MaxRewardedAdListener {
-            override fun onAdLoaded(ad: MaxAd?) {
+            override fun onAdLoaded(ad: MaxAd) {
 
             }
 
-            override fun onAdDisplayed(ad: MaxAd?) {
+            override fun onAdDisplayed(ad: MaxAd) {
                 listener?.onDisplayed(platform)
             }
 
-            override fun onAdHidden(ad: MaxAd?) {
+            override fun onAdHidden(ad: MaxAd) {
                 viewIntances[placementName] = null
                 listener?.onClosed(platform)
             }
 
-            override fun onAdClicked(ad: MaxAd?) {
+            override fun onAdClicked(ad: MaxAd) {
             }
 
-            override fun onAdLoadFailed(adUnitId: String?, error: MaxError?) {
+            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
 
             }
 
-            override fun onAdDisplayFailed(ad: MaxAd?, error: MaxError?) {
+            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded show >> error code=${error?.code} / ${error?.message}", platform)
                 viewIntances[placementName] = null
             }
 
-            override fun onRewardedVideoStarted(ad: MaxAd?) {
+            override fun onRewardedVideoStarted(ad: MaxAd) {
 
             }
 
-            override fun onRewardedVideoCompleted(ad: MaxAd?) {
+            override fun onRewardedVideoCompleted(ad: MaxAd) {
 
             }
 
-            override fun onUserRewarded(ad: MaxAd?, reward: MaxReward?) {
+            override fun onUserRewarded(ad: MaxAd, reward: MaxReward) {
                 listener?.onRewarded(reward?.label, reward?.amount, platform)
             }
         })
@@ -323,23 +323,23 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
 
         bannerAdView.setListener(object : MaxAdViewAdListener {
-            override fun onAdLoaded(ad: MaxAd?) {
+            override fun onAdLoaded(ad: MaxAd) {
                 viewIntances[placementName] = bannerAdView
             }
 
-            override fun onAdDisplayed(ad: MaxAd?) {
+            override fun onAdDisplayed(ad: MaxAd) {
                 listener?.onDisplayed(platform)
             }
 
-            override fun onAdHidden(ad: MaxAd?) {
+            override fun onAdHidden(ad: MaxAd) {
 
             }
 
-            override fun onAdClicked(ad: MaxAd?) {
+            override fun onAdClicked(ad: MaxAd) {
                 listener?.onClicked(platform)
             }
 
-            override fun onAdLoadFailed(adUnitId: String?, error: MaxError?) {
+            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
                 viewIntances[placementName] = null
                 activity.runOnUiThread {
                     _removeBannerViewIfExists(bannerAdView, containerView)
@@ -348,15 +348,15 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=${error?.code} / ${error?.message}", platform)
             }
 
-            override fun onAdDisplayFailed(ad: MaxAd?, error: MaxError?) {
+            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
 
             }
 
-            override fun onAdExpanded(ad: MaxAd?) {
+            override fun onAdExpanded(ad: MaxAd) {
 
             }
 
-            override fun onAdCollapsed(ad: MaxAd?) {
+            override fun onAdCollapsed(ad: MaxAd) {
 
             }
 
@@ -407,23 +407,23 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
 
         mrecAdView.setListener(object : MaxAdViewAdListener {
-            override fun onAdLoaded(ad: MaxAd?) {
+            override fun onAdLoaded(ad: MaxAd) {
                 viewIntances[placementName] = mrecAdView
             }
 
-            override fun onAdDisplayed(ad: MaxAd?) {
+            override fun onAdDisplayed(ad: MaxAd) {
                 listener?.onDisplayed(platform)
             }
 
-            override fun onAdHidden(ad: MaxAd?) {
+            override fun onAdHidden(ad: MaxAd) {
 
             }
 
-            override fun onAdClicked(ad: MaxAd?) {
+            override fun onAdClicked(ad: MaxAd) {
                 listener?.onClicked(platform)
             }
 
-            override fun onAdLoadFailed(adUnitId: String?, error: MaxError?) {
+            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
                 viewIntances[placementName] = null
                 activity.runOnUiThread {
                     _removeBannerViewIfExists(mrecAdView, containerView)
@@ -432,15 +432,15 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> error code=${error?.code} / ${error?.message}", platform)
             }
 
-            override fun onAdDisplayFailed(ad: MaxAd?, error: MaxError?) {
+            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
 
             }
 
-            override fun onAdExpanded(ad: MaxAd?) {
+            override fun onAdExpanded(ad: MaxAd) {
 
             }
 
-            override fun onAdCollapsed(ad: MaxAd?) {
+            override fun onAdCollapsed(ad: MaxAd) {
 
             }
 
@@ -485,7 +485,8 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         val nativeAdLoader = MaxNativeAdLoader(placementName, activity)
         nativeAdLoader.setNativeAdListener(object : MaxNativeAdListener() {
-            override fun onNativeAdLoaded(nativeAdView: MaxNativeAdView?, ad: MaxAd?) {
+
+            override fun onNativeAdLoaded(nativeAdView: MaxNativeAdView?, ad: MaxAd) {
                 super.onNativeAdLoaded(nativeAdView, ad)
 
                 nativeAdView?.let {
@@ -496,7 +497,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 listener?.onLoaded(platform)
             }
 
-            override fun onNativeAdLoadFailed(adUnitId: String?, error: MaxError?) {
+            override fun onNativeAdLoadFailed(adUnitId: String, error: MaxError) {
                 super.onNativeAdLoadFailed(adUnitId, error)
 
                 listener?.onError(
@@ -505,7 +506,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 )
             }
 
-            override fun onNativeAdClicked(ad: MaxAd?) {
+            override fun onNativeAdClicked(ad: MaxAd) {
                 super.onNativeAdClicked(ad)
             }
         })
