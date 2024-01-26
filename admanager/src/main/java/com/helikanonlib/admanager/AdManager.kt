@@ -469,7 +469,7 @@ class AdManager {
 
                 // on close load new one for next show
                 if (autoLoadForInterstitial) {
-                    _autoloadInterstitialByHandler(activity, null, platform)
+                    _autoloadInterstitialByHandler(activity, null, null)
                 }
             }
 
@@ -506,7 +506,7 @@ class AdManager {
                         stopAutoloadInterstitialHandler()
                         loadAndShowInterstitial(activity, shownWhere, listener, platform, placementGroupIndex)
                     } else {
-                        _autoloadInterstitialByHandler(activity, null, platform)
+                        _autoloadInterstitialByHandler(activity, null, null)
 
                         globalInterstitialShowListener?.onError(errorMode, errorMessage, adPlatformEnum)
                         // listener?.onError(errorMode, errorMessage, adPlatformEnum) // call for adplatform
