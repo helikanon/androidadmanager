@@ -173,7 +173,7 @@ class MainActivity : AppCompatActivity() {
 
     /*
     var ADMOB_APP_ID = "ca-app-pub-8018256245650162~9841851144"
-    var STARTAPP_APP_ID = "207754325"
+
     var IRONSOURCE_APP_ID = "a1a67f75"
     var MOPUB_APP_ID = "207754325"
      */

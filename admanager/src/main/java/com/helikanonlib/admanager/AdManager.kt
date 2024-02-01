@@ -260,7 +260,7 @@ class AdManager {
     /**
      * example :
      * adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,mopub,admob,facebook")
-     * adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,facebook,admob,startapp,mopub")
+     * adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,facebook,admob,mopub")
      */
     fun setAdPlatformSortByAdFormatStr(placementGroupIndex: Int, adFormatName: String, adPlatformsStr: String) {
         try {
@@ -474,9 +474,7 @@ class AdManager {
             }
 
             override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
-                if (adPlatformEnum != AdPlatformTypeEnum.STARTAPP) {
-                    stopAutoloadInterstitialHandler()
-                }
+                stopAutoloadInterstitialHandler()
 
                 globalInterstitialShowListener?.onDisplayed(adPlatformEnum)
                 listener?.onDisplayed(adPlatformEnum)
@@ -896,9 +894,7 @@ class AdManager {
             }
 
             override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
-                if (adPlatformEnum != AdPlatformTypeEnum.STARTAPP) {
-                    stopAutoloadRewardedHandler()
-                }
+                stopAutoloadRewardedHandler()
 
                 globalRewardedShowListener?.onDisplayed(adPlatformEnum)
                 listener?.onDisplayed(adPlatformEnum)

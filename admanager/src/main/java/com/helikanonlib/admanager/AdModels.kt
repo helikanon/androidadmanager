@@ -12,10 +12,7 @@ enum class AdErrorMode {
 enum class AdPlatformTypeEnum {
     FACEBOOK,
     ADMOB,
-    STARTAPP,
-    ADINCUBE,
     IRONSOURCE,
-    MOPUB,
     UNITYADS,
     ADMOST,
     APPLOVIN
