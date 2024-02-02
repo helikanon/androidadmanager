@@ -10,7 +10,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        mavenLocal()
+        // mavenLocal()
         maven(url = "https://jitpack.io")
 
         // maven(url = "https://artifacts.applovin.com/android")

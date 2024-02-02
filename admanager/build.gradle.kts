@@ -5,8 +5,28 @@ plugins {
     id("maven-publish")
 }
 
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            // Replace with your library's details
+            groupId = "com.helikanonlib"
+            artifactId = "admanager"
+            version = "5.072"
 
+            val aarFile = layout.buildDirectory.file("outputs/aar/${project.name}-release.aar")
+            artifact(aarFile.get().asFile)
+        }
+    }
+}
 
+/*publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+        }
+    }
+}
+*/
 android {
     namespace = "com.helikanonlib.admanager"
     compileSdk = 34
@@ -36,6 +56,8 @@ android {
         viewBinding = true
         buildConfig = true
     }
+
+
 }
 
 dependencies {
