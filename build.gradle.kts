@@ -13,10 +13,6 @@ plugins {
 }
 
 buildscript {
-    val agp_version by extra("7.4.2")
-    val agp_version1 by extra("8.2.2")
-    val agp_version2 by extra("8.0.0")
-    val agp_version3 by extra("8.2.0")
     repositories {
         maven { url = uri("https://artifacts.applovin.com/android") }
     }
