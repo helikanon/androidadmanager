@@ -3,7 +3,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("applovin-quality-service")
-    //id("maven-publish")
 }
 
 applovin {
