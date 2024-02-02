@@ -16,6 +16,6 @@
         <domain includeSubdomains="true">127.0.0.1</domain>
         <!-- End Meta Audience Network section -->
 
-        <domain includeSubdomains="true">admost.com</domain>
+        <!--<domain includeSubdomains="true">admost.com</domain>-->
     </domain-config>
 </network-security-config>
