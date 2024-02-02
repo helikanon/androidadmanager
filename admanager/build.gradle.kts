@@ -4,7 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("maven-publish")
 }
-afterEvaluate {
+/*afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("release") {
@@ -18,7 +18,22 @@ afterEvaluate {
             }
         }
     }
+}*/
+
+publishing{
+    publications{
+        register<MavenPublication>("release"){
+            groupId = "com.helikanonlib"
+            artifactId = "admanager"
+            version = "5.072"
+
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
 }
+
 /*publishing {
     publications {
         create<MavenPublication>("mavenJava") {
