@@ -4,21 +4,21 @@ plugins {
     id("kotlin-kapt")
     id("maven-publish")
 }
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                // Replace with your library's details
+                groupId = "com.helikanonlib"
+                artifactId = "admanager"
+                version = "5.072"
 
-publishing {
-    publications {
-        create<MavenPublication>("release") {
-            // Replace with your library's details
-            groupId = "com.helikanonlib"
-            artifactId = "admanager"
-            version = "5.072"
-
-            val aarFile = layout.buildDirectory.file("outputs/aar/${project.name}-release.aar")
-            artifact(aarFile.get().asFile)
+                val aarFile = layout.buildDirectory.file("outputs/aar/${project.name}-release.aar")
+                artifact(aarFile.get().asFile)
+            }
         }
     }
 }
-
 /*publishing {
     publications {
         create<MavenPublication>("mavenJava") {
