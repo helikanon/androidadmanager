@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" /> <!-- Ironsource içinde gerekli -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Ironsource içinde gerekli -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /><!--When targeting Android 13 or higher, posting a permission requires holding the POST_NOTIFICATIONS permission (usage from com.mbridge.msdk.playercommon.exoplayer2.util.NotificationUtil) [NotificationPermission]-->
 
 
     <application
