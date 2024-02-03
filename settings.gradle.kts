@@ -23,4 +23,4 @@ dependencyResolutionManagement {
 rootProject.name = "Helikanon AdManager"
 include(":app")
 include(":admanager")
-include(":nativetemplates")
+//include(":nativetemplates")

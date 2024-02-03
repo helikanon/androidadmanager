@@ -7,8 +7,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.google.android.ads.nativetemplates.NativeTemplateStyle
-import com.google.android.ads.nativetemplates.TemplateView
+// import com.google.android.ads.nativetemplates.NativeTemplateStyle
+// import com.google.android.ads.nativetemplates.TemplateView
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -485,7 +485,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         )
 
 
-        val template = nativeView.findViewById<TemplateView>(
+        /*val template = nativeView.findViewById<TemplateView>(
             if (nativeAdFormat == AdFormatEnum.NATIVE) {
                 R.id.admanager_native_small
             } else {
@@ -498,7 +498,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         template.setNativeAd(nativeAd)
 
         _removeViewIfExists(template.parent as ViewGroup?, containerView)
-        containerView.addView(template.parent as ViewGroup)
+        containerView.addView(template.parent as ViewGroup)*/
 
         return true
     }

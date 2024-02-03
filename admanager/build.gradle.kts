@@ -97,7 +97,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-appset:16.0.1")
     implementation("com.google.android.gms:play-services-ads-identifier:18.0.0")
 
-    implementation(project(path = ":nativetemplates"))
+    // implementation(project(path = ":nativetemplates"))
 
     // APPLOVIN
     implementation("com.applovin:applovin-sdk:12.1.0")
