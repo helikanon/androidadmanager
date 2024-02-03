@@ -5,9 +5,9 @@
     android:layout_height="wrap_content">
 
     <!--  This is your template view -->
-    <!--<com.google.android.ads.nativetemplates.TemplateView
+    <com.helikanonlib.admanager.admobnativetemplates.TemplateView
         android:id="@+id/admanager_native_medium"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:gnt_template_type="@layout/admob_native_medium_template_view" />-->
+        app:gnt_template_type="@layout/admob_native_medium_template_view" />
 </LinearLayout>

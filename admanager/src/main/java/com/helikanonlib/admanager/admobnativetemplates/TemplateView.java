@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.android.ads.nativetemplates;
+package com.helikanonlib.admanager.admobnativetemplates;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -31,6 +31,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.gms.ads.nativead.MediaView;
 import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdView;
+import com.helikanonlib.admanager.R;
 
 /**
  * Base class for a template view. *
