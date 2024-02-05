@@ -20,7 +20,7 @@ plugins {
     }
 }*/
 
-publishing{
+/*publishing{
     publications{
         register<MavenPublication>("release"){
             groupId = "com.helikanonlib"
@@ -32,7 +32,7 @@ publishing{
             }
         }
     }
-}
+}*/
 
 /*publishing {
     publications {
