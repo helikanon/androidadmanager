@@ -20,19 +20,19 @@ plugins {
     }
 }*/
 
-/*publishing{
+publishing{
     publications{
         register<MavenPublication>("release"){
             groupId = "com.helikanonlib"
             artifactId = "admanager"
-            version = "5.073"
+            version = "5.075"
 
             afterEvaluate {
                 from(components["release"])
             }
         }
     }
-}*/
+}
 
 /*publishing {
     publications {
