@@ -62,6 +62,6 @@ dependencies {
 
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("com.google.android.gms:play-services-ads:22.6.0")
-    implementation(project(path = ":admanager"))
+    implementation(project(":admanager"))
 
 }
