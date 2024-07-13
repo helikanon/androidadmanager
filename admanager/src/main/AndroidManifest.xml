@@ -18,7 +18,8 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="${admobAppId}" />
+            android:value="${admobAppId}"
+            />
 
 
         <!--Google Ad Manager-->
@@ -50,7 +51,8 @@
         <!-- applovin -->
         <meta-data
             android:name="applovin.sdk.key"
-            android:value="pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP" /><!--admost için-->
+            android:value="pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP" /><!--ad
+            most için-->
         <!--TODO applovin max kaldırılınca aşağıdaki iki activity eklenecek geri manifeste-->
 
         <!--<activity
@@ -64,17 +66,6 @@
             android:name="com.applovin.sdk.AppLovinWebViewActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|uiMode" />-->
         <!-- applovin -->
-
-        <!-- adcolony -->
-        <activity
-            android:name="com.adcolony.sdk.AdColonyInterstitialActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:hardwareAccelerated="true" />
-        <activity
-            android:name="com.adcolony.sdk.AdColonyAdViewActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:hardwareAccelerated="true" /> <!-- adcolony -->
-        <!--adcolony-->
 
         <!--facebook-->
         <!--<meta-data

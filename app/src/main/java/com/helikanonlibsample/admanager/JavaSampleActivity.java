@@ -19,7 +19,6 @@ import com.helikanonlib.admanager.AdPlatformShowListener;
 import com.helikanonlib.admanager.AdPlatformTypeEnum;
 import com.helikanonlib.admanager.AdPlatformWrapper;
 import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper;
-import com.helikanonlib.admanager.adplatforms.IronSourceAdWrapper;
 
 
 import org.jetbrains.annotations.Nullable;
@@ -167,23 +166,6 @@ public class JavaSampleActivity extends AppCompatActivity {
         admobAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/5224354917");
         // facebookAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/6300978111");*/
 
-        AdPlatformWrapper ironsourceAdWrapper = new IronSourceAdWrapper("a1a67f75");
-        ironsourceAdWrapper.getPlacementGroups().add(new AdPlacementGroupModel(
-                "default",
-                "DefaultInterstitial",
-                "DefaultRewardedVideo",
-                "DefaultBanner",
-                "MREC_BANNER",
-                "",
-                ""
-        ));
-
-        /*ironsourceAdWrapper.setInterstitialPlacementId("DefaultInterstitial");
-        ironsourceAdWrapper.setBannerPlacementId("DefaultBanner");
-        ironsourceAdWrapper.setRewardedPlacementId("DefaultRewardedVideo");
-        ironsourceAdWrapper.setMrecPlacementId("MREC_BANNER");*/
-
-
         adManager = new AdManager();
 
         adManager.setAutoLoadForInterstitial(false);
@@ -194,8 +176,6 @@ public class JavaSampleActivity extends AppCompatActivity {
         adManager.setTestMode(BuildConfig.DEBUG);
         adManager.setDeviceId("47088e48-5195-4757-90b2-0da94116befd"); // necessary if test mode enabled
         adManager.addAdPlatform(new AdPlatformModel(admobAdWrapper, true, false, true, true));
-        adManager.addAdPlatform(new AdPlatformModel(ironsourceAdWrapper, true, true, true, false));
-
 
         adManager.setGlobalRewardedShowListener(new AdPlatformShowListener() {
             @Override

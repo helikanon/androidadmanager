@@ -23,6 +23,9 @@ class AdManager {
     companion object {
         var DEFAULT_PLACEMENT_GROUPCODE = "default"
         var DEFAULT_INTERSTITIAL_SHOWN_WHERE_NAME = "defaultPlace"
+        var DEFAULT_BANNER_SHOWN_WHERE_NAME = "emptyPlace"
+        var DEFAULT_MREC_SHOWN_WHERE_NAME = "emptyPlace"
+        var DEFAULT_REWARDED_SHOWN_WHERE_NAME = "emptyPlace"
     }
 
     var testMode: Boolean = false

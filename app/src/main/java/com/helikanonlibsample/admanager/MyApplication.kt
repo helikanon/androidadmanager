@@ -111,36 +111,6 @@ class MyApplication : Application() {
                     },
                     true, true, true, true
                 ),
-
-                AdPlatformModel(
-                    IronSourceAdWrapper("cd353905").apply {
-                        placementGroups.add(
-                            AdPlacementGroupModel(
-                                groupName = "default",
-                                interstitial = "DefaultInterstitial",
-                                rewarded = "DefaultRewardedVideo",
-                                banner = "DefaultBanner",
-                                mrec = "MREC_BANNER",
-                                native = "DefaultNative",
-                                appOpenAd = "",
-                                nativeMedium = ""
-
-                            )
-                        )
-                        /*placementGroups.add(
-                            AdPlacementGroupModel(
-                                groupName = "second_group",
-                                interstitial = "SecondInterstitial",
-                                rewarded = "SecondRewardedVideo",
-                                banner = "SecondBanner",
-                                mrec = "SecondMrec",
-                                native = "SecondNative",
-                                appOpenAd = ""
-                            )
-                        )*/
-                    },
-                    true, true, true, true
-                ),
                 AdPlatformModel(
                     UnityAdsAdWrapper("4428087").apply {
                         placementGroups.add(
