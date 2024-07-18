@@ -162,7 +162,7 @@
           <androidx.appcompat.widget.AppCompatButton
               android:id="@+id/cta"
               android:layout_width="match_parent"
-              android:layout_height="@dimen/gnt_no_size"
+              android:layout_height="32dp"
               android:background="@color/gnt_blue"
               android:textColor="@color/gnt_white"
               android:lines="1"

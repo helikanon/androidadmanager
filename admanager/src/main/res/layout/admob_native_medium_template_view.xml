@@ -204,7 +204,7 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/cta"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="48dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:background="@drawable/bg_primary_rounded"
