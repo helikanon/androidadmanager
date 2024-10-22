@@ -12,11 +12,16 @@ import com.applovin.mediation.ads.MaxRewardedAd
 import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
+import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkConfiguration
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.applovin.sdk.AppLovinSdkUtils
 import com.helikanonlib.admanager.*
 
+/**
+ * appId is equal with applovin SDK-key
+ */
 class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override var platform = AdPlatformTypeEnum.APPLOVIN
@@ -35,11 +40,18 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun initialize(context: Context, testMode: Boolean) {
         if (isInitialized) return
 
+        val initConfig = AppLovinSdkInitializationConfiguration.builder(appId, context)
+            .setMediationProvider(AppLovinMediationProvider.MAX)
+            .build()
 
-        AppLovinSdk.getInstance(context).mediationProvider = "max"
-        AppLovinSdk.getInstance(context).initializeSdk { configuration: AppLovinSdkConfiguration ->
-            // AppLovinSdk.getInstance( context ).showMediationDebugger();
+        AppLovinSdk.getInstance(context).initialize(initConfig) { sdkConfig ->
+
         }
+
+        /*AppLovinSdk.getInstance(context).mediationProvider = "max"
+        AppLovinSdk.getInstance(context).initializeSdk { configuration: AppLovinSdkConfiguration ->
+
+        }*/
         isInitialized = true
 
     }
@@ -188,14 +200,6 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             }
 
-            override fun onRewardedVideoStarted(ad: MaxAd) {
-
-            }
-
-            override fun onRewardedVideoCompleted(ad: MaxAd) {
-
-            }
-
             override fun onUserRewarded(ad: MaxAd, reward: MaxReward) {
 
             }
@@ -238,14 +242,6 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded show >> error code=${error?.code} / ${error?.message}", platform)
                 viewIntances[placementName] = null
-            }
-
-            override fun onRewardedVideoStarted(ad: MaxAd) {
-
-            }
-
-            override fun onRewardedVideoCompleted(ad: MaxAd) {
-
             }
 
             override fun onUserRewarded(ad: MaxAd, reward: MaxReward) {

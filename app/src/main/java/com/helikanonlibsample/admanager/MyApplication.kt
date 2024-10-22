@@ -145,7 +145,7 @@ class MyApplication : Application() {
                     true, true, true, true
                 ),*/
                 AdPlatformModel(
-                    ApplovinAdWrapper("noneed").apply {
+                    ApplovinAdWrapper("pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP").apply {
                         placementGroups.add(
                             AdPlacementGroupModel(
                                 groupName = "default",
@@ -163,6 +163,7 @@ class MyApplication : Application() {
                 )
             )
         }
+
 
         /*adManager.addAdPlatform(
             AdPlatformModel(

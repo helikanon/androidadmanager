@@ -48,11 +48,11 @@
         <!-- Ironsource -->
 
 
-        <!-- applovin -->
-        <meta-data
+        <!-- applovin yeni applovin sdk init ile gerek kalmadı -->
+        <!--<meta-data
             android:name="applovin.sdk.key"
-            android:value="pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP" /><!--ad
-            most için-->
+            android:value="pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP" />-->
+        <!--ad most için-->
         <!--TODO applovin max kaldırılınca aşağıdaki iki activity eklenecek geri manifeste-->
 
         <!--<activity

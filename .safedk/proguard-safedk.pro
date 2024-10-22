@@ -30,5 +30,6 @@
 -keep class com.five_corp.** { *; }
 -keep class com.bytedance.** { *; }
 -keep class com.smaato.** { *; }
+-keep class com.explorestack.** { *; }
 -keep class com.safedk.** { *; }
 -keep class com.applovin.quality.** { *; }
