@@ -17,8 +17,8 @@ android {
         applicationId = "com.helikanonlibsample.admanager"
         minSdk = 24
         targetSdk = 35
-        versionCode = 80
-        versionName = "5.080"
+        versionCode = 81
+        versionName = "5.081"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
