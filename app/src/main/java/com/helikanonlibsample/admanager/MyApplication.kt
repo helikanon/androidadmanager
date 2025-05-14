@@ -11,7 +11,7 @@ class MyApplication : Application() {
 
     companion object {
         lateinit var adManager: AdManager
-        var admobAppOpenAdManager: AppOpenAdManager? = null
+        var AppOpenAdManager: AppOpenAdManager? = null
     }
 
 
@@ -20,7 +20,7 @@ class MyApplication : Application() {
 
         initAdManager()
 
-        admobAppOpenAdManager = AppOpenAdManager(
+        AppOpenAdManager = AppOpenAdManager(
             this,
             mutableMapOf(
                 AdPlatformTypeEnum.ADMOB to "ca-app-pub-3940256099942544/3419835294",
@@ -30,30 +30,30 @@ class MyApplication : Application() {
 
             object : AdPlatformShowListener() {
                 override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
-                    Log.e("adManager", "AdmobAppOpenAdManager >>> success display")
+                    Log.e("adManager", "AppOpenAdManager >>> success display")
                 }
 
                 override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
 
-                    Log.e("adManager", "AdmobAppOpenAdManager show error >>> $errorMessage")
+                    Log.e("adManager", "AppOpenAdManager show error >>> $errorMessage")
                 }
 
             },
             object : AdPlatformLoadListener() {
                 override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
-                    Log.e("adManager", "AdmobAppOpenAdManager >>> success load")
+                    Log.e("adManager", "AppOpenAdManager >>> success load")
                 }
 
                 override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                    Log.e("adManager", "AdmobAppOpenAdManager load error >>> $errorMessage")
+                    Log.e("adManager", "AppOpenAdManager load error >>> $errorMessage")
                 }
 
             }
         )
 
-        admobAppOpenAdManager?.excludedActivities?.add(JavaSampleActivity::class.java.simpleName)
-        admobAppOpenAdManager?.minElapsedSecondsToNextShow = 10
-        admobAppOpenAdManager?.disable()
+        AppOpenAdManager?.excludedActivities?.add(JavaSampleActivity::class.java.simpleName)
+        AppOpenAdManager?.minElapsedSecondsToNextShow = 10
+        AppOpenAdManager?.disable()
     }
 
     fun initAdManager() {
@@ -178,9 +178,9 @@ class MyApplication : Application() {
         )*/
 
 
-        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "applovin,admob,ironsource")
+        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "applovin,admob")
         adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob,applovin")
-        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "ironsource,applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,applovin")
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,applovin")
         adManager.setAdPlatformSortByAdFormatStr(0, "native", "admob,applovin")
         adManager.setAdPlatformSortByAdFormatStr(0, "native_medium", "applovin")

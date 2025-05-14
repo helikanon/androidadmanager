@@ -33,3 +33,7 @@
 -keep class com.explorestack.** { *; }
 -keep class com.safedk.** { *; }
 -keep class com.applovin.quality.** { *; }
+-keep class com.braze.** { *; }
+-keep class androidx.media3.common.Player {
+	void release();
+}
