@@ -17,15 +17,17 @@ android {
         applicationId = "com.helikanonlibsample.admanager"
         minSdk = 24
         targetSdk = 35
-        versionCode = 82
-        versionName = "5.082"
+        versionCode = 83
+        versionName = "5.083"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         manifestPlaceholders["admobAppId"] = "ca-app-pub-3940256099942544~3347511713"
 
     }
-
+    /*publishing {
+        singleVariant("release") {}
+    }*/
     buildTypes {
         release {
             isShrinkResources = false

@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
                 }
             })*/
 
-            MyApplication.admobAppOpenAdManager?.isEnable = true
+            MyApplication.AppOpenAdManager?.isEnable = true
         }, 2000)
 
 
@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnLoadAppOpenAd.setOnClickListener {
-            MyApplication.admobAppOpenAdManager?.show("admob,applovin", this, null)
+            MyApplication.AppOpenAdManager?.show("admob,applovin", this, null)
 
             //MyApplication.admobAppOpenAdManager?.disable()
         }
