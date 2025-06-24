@@ -31,6 +31,12 @@
 -keep class com.bytedance.** { *; }
 -keep class com.smaato.** { *; }
 -keep class com.explorestack.** { *; }
+-keep class io.bidmachine.** { *; }
+-keep class com.pubmatic.** { *; }
+-keep class com.chartboost.** { *; }
+-keep class com.mobilefuse.** { *; }
+-keep class com.verve.** { *; }
+-keep class net.pubnative.** { *; }
 -keep class com.safedk.** { *; }
 -keep class com.applovin.quality.** { *; }
 -keep class com.braze.** { *; }

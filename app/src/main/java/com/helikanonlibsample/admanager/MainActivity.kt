@@ -24,7 +24,8 @@ class MainActivity : AppCompatActivity() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             MyApplication.adManager?.showNative(this@MainActivity, AdFormatEnum.NATIVE, binding.nativeContainer)
-        }, 5000)
+            MyApplication.adManager?.showNative(this@MainActivity, AdFormatEnum.NATIVE_MEDIUM, binding.nativeMediumContainer)
+        }, 15000)
 
 
         Handler(Looper.getMainLooper()).postDelayed({

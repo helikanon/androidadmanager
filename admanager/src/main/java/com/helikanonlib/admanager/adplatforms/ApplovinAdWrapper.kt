@@ -3,8 +3,10 @@ package com.helikanonlib.admanager.adplatforms
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import androidx.transition.Visibility
 import com.applovin.mediation.*
 import com.applovin.mediation.ads.MaxAdView
 import com.applovin.mediation.ads.MaxInterstitialAd
@@ -12,6 +14,7 @@ import com.applovin.mediation.ads.MaxRewardedAd
 import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
+import com.applovin.mediation.nativeAds.MaxNativeAdViewBinder
 import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkConfiguration
@@ -40,13 +43,22 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun initialize(context: Context, testMode: Boolean) {
         if (isInitialized) return
 
-        val initConfig = AppLovinSdkInitializationConfiguration.builder(appId, context)
+        val initConfigPrep = AppLovinSdkInitializationConfiguration.builder(appId)
             .setMediationProvider(AppLovinMediationProvider.MAX)
-            .build()
 
+        /*
+        GAID: 34db0fa1-f830-45a9-862d-4d5c889706fa
+        App Set ID: d27ac915-a1af-81bf-a8cc-ff847e2e3493 (use this for test devices)
+        SDK Key: pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP
+         */
+        // initConfigPrep.setTestDeviceAdvertisingIds(arrayListOf("34db0fa1-f830-45a9-862d-4d5c889706fa"))
+
+        val initConfig = initConfigPrep.build()
+        AppLovinSdk.getInstance(context).settings.setVerboseLogging(true)
         AppLovinSdk.getInstance(context).initialize(initConfig) { sdkConfig ->
 
         }
+
 
         /*AppLovinSdk.getInstance(context).mediationProvider = "max"
         AppLovinSdk.getInstance(context).initializeSdk { configuration: AppLovinSdkConfiguration ->
@@ -68,7 +80,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).interstitial
         viewIntances.put(placementName, null)
 
-        val applovinInterstitialIns = MaxInterstitialAd(placementName, activity)
+        val applovinInterstitialIns = MaxInterstitialAd(placementName)
         applovinInterstitialIns.setListener(object : MaxAdListener {
             override fun onAdLoaded(ad: MaxAd) {
                 updateLastLoadInterstitialDateByAdPlatform(platform)
@@ -142,7 +154,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
         })
-        interstitial?.showAd(shownWhere)
+        interstitial?.showAd(shownWhere, activity)
         viewIntances[placementName] = null // gösterir göstermez boşalt
 
     }
@@ -169,7 +181,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).rewarded
         viewIntances.put(placementName, null)
 
-        val rewardedAd = MaxRewardedAd.getInstance(placementName, activity)
+        val rewardedAd = MaxRewardedAd.getInstance(placementName)
 
         rewardedAd?.setListener(object : MaxRewardedAdListener {
             override fun onAdLoaded(ad: MaxAd) {
@@ -249,7 +261,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
         })
 
-        rewardedAd?.showAd()
+        rewardedAd?.showAd(activity)
         viewIntances[placementName] = null
 
     }
@@ -301,7 +313,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             return
         }
 
-        bannerAdView = MaxAdView(placementName, activity)
+        bannerAdView = MaxAdView(placementName)
 
         //val heightDp = MaxAdFormat.BANNER.getAdaptiveSize(activity).height
         // val heightPx = AppLovinSdkUtils.dpToPx(activity, heightDp)
@@ -465,7 +477,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             getPlacementGroupByIndex(placementGroupIndex).nativeMedium
         }
 
-        var nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
+        val nativeAds: ArrayList<Any> = if (viewIntances.containsKey(placementName) && viewIntances[placementName] != null) viewIntances.get(placementName) as ArrayList<Any> else ArrayList<Any>()
 
         try {
             nativeAds.forEach {
@@ -479,13 +491,17 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             viewIntances.put(placementName, nativeAds)
         }
 
-        val nativeAdLoader = MaxNativeAdLoader(placementName, activity)
+        val nativeAdLoader = MaxNativeAdLoader(placementName)
+
         nativeAdLoader.setNativeAdListener(object : MaxNativeAdListener() {
 
             override fun onNativeAdLoaded(nativeAdView: MaxNativeAdView?, ad: MaxAd) {
                 super.onNativeAdLoaded(nativeAdView, ad)
 
                 nativeAdView?.let {
+                    if (ad.nativeAd?.icon == null) {
+                        nativeAdView.iconImageView.visibility = View.GONE
+                    }
                     nativeAds.add(it)
                     viewIntances.put(placementName, nativeAds)
                 }
@@ -506,8 +522,24 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 super.onNativeAdClicked(ad)
             }
         })
-        nativeAdLoader.loadAd()
 
+        var layoutId = R.layout.applovin_native_small
+        if (nativeAdFormat == AdFormatEnum.NATIVE_MEDIUM) {
+            layoutId = R.layout.applovin_native_medium
+        }
+        val binder: MaxNativeAdViewBinder = MaxNativeAdViewBinder
+            .Builder(layoutId)
+            .setTitleTextViewId(R.id.title_text_view)
+            .setBodyTextViewId(R.id.body_text_view)
+            .setStarRatingContentViewGroupId(R.id.star_rating_view)
+            .setAdvertiserTextViewId(R.id.advertiser_textView)
+            .setIconImageViewId(R.id.icon_image_view)
+            .setMediaContentViewGroupId(R.id.media_view_container)
+            .setOptionsContentViewGroupId(R.id.options_view)
+            .setCallToActionButtonId(R.id.cta_button)
+            .build()
+
+        nativeAdLoader.loadAd(MaxNativeAdView(binder, activity))
     }
 
 
@@ -530,9 +562,10 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             showPositionAt = 0
         }
 
-        if (nativeAds.size == 0) {
+        if (nativeAds.size < 1) {
             return false
         }
+
         lastLoadedNativeAdPositions[placementName] = showPositionAt
 
         val nativeAd = nativeAds[showPositionAt] as MaxNativeAdView?

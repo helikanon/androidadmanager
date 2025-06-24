@@ -182,7 +182,7 @@ class MyApplication : Application() {
         adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob,applovin")
         adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,applovin")
         adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,applovin")
-        adManager.setAdPlatformSortByAdFormatStr(0, "native", "admob,applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "native", "applovin")
         adManager.setAdPlatformSortByAdFormatStr(0, "native_medium", "applovin")
 
 

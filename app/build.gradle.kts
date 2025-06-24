@@ -17,8 +17,8 @@ android {
         applicationId = "com.helikanonlibsample.admanager"
         minSdk = 24
         targetSdk = 35
-        versionCode = 83
-        versionName = "5.083"
+        versionCode = 84
+        versionName = "5.084"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -33,6 +33,7 @@ android {
             isShrinkResources = false
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -54,7 +55,7 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.16.0")
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     testImplementation("junit:junit:4.13.2")
@@ -63,7 +64,7 @@ dependencies {
 
 
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("com.google.android.gms:play-services-ads:24.2.0")
+    implementation("com.google.android.gms:play-services-ads:24.4.0")
     implementation(project(":admanager"))
 
 }
