@@ -51,19 +51,15 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         App Set ID: d27ac915-a1af-81bf-a8cc-ff847e2e3493 (use this for test devices)
         SDK Key: pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP
          */
-        // initConfigPrep.setTestDeviceAdvertisingIds(arrayListOf("34db0fa1-f830-45a9-862d-4d5c889706fa"))
+
+        // initConfigPrep.setTestDeviceAdvertisingIds(arrayListOf("676325f4-acb4-4f79-aa02-9bf144dcb37b","34db0fa1-f830-45a9-862d-4d5c889706fa"))
 
         val initConfig = initConfigPrep.build()
-        AppLovinSdk.getInstance(context).settings.setVerboseLogging(true)
+        // AppLovinSdk.getInstance(context).settings.setVerboseLogging(true)
         AppLovinSdk.getInstance(context).initialize(initConfig) { sdkConfig ->
 
         }
 
-
-        /*AppLovinSdk.getInstance(context).mediationProvider = "max"
-        AppLovinSdk.getInstance(context).initializeSdk { configuration: AppLovinSdkConfiguration ->
-
-        }*/
         isInitialized = true
 
     }
@@ -573,6 +569,14 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         nativeAd?.let {
             _removeViewIfExists(nativeAd, containerView)
             // containerView.removeAllViews()
+
+            val params = RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.addRule(RelativeLayout.CENTER_IN_PARENT)
+            nativeAd.layoutParams = params
+            // button.layoutParams = params
             containerView.addView(nativeAd)
 
         }
