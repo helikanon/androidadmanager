@@ -251,6 +251,14 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         if (_isBannerLoaded(bannerAdView)) {
             try {
                 _removeBannerViewIfExists(bannerAdView)
+
+
+                val params = RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.addRule(RelativeLayout.CENTER_IN_PARENT)
+                bannerAdView?.layoutParams = params
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
@@ -291,9 +299,17 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
         }
         _removeBannerViewIfExists(bannerAdView, containerView)
+
+
+        val params = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.addRule(RelativeLayout.CENTER_IN_PARENT)
+        bannerAdView.layoutParams = params
         containerView.addView(bannerAdView, lp)
 
-        bannerAdView?.loadAd(AdRequest.Builder().build())
+        bannerAdView.loadAd(AdRequest.Builder().build())
     }
 
     override fun isMrecLoaded(placementGroupIndex: Int): Boolean {
@@ -327,6 +343,13 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         if (_isBannerLoaded(mrecAdView)) {
             try {
                 _removeBannerViewIfExists(mrecAdView)
+
+                val params = RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.MATCH_PARENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.addRule(RelativeLayout.CENTER_IN_PARENT)
+                mrecAdView?.layoutParams = params
                 containerView.addView(mrecAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
@@ -361,6 +384,13 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
         }
         _removeBannerViewIfExists(mrecAdView, containerView)
+
+        val params = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.addRule(RelativeLayout.CENTER_IN_PARENT)
+        mrecAdView.layoutParams = params
         containerView.addView(mrecAdView, lp)
 
         mrecAdView.loadAd(AdRequest.Builder().build())
@@ -497,8 +527,16 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         template.setStyles(styles)
         template.setNativeAd(nativeAd)
 
-        _removeViewIfExists(template.parent as ViewGroup?, containerView)
-        containerView.addView(template.parent as ViewGroup)
+        val v = template.parent as ViewGroup?
+        _removeViewIfExists(v, containerView)
+
+        val params = RelativeLayout.LayoutParams(
+            RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.addRule(RelativeLayout.CENTER_IN_PARENT)
+        v?.layoutParams = params
+        containerView.addView(v)
 
         return true
     }
