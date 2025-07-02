@@ -25,7 +25,7 @@ publishing{
         register<MavenPublication>("release"){
             groupId = "com.helikanonlib"
             artifactId = "admanager"
-            version = "5.084"
+            version = "5.085"
 
             afterEvaluate {
                 from(components["release"])

@@ -302,13 +302,6 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             try {
                 _removeBannerViewIfExists(bannerAdView, containerView)
 
-
-                val params = RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT
-                )
-                params.addRule(RelativeLayout.CENTER_IN_PARENT)
-                bannerAdView?.layoutParams = params
                 containerView.addView(bannerAdView)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
@@ -374,14 +367,6 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         })
         _removeBannerViewIfExists(bannerAdView, containerView)
-
-
-        val params = RelativeLayout.LayoutParams(
-            RelativeLayout.LayoutParams.MATCH_PARENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.addRule(RelativeLayout.CENTER_IN_PARENT)
-        bannerAdView.layoutParams = params
         containerView.addView(bannerAdView)
         // listener?.onDisplayed(AdPlatformTypeEnum.APPLOVIN)
 
@@ -409,13 +394,6 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         if (_isBannerLoaded(mrecAdView)) {
             try {
                 _removeBannerViewIfExists(mrecAdView, containerView)
-
-                val params = RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.MATCH_PARENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT
-                )
-                params.addRule(RelativeLayout.CENTER_IN_PARENT)
-                mrecAdView?.layoutParams = params
                 containerView.addView(mrecAdView)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
@@ -473,14 +451,6 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         })
         _removeBannerViewIfExists(mrecAdView, containerView)
-
-
-        val params = RelativeLayout.LayoutParams(
-            RelativeLayout.LayoutParams.MATCH_PARENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.addRule(RelativeLayout.CENTER_IN_PARENT)
-        mrecAdView.layoutParams = params
         containerView.addView(mrecAdView)
 
         mrecAdView.loadAd()

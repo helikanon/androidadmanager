@@ -244,3 +244,5 @@
 -keep class com.bytedance.sdk.openadsdk.*{ public *; }
 -keep class com.bytedance.sdk.** { *; }
 -keep class com.pgl.sys.ces.* {*;}
+
+-keep public class com.google.android.gms.** { public protected *; }
