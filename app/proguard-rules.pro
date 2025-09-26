@@ -242,3 +242,7 @@
 -keep class com.bytedance.sdk.openadsdk.*{ public *; }
 -keep class com.bytedance.sdk.** { *; }
 -keep class com.pgl.sys.ces.* {*;}
+
+-keep class com.tiktok.** { *; }
+-keep class com.android.billingclient.api.** { *; }
+-keep class androidx.lifecycle.** { *; }

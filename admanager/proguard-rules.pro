@@ -246,3 +246,7 @@
 -keep class com.pgl.sys.ces.* {*;}
 
 -keep public class com.google.android.gms.** { public protected *; }
+
+-keep class com.tiktok.** { *; }
+-keep class com.android.billingclient.api.** { *; }
+-keep class androidx.lifecycle.** { *; }

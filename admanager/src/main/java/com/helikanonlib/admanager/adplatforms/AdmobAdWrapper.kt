@@ -18,6 +18,9 @@ import com.helikanonlib.admanager.*
 import com.helikanonlib.admanager.R
 import com.helikanonlib.admanager.admobnativetemplates.NativeTemplateStyle
 import com.helikanonlib.admanager.admobnativetemplates.TemplateView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * *************************************************************************************************
@@ -45,7 +48,10 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun initialize(context: Context, testMode: Boolean) {
         if (isInitialized) return
 
-        MobileAds.initialize(context)
+        CoroutineScope(Dispatchers.IO).launch {
+            MobileAds.initialize(context)
+        }
+
         isInitialized = true
 
         if (testMode) {
