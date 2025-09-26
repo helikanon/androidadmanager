@@ -14,7 +14,6 @@ import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.ViewCompat
-import com.tiktok.TikTokBusinessSdk
 import java.util.*
 import java.util.concurrent.TimeUnit
 
