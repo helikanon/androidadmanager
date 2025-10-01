@@ -25,7 +25,7 @@ publishing{
         register<MavenPublication>("release"){
             groupId = "com.helikanonlib"
             artifactId = "admanager"
-            version = "5.089"
+            version = "5.090"
 
             afterEvaluate {
                 from(components["release"])
@@ -114,5 +114,11 @@ dependencies {
         exclude(module = "tiktok-business-android-sdk-comp")
     }
     implementation("com.applovin.mediation:unityads-adapter:+")
+
+    // inmobi begin
+    implementation("com.applovin.mediation:inmobi-adapter:+")
+    implementation("com.squareup.picasso:picasso:2.8")
+    // implementation("androidx.recyclerview:recyclerview:1.1.0") // zaten yukarıda ekli
+    // inmobi end
 
 }
