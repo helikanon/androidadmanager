@@ -18,8 +18,8 @@ android {
         minSdk = 24
         //noinspection OldTargetApi
         targetSdk = 36
-        versionCode = 90
-        versionName = "5.090"
+        versionCode = 91
+        versionName = "5.091"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -65,7 +65,7 @@ dependencies {
 
 
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("com.google.android.gms:play-services-ads:24.6.0")
+    implementation("com.google.android.gms:play-services-ads:24.7.0")
     implementation(project(":admanager"))
 
 }

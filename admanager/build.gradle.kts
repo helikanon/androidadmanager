@@ -25,7 +25,7 @@ publishing{
         register<MavenPublication>("release"){
             groupId = "com.helikanonlib"
             artifactId = "admanager"
-            version = "5.090"
+            version = "5.091"
 
             afterEvaluate {
                 from(components["release"])
@@ -93,10 +93,10 @@ dependencies {
     // kapt("androidx.lifecycle:lifecycle-compiler:2.7.0")
     implementation("androidx.lifecycle:lifecycle-process:2.9.4")
 
-    implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.6") // NativeTemplateStyle.java içinde bulunan @CanIgnoreReturnValue annotation için ekledik
+    // implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.6") // NativeTemplateStyle.java içinde bulunan @CanIgnoreReturnValue annotation için ekledik
 
     // google service
-    implementation("com.google.android.gms:play-services-ads:24.6.0")
+    implementation("com.google.android.gms:play-services-ads:24.7.0")
     implementation("com.google.android.gms:play-services-appset:16.1.0")
     implementation("com.google.android.gms:play-services-ads-identifier:18.2.0")
 
