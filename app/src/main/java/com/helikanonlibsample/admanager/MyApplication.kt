@@ -59,7 +59,7 @@ class MyApplication : Application() {
     fun initAdManager() {
         adManager = AdManager().apply {
             showAds = true
-            autoLoadForInterstitial = false
+            autoLoadForInterstitial = true
             isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode = true
             autoLoadDelay = 11 // seconds
 

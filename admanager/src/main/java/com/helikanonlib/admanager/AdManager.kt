@@ -14,6 +14,7 @@ import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.ViewCompat
+import com.applovin.sdk.AppLovinSdk
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -172,6 +173,7 @@ class AdManager {
 
                 loadingView?.layoutParams = layoutParams
             }
+
             "ConstraintLayout" -> {
                 val layoutParams: ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
@@ -184,6 +186,7 @@ class AdManager {
 
                 loadingView?.layoutParams = layoutParams
             }
+
             "LinearLayout" -> {
                 val layoutParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -1255,6 +1258,15 @@ class AdManager {
         }
 
         return count
+
+    }
+
+    fun applovinDebugger(activity: Activity) {
+        AppLovinSdk.getInstance(activity).showMediationDebugger()
+    }
+
+    fun applovinCreativeDebugger(activity: Activity) {
+        AppLovinSdk.getInstance( activity ).showCreativeDebugger()
 
     }
 }

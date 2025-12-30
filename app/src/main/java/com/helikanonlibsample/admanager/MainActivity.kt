@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
 
     fun initViews() {
         binding.btnShowInterstitial.setOnClickListener {
-            MyApplication.adManager.showInterstitial(this, "btnShowInterstitial" ,object : AdPlatformShowListener() {
+            MyApplication.adManager.showInterstitial(this, "btnShowInterstitial", object : AdPlatformShowListener() {
                 override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
                     super.onDisplayed(adPlatformEnum)
                 }
@@ -169,6 +169,10 @@ class MainActivity : AppCompatActivity() {
             MyApplication.AppOpenAdManager?.show("admob,applovin", this, null)
 
             //MyApplication.admobAppOpenAdManager?.disable()
+        }
+        binding.btnApplovinDebugger.setOnClickListener {
+            MyApplication.adManager.applovinDebugger(this@MainActivity)
+
         }
     }
 

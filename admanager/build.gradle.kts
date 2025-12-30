@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
@@ -25,7 +27,7 @@ publishing{
         register<MavenPublication>("release"){
             groupId = "com.helikanonlib"
             artifactId = "admanager"
-            version = "5.091"
+            version = "5.092"
 
             afterEvaluate {
                 from(components["release"])
@@ -65,8 +67,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 
     buildFeatures {
@@ -91,12 +96,12 @@ dependencies {
 
     //implementation "androidx.lifecycle:lifecycle-common-java8:2.3.0"
     // kapt("androidx.lifecycle:lifecycle-compiler:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-process:2.9.4")
+    implementation("androidx.lifecycle:lifecycle-process:2.10.0")
 
     // implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.6") // NativeTemplateStyle.java içinde bulunan @CanIgnoreReturnValue annotation için ekledik
 
     // google service
-    implementation("com.google.android.gms:play-services-ads:24.7.0")
+    implementation("com.google.android.gms:play-services-ads:24.9.0")
     implementation("com.google.android.gms:play-services-appset:16.1.0")
     implementation("com.google.android.gms:play-services-ads-identifier:18.2.0")
 
