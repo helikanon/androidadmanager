@@ -345,12 +345,14 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
-                viewIntances[placementName] = null
-                activity.runOnUiThread {
-                    _removeBannerViewIfExists(bannerAdView, containerView)
-                }
+                if (!isBannerLoaded(placementGroupIndex)) {
+                    viewIntances[placementName] = null
+                    activity.runOnUiThread {
+                        _removeBannerViewIfExists(bannerAdView, containerView)
+                    }
 
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=${error?.code} / ${error?.message}", platform)
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=${error?.code} / ${error?.message}", platform)
+                }
             }
 
             override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
@@ -429,12 +431,14 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
-                viewIntances[placementName] = null
-                activity.runOnUiThread {
-                    _removeBannerViewIfExists(mrecAdView, containerView)
-                }
+                if (!isMrecLoaded(placementGroupIndex)) {
+                    viewIntances[placementName] = null
+                    activity.runOnUiThread {
+                        _removeBannerViewIfExists(mrecAdView, containerView)
+                    }
 
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> error code=${error?.code} / ${error?.message}", platform)
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> error code=${error?.code} / ${error?.message}", platform)
+                }
             }
 
             override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {

@@ -218,11 +218,11 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         val bannerAdView: AdView? = if (viewIntances.containsKey(placementName)) viewIntances.get(placementName) as AdView? else null
 
         var isLoaded = _isBannerLoaded(bannerAdView)
-        if (isLoaded && !isValidLoadedBanner(platform)) {
+        /*if (isLoaded && !isValidLoadedBanner(platform)) {
             _removeBannerViewIfExists(bannerAdView)
             viewIntances[placementName] = null
             isLoaded = false
-        }
+        }*/
 
         return isLoaded
     }
@@ -254,7 +254,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 addRule(RelativeLayout.CENTER_HORIZONTAL)
             }
 
-        if (_isBannerLoaded(bannerAdView)) {
+        if (isBannerLoaded(placementGroupIndex)) {
             try {
                 _removeBannerViewIfExists(bannerAdView)
                 containerView.addView(bannerAdView, lp)
@@ -273,12 +273,16 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         bannerAdView.adListener = object : AdListener() {
             override fun onAdFailedToLoad(error: LoadAdError) {
                 super.onAdFailedToLoad(error)
-                viewIntances[placementName] = null
-                activity.runOnUiThread {
-                    _removeBannerViewIfExists(bannerAdView, containerView)
-                }
 
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=${error.code} / ${error.message}", platform)
+                if (!isBannerLoaded(placementGroupIndex)) {
+                    activity.runOnUiThread {
+                        _removeBannerViewIfExists(bannerAdView, containerView)
+                        bannerAdView.destroy()
+                    }
+                    viewIntances[placementName] = null
+
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=${error.code} / ${error.message}", platform)
+                }
             }
 
             override fun onAdLoaded() {
@@ -306,15 +310,15 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun isMrecLoaded(placementGroupIndex: Int): Boolean {
         val placementName = getPlacementGroupByIndex(placementGroupIndex).mrec
         val instanceKeyName = placementName + "_mrec"
-        val mrecAdView: AdView? = if (viewIntances.containsKey(instanceKeyName)) viewIntances.get(instanceKeyName) as AdView? else null
+        // val mrecAdView: AdView? = if (viewIntances.containsKey(instanceKeyName)) viewIntances.get(instanceKeyName) as AdView? else null
 
 
-        var isLoaded = _isBannerLoaded(mrecAdView)
-        if (isLoaded && !isValidLoadedBanner(platform)) {
+        var isLoaded = isBannerLoaded(placementGroupIndex)
+        /*if (isLoaded && !isValidLoadedBanner(platform)) {
             _removeBannerViewIfExists(mrecAdView)
             viewIntances[placementName] = null
             isLoaded = false
-        }
+        }*/
 
         return isLoaded
     }
@@ -351,12 +355,15 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onAdFailedToLoad(error: LoadAdError) {
                 super.onAdFailedToLoad(error)
 
-                viewIntances[placementName] = null
-                activity.runOnUiThread {
-                    _removeBannerViewIfExists(mrecAdView, containerView)
+                if (!isMrecLoaded(placementGroupIndex)){
+                    viewIntances[placementName] = null
+                    activity.runOnUiThread {
+                        _removeBannerViewIfExists(mrecAdView, containerView)
+                    }
+
+                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> errorcode=${error.code} / ${error.message}", platform)
                 }
 
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> errorcode=${error.code} / ${error.message}", platform)
             }
 
             override fun onAdLoaded() {
