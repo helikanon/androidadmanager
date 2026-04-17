@@ -7,7 +7,7 @@ import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.helikanonlib.admanager.*
-import com.helikanonlib.admanager.adplatforms.*
+import com.helikanonlib.admanager.adplatforms.ApplovinAdWrapper
 import com.helikanonlibsample.admanager.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -23,8 +23,53 @@ class MainActivity : AppCompatActivity() {
 
 
         Handler(Looper.getMainLooper()).postDelayed({
-            MyApplication.admobAppOpenAdManager?.show(this@MainActivity,null)
-        },2000)
+            MyApplication.adManager?.showNative(this@MainActivity, AdFormatEnum.NATIVE, binding.nativeContainer)
+            MyApplication.adManager?.showNative(this@MainActivity, AdFormatEnum.NATIVE_MEDIUM, binding.nativeMediumContainer)
+        }, 15000)
+
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            // MyApplication.admobAppOpenAdManager?.show(this@MainActivity, null)
+
+
+            /*val ap = MyApplication.adManager?.getAdPlatformByType(AdPlatformTypeEnum.ADMOB)
+            ap?.platformInstance?.loadNativeAds(this@MainActivity, 4, object : AdPlatformLoadListener() {
+                override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                    super.onLoaded(adPlatformEnum)
+
+                    runOnUiThread {
+
+                        val nativeAd = ap?.platformInstance?.showNative(
+                            this@MainActivity,
+                            "medium",
+                            binding.nativeContainer
+                        )
+
+                        val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                        val templateRoot = inflater.inflate(R.layout.admob_native_medium_template, null)
+                        val template = templateRoot.findViewById<TemplateView>(R.id.admanager_native_medium)
+
+                        val nativeAd = ap?.platformInstance?.showNative(
+                            this@MainActivity,
+                            0
+                        )
+                        nativeAd?.let {
+                            val styles = NativeTemplateStyle.Builder().build()
+                            template.setStyles(styles)
+                            template.setNativeAd(nativeAd)
+                            binding.nativeContainer.addView(templateRoot)
+                        }
+                    }
+                }
+
+                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                    Log.d("MyApplication.adManager", "[NATIVE] ${errorMode?.name} / $errorMessage / ${adPlatformEnum?.name}")
+                }
+            })*/
+
+            MyApplication.AppOpenAdManager?.isEnable = true
+        }, 2000)
+
 
         /*val x = MyApplication.adManager.getAdPlatformByType(AdPlatformTypeEnum.ADMOB)?.platformInstance as AdmobAdWrapper
         x.loadNativeAds(this, 3, object : AdPlatformLoadListener() {
@@ -46,11 +91,13 @@ class MainActivity : AppCompatActivity() {
                 Log.d("MyApplication.adManager", "[BANNER] AdErrorMode.PLATFORM showBanner>> $errorMode $errorMessage ${adPlatformEnum?.name}")
             }
         })
-        /*MyApplication.adManager.showMrec(this, mrecContainer, object : AdPlatformShowListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                Log.d("MyApplication.adManager", "[MREC]AdErrorMode.PLATFORM showMrec>> $errorMode $errorMessage ${adPlatformEnum?.name}")
-            }
-        })*/
+        Handler(Looper.getMainLooper()).postDelayed({
+            MyApplication.adManager.showMrec(this, binding.mrecContainer, object : AdPlatformShowListener() {
+                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                    Log.d("MyApplication.adManager", "[MREC] AdErrorMode.PLATFORM showMrec>> $errorMode $errorMessage ${adPlatformEnum?.name}")
+                }
+            })
+        }, 3000)
     }
 
     override fun onPause() {
@@ -69,7 +116,7 @@ class MainActivity : AppCompatActivity() {
 
     fun initViews() {
         binding.btnShowInterstitial.setOnClickListener {
-            MyApplication.adManager.showInterstitial(this,object:AdPlatformShowListener(){
+            MyApplication.adManager.showInterstitial(this, "btnShowInterstitial", object : AdPlatformShowListener() {
                 override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
                     super.onDisplayed(adPlatformEnum)
                 }
@@ -94,7 +141,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnShowRewarded.setOnClickListener {
-            MyApplication.adManager.showRewarded(this) // if autoload mode is false it will load and show
+            MyApplication.adManager.showRewarded(this, object : AdPlatformShowListener() {
+                override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum?) {
+                    super.onRewarded(type, amount, adPlatformEnum)
+                }
+            }) // if autoload mode is false it will load and show
         }
 
         binding.btnShowInterstitialForTimeStrategy.setOnClickListener {
@@ -115,21 +166,46 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnLoadAppOpenAd.setOnClickListener {
-            MyApplication.admobAppOpenAdManager?.show(this,null)
+            MyApplication.AppOpenAdManager?.show("admob,applovin", this, null)
 
             //MyApplication.admobAppOpenAdManager?.disable()
+        }
+        binding.btnApplovinDebugger.setOnClickListener {
+            MyApplication.adManager.applovinDebugger(this@MainActivity)
+
         }
     }
 
     /*
     var ADMOB_APP_ID = "ca-app-pub-8018256245650162~9841851144"
-    var STARTAPP_APP_ID = "207754325"
+
     var IRONSOURCE_APP_ID = "a1a67f75"
     var MOPUB_APP_ID = "207754325"
      */
     fun initAds() {
         MyApplication.adManager.initializePlatformsWithActivity(this)
         MyApplication.adManager.start(this)
+        MyApplication.adManager.loadNativeAds(this, AdFormatEnum.NATIVE, 3, object : AdPlatformLoadListener() {
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                super.onLoaded(adPlatformEnum)
+            }
+
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                super.onError(errorMode, errorMessage, adPlatformEnum)
+            }
+
+        })
+
+        MyApplication.adManager.loadNativeAds(this, AdFormatEnum.NATIVE_MEDIUM, 3, object : AdPlatformLoadListener() {
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                super.onLoaded(adPlatformEnum)
+            }
+
+            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                super.onError(errorMode, errorMessage, adPlatformEnum)
+            }
+
+        })
         /*Handler(Looper.getMainLooper()).postDelayed({
             MyApplication.adManager.showInterstitial(this@MainActivity)
         }, 2000)*/

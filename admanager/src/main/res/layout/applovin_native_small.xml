@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/icon_image_view"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:layout_constraintBottom_toBottomOf="@+id/media_view_container"
+        app:layout_constraintEnd_toStartOf="@+id/body_text_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <FrameLayout
+        android:id="@+id/media_view_container"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:maxHeight="150dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="W,16:9"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/options_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/media_view_container"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/ad_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:background="@android:color/holo_green_dark"
+        android:padding="2dp"
+        android:text="Ad"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@id/media_view_container"
+        app:layout_constraintTop_toBottomOf="@+id/options_view" />
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/title_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="AdTitle"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/ad_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ad_text_view"
+        app:layout_constraintTop_toTopOf="@+id/ad_text_view" />
+
+    <FrameLayout
+        android:id="@+id/star_rating_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/advertiser_textView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/advertiser_textView"
+        app:layout_constraintTop_toTopOf="@+id/advertiser_textView" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/advertiser_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLength="16"
+        android:text="Advertiser Name"
+        app:layout_constraintStart_toStartOf="@+id/ad_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/title_text_view" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/body_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="Body Text View Body Text View Body Text View Body Text View Body Text View Body Text View Body Text View"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/ad_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/advertiser_textView" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/cta_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="install"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/ad_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/body_text_view" />
+</androidx.constraintlayout.widget.ConstraintLayout>

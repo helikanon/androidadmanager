@@ -1,6 +1,8 @@
 package com.helikanonlibsample.admanager;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -11,14 +13,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.helikanonlib.admanager.AdErrorMode;
 import com.helikanonlib.admanager.AdManager;
+import com.helikanonlib.admanager.AdPlacementGroupModel;
 import com.helikanonlib.admanager.AdPlatformModel;
 import com.helikanonlib.admanager.AdPlatformShowListener;
 import com.helikanonlib.admanager.AdPlatformTypeEnum;
 import com.helikanonlib.admanager.AdPlatformWrapper;
 import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper;
-import com.helikanonlib.admanager.adplatforms.FacebookAdWrapper;
-import com.helikanonlib.admanager.adplatforms.IronSourceAdWrapper;
-import com.helikanonlib.admanager.adplatforms.StartAppAdWrapper;
+
 
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +37,7 @@ public class JavaSampleActivity extends AppCompatActivity {
     Button btnLoadAndShowRewarded;
 
     String oldBannerPlacementId = "";
+    private int placementGroupIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,8 @@ public class JavaSampleActivity extends AppCompatActivity {
 
         adManager = MyApplication.adManager;
         //adManager.destroyBannersAndMrecs(this);
-
+        adManager.loadInterstitial(this, null, null, false, placementGroupIndex);
+        adManager.loadRewarded(this, null, null, false, placementGroupIndex);
         // initAdManager(); // already inited in MainActivity
         initViews();
     }
@@ -66,8 +69,16 @@ public class JavaSampleActivity extends AppCompatActivity {
         oldBannerPlacementId = ironsrc.getBannerPlacementId();
         ironsrc.setBannerPlacementId("new_placementId");*/
 
-        adManager.showBanner(this, bannerContainer);
-        adManager.showMrec(this, mrecContainer);
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            adManager.showBanner(this, bannerContainer, null, null, placementGroupIndex);
+        }, 2000);
+
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            adManager.showMrec(this, mrecContainer, null, null, placementGroupIndex);
+        }, 5000);
+
+
     }
 
     @Override
@@ -93,7 +104,7 @@ public class JavaSampleActivity extends AppCompatActivity {
         btnShowInterstitial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.showInterstitial(JavaSampleActivity.this);
+                adManager.showInterstitial(JavaSampleActivity.this, "javaBtnShowInterstitial",null, null, placementGroupIndex);
             }
         });
 
@@ -105,14 +116,14 @@ public class JavaSampleActivity extends AppCompatActivity {
                     public void onRewarded(@Nullable String type, @Nullable Integer amount, @Nullable AdPlatformTypeEnum adPlatformEnum) {
                         Toast.makeText(JavaSampleActivity.this, "Rewarded!", Toast.LENGTH_LONG).show();
                     }
-                });
+                }, null, placementGroupIndex);
             }
         });
 
         btnShowInterstitialForTimeStrategy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.showInterstitial(JavaSampleActivity.this);
+                adManager.showInterstitial(JavaSampleActivity.this, "javaBtnShowInterstitialForTimeStrategy",null, null, placementGroupIndex);
             }
         });
 
@@ -120,57 +131,51 @@ public class JavaSampleActivity extends AppCompatActivity {
         btnLoadAndShowInterstitial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.loadAndShowInterstitial(JavaSampleActivity.this);
+                adManager.loadAndShowInterstitial(JavaSampleActivity.this, "javaBtnLoadAndShowInterstitial",null, null, placementGroupIndex);
             }
         });
 
         btnLoadAndShowRewarded.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                adManager.loadAndShowRewarded(JavaSampleActivity.this);
+                adManager.loadAndShowRewarded(JavaSampleActivity.this, null, null, placementGroupIndex);
             }
         });
     }
 
     private void initAdManager() {
-        AdPlatformWrapper facebookAdWrapper = new FacebookAdWrapper("your_app_id");
+        /*AdPlatformWrapper facebookAdWrapper = new FacebookAdWrapper("your_app_id");
         facebookAdWrapper.setInterstitialPlacementId("YOUR_PLACEMENT_ID");
         facebookAdWrapper.setBannerPlacementId("YOUR_PLACEMENT_ID");
         facebookAdWrapper.setRewardedPlacementId("YOUR_PLACEMENT_ID");
-        facebookAdWrapper.setRewardedPlacementId("YOUR_PLACEMENT_ID");
+        facebookAdWrapper.setRewardedPlacementId("YOUR_PLACEMENT_ID");*/
 
 
         AdPlatformWrapper admobAdWrapper = new AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713");
-        admobAdWrapper.setInterstitialPlacementId("ca-app-pub-3940256099942544/1033173712");
+        admobAdWrapper.getPlacementGroups().add(new AdPlacementGroupModel(
+                "default",
+                "ca-app-pub-3940256099942544/1033173712",
+                "ca-app-pub-3940256099942544/5224354917",
+                "ca-app-pub-3940256099942544/6300978111",
+                "ca-app-pub-3940256099942544/6300978111",
+                "ca-app-pub-3940256099942544/2247696110",
+                "ca-app-pub-3940256099942544/3419835294"
+        ));
+        /*admobAdWrapper.setInterstitialPlacementId("ca-app-pub-3940256099942544/1033173712");
         admobAdWrapper.setBannerPlacementId("ca-app-pub-3940256099942544/6300978111");
         admobAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/5224354917");
-        facebookAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/6300978111");
+        // facebookAdWrapper.setRewardedPlacementId("ca-app-pub-3940256099942544/6300978111");*/
 
-        AdPlatformWrapper startappAdWrapper = new StartAppAdWrapper("207754325");
+        adManager = new AdManager();
 
-        AdPlatformWrapper ironsourceAdWrapper = new IronSourceAdWrapper("a1a67f75");
-        ironsourceAdWrapper.setInterstitialPlacementId("DefaultInterstitial");
-        ironsourceAdWrapper.setBannerPlacementId("DefaultBanner");
-        ironsourceAdWrapper.setRewardedPlacementId("DefaultRewardedVideo");
-        ironsourceAdWrapper.setMrecPlacementId("MREC_BANNER");
-
-
-        adManager = new AdManager
-                .Builder()
-                .autoLoad(true)
-                .autoLoadDelay(20)
-                .interstitialMinElapsedSecondsToNextShow(60)
-                .randomInterval(30)
-                .showAds(true)
-                .testMode(BuildConfig.DEBUG)
-                .deviceId("47088e48-5195-4757-90b2-0da94116befd") // necessary if test mode enabled
-                .addAdPlatforms(
-                        new AdPlatformModel(facebookAdWrapper, true, true, true, true),
-                        new AdPlatformModel(admobAdWrapper, true, false, true, true),
-                        new AdPlatformModel(startappAdWrapper, true, true, true, true),
-                        new AdPlatformModel(ironsourceAdWrapper, true, true, true, false)
-                )
-                .build();
+        adManager.setAutoLoadForInterstitial(false);
+        adManager.setAutoLoadDelay(20);
+        adManager.setInterstitialMinElapsedSecondsToNextShow(60);
+        adManager.setRandomInterval(30);
+        adManager.setShowAds(true);
+        adManager.setTestMode(BuildConfig.DEBUG);
+        adManager.setDeviceId("47088e48-5195-4757-90b2-0da94116befd"); // necessary if test mode enabled
+        adManager.addAdPlatform(new AdPlatformModel(admobAdWrapper, true, false, true, true));
 
         adManager.setGlobalRewardedShowListener(new AdPlatformShowListener() {
             @Override

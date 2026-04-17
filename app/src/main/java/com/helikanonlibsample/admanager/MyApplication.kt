@@ -1,19 +1,17 @@
 package com.helikanonlibsample.admanager
 
+import android.app.Application
 import android.util.Log
-import androidx.multidex.MultiDexApplication
+// import androidx.multidex.MultiDexApplication
 import com.helikanonlib.admanager.*
-import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper
-import com.helikanonlib.admanager.adplatforms.FacebookAdWrapper
-import com.helikanonlib.admanager.adplatforms.IronSourceAdWrapper
-import com.helikanonlib.admanager.adplatforms.StartAppAdWrapper
+import com.helikanonlib.admanager.adplatforms.*
 
-class MyApplication : MultiDexApplication() {
+class MyApplication : Application() {
 
 
     companion object {
         lateinit var adManager: AdManager
-        var admobAppOpenAdManager: AdmobAppOpenAdManager? = null
+        var AppOpenAdManager: AppOpenAdManager? = null
     }
 
 
@@ -21,43 +19,62 @@ class MyApplication : MultiDexApplication() {
         super.onCreate()
 
         initAdManager()
-        admobAppOpenAdManager = AdmobAppOpenAdManager(this, "ca-app-pub-3940256099942544/3419835294",
+
+        AppOpenAdManager = AppOpenAdManager(
+            this,
+            mutableMapOf(
+                AdPlatformTypeEnum.ADMOB to "ca-app-pub-3940256099942544/3419835294",
+                AdPlatformTypeEnum.APPLOVIN to "dd9249369deec4ec",
+            ),
+            "applovin,admob",
+
             object : AdPlatformShowListener() {
                 override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
-                    Log.e("adManager", "AdmobAppOpenAdManager >>> success display")
+                    Log.e("adManager", "AppOpenAdManager >>> success display")
                 }
 
                 override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
 
-                    Log.e("adManager", "AdmobAppOpenAdManager show error >>> $errorMessage")
+                    Log.e("adManager", "AppOpenAdManager show error >>> $errorMessage")
                 }
 
             },
             object : AdPlatformLoadListener() {
                 override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
-                    Log.e("adManager", "AdmobAppOpenAdManager >>> success load")
+                    Log.e("adManager", "AppOpenAdManager >>> success load")
                 }
 
                 override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                    Log.e("adManager", "AdmobAppOpenAdManager load error >>> $errorMessage")
+                    Log.e("adManager", "AppOpenAdManager load error >>> $errorMessage")
                 }
 
             }
         )
-        admobAppOpenAdManager?.minElapsedSecondsToNextShow = 10
+
+        AppOpenAdManager?.excludedActivities?.add(JavaSampleActivity::class.java.simpleName)
+        AppOpenAdManager?.minElapsedSecondsToNextShow = 10
+        AppOpenAdManager?.disable()
     }
 
     fun initAdManager() {
         adManager = AdManager().apply {
             showAds = true
-            autoLoad = true
-            autoLoadDelay = 15 // seconds
-            interstitialMinElapsedSecondsToNextShow = 60 // seconds
+            autoLoadForInterstitial = true
+            isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode = true
+            autoLoadDelay = 11 // seconds
+
+            autoLoadForRewarded = true
+
             randomInterval = 30 // random seconds for showing interstitial. Interstitial will show after previous showing passed seconds between 60-90
+            interstitialMinElapsedSecondsToNextShow = 30
+            rewardedMinElapsedSecondsToNextShow = 30
+
+
             testMode = BuildConfig.DEBUG
             deviceId = "47088e48-5195-4757-90b2-0da94116befd" // necessary if testmode enabled
+            placementGroups = arrayListOf("default")
             adPlatforms = mutableListOf<AdPlatformModel>(
-                AdPlatformModel(
+                /*AdPlatformModel(
                     FacebookAdWrapper("your_app_id").apply {
                         interstitialPlacementId = "YOUR_PLACEMENT_ID"
                         bannerPlacementId = "YOUR_PLACEMENT_ID"
@@ -65,33 +82,88 @@ class MyApplication : MultiDexApplication() {
                         mrecPlacementId = "YOUR_PLACEMENT_ID"
                     },
                     true, true, true, true
-                ),
+                ),*/
                 AdPlatformModel(
                     AdmobAdWrapper("ca-app-pub-3940256099942544~3347511713").apply {
-                        interstitialPlacementId = "ca-app-pub-3940256099942544/1033173712"
-                        bannerPlacementId = "ca-app-pub-3940256099942544/6300978111"
-                        rewardedPlacementId = "ca-app-pub-3940256099942544/5224354917"
-                        mrecPlacementId = "ca-app-pub-3940256099942544/6300978111"
-                        nativePlacementId = "ca-app-pub-3940256099942544/2247696110"
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "default",
+                                interstitial = "ca-app-pub-3940256099942544/1033173712",
+                                rewarded = "ca-app-pub-3940256099942544/5224354917",
+                                banner = "ca-app-pub-3940256099942544/6300978111",
+                                mrec = "ca-app-pub-3940256099942544/6300978112",
+                                native = "ca-app-pub-3940256099942544/2247696110",
+                                appOpenAd = "ca-app-pub-3940256099942544/3419835294",
+                                nativeMedium = ""
+                            )
+                        )
+                        /*placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "second_group",
+                                interstitial = "ca-app-pub-3940256099942544/8691691433",
+                                rewarded = "ca-app-pub-3940256099942544/5354046379",
+                                banner = "ca-app-pub-3940256099942544/6300978111",
+                                mrec = "ca-app-pub-3940256099942544/6300978111",
+                                native = "ca-app-pub-3940256099942544/1044960115",
+                                appOpenAd = "ca-app-pub-3940256099942544/3419835294"
+                            )
+                        )*/
                     },
                     true, true, true, true
                 ),
-
                 AdPlatformModel(
-                    IronSourceAdWrapper("cd353905").apply {
-                        interstitialPlacementId = "DefaultInterstitial"
-                        bannerPlacementId = "DefaultBanner"
-                        rewardedPlacementId = "DefaultRewardedVideo"
-                        mrecPlacementId = "MREC_BANNER"
+                    UnityAdsAdWrapper("4428087").apply {
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "default",
+                                interstitial = "Interstitial_Android",
+                                rewarded = "Rewarded_Android",
+                                banner = "Banner_Android",
+                                mrec = "BannerMrec_Android",
+                                native = "DefaultNative",
+                                appOpenAd = "",
+                                nativeMedium = ""
+                            )
+                        )
                     },
                     true, true, true, true
                 ),
+                /*AdPlatformModel(
+                    AdmostAdWrapper("6cc8e89a-b52a-4e9a-bb8c-579f7ec538fe").apply {
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "default",
+                                interstitial = "f99e409b-f9ab-4a2e-aa9a-4d143e6809ae",
+                                rewarded = "88cfcfd0-2f8c-4aba-9f36-cc0ac99ab140",
+                                banner = "86644357-21d0-45a4-906a-37262461df65",
+                                mrec = "86644357-21d0-45a4-906a-37262461df65",
+                                native = "",
+                                appOpenAd = ""
+                            )
+                        )
+                    },
+                    true, true, true, true
+                ),*/
                 AdPlatformModel(
-                    StartAppAdWrapper("207754325").apply {},
+                    ApplovinAdWrapper("pHS9IvJQm4f3s9fPw3xpJLFIu6lLDfukm72lv_OqABUrmgxiCnDKCx4vAPNHI9lOv3oDcJZngd-ek0cHus5pBP").apply {
+                        placementGroups.add(
+                            AdPlacementGroupModel(
+                                groupName = "default",
+                                interstitial = "7c4a01242eaee289",
+                                rewarded = "f2f5534658a6b4ab",
+                                banner = "609a039e1d803bea",
+                                mrec = "851a6927fdae17d5",
+                                native = "2b1686bf9db060d3",
+                                appOpenAd = "dd9249369deec4ec",
+                                nativeMedium = "96454048eeffaad2"
+                            )
+                        )
+                    },
                     true, true, true, true
                 )
             )
         }
+
 
         /*adManager.addAdPlatform(
             AdPlatformModel(
@@ -104,10 +176,14 @@ class MyApplication : MultiDexApplication() {
                 true, true, true, true
             )
         )*/
-        adManager.setAdPlatformSortByAdFormatStr("interstitial", "admob,ironsource,facebook")
-        adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,admob,facebook,startapp")
-        adManager.setAdPlatformSortByAdFormatStr("rewarded", "admob,ironsource,startapp,facebook")
-        adManager.setAdPlatformSortByAdFormatStr("mrec", "admob,facebook,startapp,ironsource")
+
+
+        adManager.setAdPlatformSortByAdFormatStr(0, "interstitial", "applovin,admob")
+        adManager.setAdPlatformSortByAdFormatStr(0, "banner", "admob,applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "rewarded", "admob,applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "mrec", "admob,applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "native", "applovin")
+        adManager.setAdPlatformSortByAdFormatStr(0, "native_medium", "applovin")
 
 
         adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {

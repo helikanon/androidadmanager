@@ -1,17 +1,35 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# OS
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-/.idea/codeStyles/Project.xml
-/app/release/
-/nativetemplates/build/
+Thumbs.db
+
+# Gradle
+.gradle/
+build/
+
+# Android
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Release outputs (optional)
+*.apk
+*.aab
+
+# IntelliJ / Android Studio
+*.iml
+.idea/
+!.idea/codeStyles/
+!.idea/runConfigurations/
+!.idea/inspectionProfiles/
+
+# Keystores (never commit)
+*.jks
+*.keystore
+
+# Logs
+*.log
+
+# SafeDK
+**/.safedk/
+/.kotlin/sessions/
