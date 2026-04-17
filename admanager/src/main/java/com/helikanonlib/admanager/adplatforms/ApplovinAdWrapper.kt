@@ -59,7 +59,6 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         AppLovinSdk.getInstance(context).initialize(initConfig) { sdkConfig ->
 
         }
-
         isInitialized = true
 
     }
@@ -148,8 +147,11 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 viewIntances[placementName] = null
                 listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial show >> error code=${error?.code} / ${error?.message}", platform)
             }
-
         })
+
+        /*interstitial?.setRevenueListener { it->
+
+        }*/
         interstitial?.showAd(shownWhere, activity)
         viewIntances[placementName] = null // gösterir göstermez boşalt
 

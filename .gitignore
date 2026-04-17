@@ -1,54 +1,35 @@
-*.iml
-.gradle
-/local.properties
-.idea/
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-/.idea/modules
-/.idea/codeStyles
-/.idea/compiler.xml
-/.idea/gradle.xml
-/.idea/jarRepositories.xml
-/.idea/misc.xml
-/.idea/vcs.xml
+# OS
 .DS_Store
-/build
-/app/release
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-/nativetemplates/build/
-/nativetemplates/build/intermediates/
-/nativetemplates/build/
-/nativetemplates/build/.transforms/
-/nativetemplates/build/intermediates/
-/.safedk/api
-/.safedk/dex
-/.safedk/app_sdks.lst
-/.safedk/hashes.safedk
-/.safedk/list.enc
-/.safedk/permissions_mapping.json
-/.safedk/plugin.properties
-/.safedk/proguard-safedk.pro
-*.aab
-*.apk
-.aab
-.apk
-/.idea/AndroidProjectSystem.xml
-.safesdk/
-*.jks
-*.log
 Thumbs.db
-.DS_Store
+
+# Gradle
 .gradle/
 build/
-/app/release/
-*/release/
-/app/build/
-*/build/
-**/build/
+
+# Android
+local.properties
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Release outputs (optional)
+*.apk
+*.aab
+
+# IntelliJ / Android Studio
+*.iml
+.idea/
+!.idea/codeStyles/
+!.idea/runConfigurations/
+!.idea/inspectionProfiles/
+
+# Keystores (never commit)
+*.jks
+*.keystore
+
+# Logs
+*.log
+
+# SafeDK
+**/.safedk/
+/.kotlin/sessions/

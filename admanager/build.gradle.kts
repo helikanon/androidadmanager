@@ -27,7 +27,7 @@ publishing{
         register<MavenPublication>("release"){
             groupId = "com.helikanonlib"
             artifactId = "admanager"
-            version = "5.095"
+            version = "5.096"
 
             afterEvaluate {
                 from(components["release"])
@@ -84,7 +84,7 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.core:core-ktx:1.18.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("com.google.android.material:material:1.13.0")
     testImplementation("junit:junit:4.13.2")
@@ -101,9 +101,9 @@ dependencies {
     // implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.6") // NativeTemplateStyle.java içinde bulunan @CanIgnoreReturnValue annotation için ekledik
 
     // google service
-    implementation("com.google.android.gms:play-services-ads:24.9.0")
+    implementation("com.google.android.gms:play-services-ads:25.2.0")
     implementation("com.google.android.gms:play-services-appset:16.1.0")
-    implementation("com.google.android.gms:play-services-ads-identifier:18.2.0")
+    implementation("com.google.android.gms:play-services-ads-identifier:18.3.0")
 
     // implementation(project(path = ":nativetemplates"))
 

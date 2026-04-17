@@ -20,8 +20,8 @@ android {
         minSdk = 24
         //noinspection OldTargetApi
         targetSdk = 36
-        versionCode = 95
-        versionName = "5.095"
+        versionCode = 96
+        versionName = "5.096"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -60,7 +60,7 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.17.0")
+    implementation("androidx.core:core-ktx:1.18.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
@@ -70,7 +70,7 @@ dependencies {
 
 
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-    implementation("com.google.android.gms:play-services-ads:24.9.0")
+    implementation("com.google.android.gms:play-services-ads:25.2.0")
     implementation(project(":admanager"))
 
 }
