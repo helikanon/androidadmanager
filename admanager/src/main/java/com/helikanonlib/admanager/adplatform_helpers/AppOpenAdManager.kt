@@ -199,6 +199,10 @@ class AppOpenAdManager(
     fun loadApplovin(listener: AdPlatformLoadListener?) {
         val platform = AdPlatformTypeEnum.APPLOVIN
 
+        if (isApplovinAdLoaded()) {
+            listener?.onLoaded(platform)
+            return
+        }
         applovinAppOpenAd?.setListener(object : MaxAdListener {
             override fun onAdLoaded(ad: MaxAd) {
                 applovinLoadTime = Date().time
