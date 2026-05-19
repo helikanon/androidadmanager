@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.google.android.gms.ads.*
+import com.google.android.gms.ads.initialization.InitializationStatus
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
@@ -39,20 +41,26 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     var mrecAdView: AdView? = null*/
 
     companion object {
-        var isInitialized = false
+        var isInitializeStarted = false
     }
 
-    override fun initialize(activity: Activity, testMode: Boolean) {
+    override fun initialize(activity: Activity, onInitializeComplete: ((Boolean) -> Unit)?, testMode: Boolean) {
     }
 
-    override fun initialize(context: Context, testMode: Boolean) {
-        if (isInitialized) return
+    override fun initialize(context: Context, onInitializeComplete: ((Boolean) -> Unit)?, testMode: Boolean) {
+        if (isInitializeStarted || isInitialized) return
 
         CoroutineScope(Dispatchers.IO).launch {
-            MobileAds.initialize(context)
+            MobileAds.initialize(context, object : OnInitializationCompleteListener {
+                override fun onInitializationComplete(p0: InitializationStatus) {
+                    isInitialized = true
+                    onInitializeComplete?.invoke(true)
+                }
+
+            })
         }
 
-        isInitialized = true
+        isInitializeStarted = true
 
         if (testMode) {
             enableTestMode(context, null)
@@ -355,7 +363,7 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onAdFailedToLoad(error: LoadAdError) {
                 super.onAdFailedToLoad(error)
 
-                if (!isMrecLoaded(placementGroupIndex)){
+                if (!isMrecLoaded(placementGroupIndex)) {
                     viewIntances[placementName] = null
                     activity.runOnUiThread {
                         _removeBannerViewIfExists(mrecAdView, containerView)

@@ -18,18 +18,18 @@ import com.unity3d.services.banners.UnityBannerSize
 class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     companion object {
-        var isInitialized = false
+        var isInitializeStarted = false
     }
 
     override var platform = AdPlatformTypeEnum.UNITYADS
     var viewIntances: MutableMap<String, Any?> = mutableMapOf()
 
 
-    override fun initialize(activity: Activity, testMode: Boolean) {
+    override fun initialize(activity: Activity, onInitializeComplete: ((Boolean) -> Unit)?, testMode: Boolean) {
     }
 
-    override fun initialize(context: Context, testMode: Boolean) {
-        if (isInitialized) return
+    override fun initialize(context: Context, onInitializeComplete: ((Boolean) -> Unit)?, testMode: Boolean) {
+        if (isInitializeStarted || isInitialized) return
 
         /*UnityAds.addListener(object : IUnityAdsListener {
             override fun onUnityAdsReady(placementId: String?) {
@@ -50,16 +50,17 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         })*/
         UnityAds.initialize(context, appId, testMode, object : IUnityAdsInitializationListener {
             override fun onInitializationComplete() {
-
+                isInitialized = true
+                onInitializeComplete?.invoke(true)
             }
 
             override fun onInitializationFailed(error: UnityAds.UnityAdsInitializationError?, message: String?) {
-
+                onInitializeComplete?.invoke(false)
             }
 
         })
 
-        isInitialized = true
+        isInitializeStarted = true
     }
 
     override fun enableTestMode(context: Context, deviceId: String?) {

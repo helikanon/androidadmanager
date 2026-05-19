@@ -10,6 +10,7 @@ import java.util.*
 abstract class AdPlatformWrapper(open var appId: String) {
 
     abstract val platform: AdPlatformTypeEnum
+    var isInitialized: Boolean = false
     var placementGroups: java.util.ArrayList<AdPlacementGroupModel> = java.util.ArrayList()
     protected fun getPlacementGroupByIndex(placementGroupIndex: Int): AdPlacementGroupModel {
         /*if (index >= placementGroups.size) {
@@ -25,12 +26,12 @@ abstract class AdPlatformWrapper(open var appId: String) {
     var nativePlacementId: String? = null
     var appOpenAdPlacementId: String? = null*/
 
-    abstract fun initialize(activity: Activity, testMode: Boolean = false)
-    abstract fun initialize(context: Context, testMode: Boolean = false)
+    abstract fun initialize(activity: Activity, onInitializeComplete: ((Boolean) -> Unit)?=null, testMode: Boolean = false)
+    abstract fun initialize(context: Context, onInitializeComplete: ((Boolean) -> Unit)?=null, testMode: Boolean = false)
     abstract fun enableTestMode(context: Context, deviceId: String? = null)
 
     abstract fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0)
-    abstract fun showInterstitial(activity: Activity, shownWhere:String ,listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
+    abstract fun showInterstitial(activity: Activity, shownWhere: String, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0)
     abstract fun isInterstitialLoaded(placementGroupIndex: Int = 0): Boolean
 
     abstract fun isBannerLoaded(placementGroupIndex: Int = 0): Boolean
@@ -184,7 +185,6 @@ abstract class AdPlatformWrapper(open var appId: String) {
 
         return isValid
     }
-
 
 
 }

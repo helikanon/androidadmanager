@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import androidx.transition.Visibility
 import com.applovin.mediation.*
 import com.applovin.mediation.ads.MaxAdView
 import com.applovin.mediation.ads.MaxInterstitialAd
@@ -32,16 +31,16 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
 
     companion object {
-        var isInitialized = false
+        var isInitializeStarted = false
     }
 
-    override fun initialize(activity: Activity, testMode: Boolean) {
+    override fun initialize(activity: Activity, onInitializeComplete: ((Boolean) -> Unit)?, testMode: Boolean) {
 
 
     }
 
-    override fun initialize(context: Context, testMode: Boolean) {
-        if (isInitialized) return
+    override fun initialize(context: Context, onInitializeComplete: ((Boolean) -> Unit)?, testMode: Boolean) {
+        if (isInitializeStarted || isInitialized) return
 
         val initConfigPrep = AppLovinSdkInitializationConfiguration.builder(appId)
             .setMediationProvider(AppLovinMediationProvider.MAX)
@@ -56,10 +55,14 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
         val initConfig = initConfigPrep.build()
         // AppLovinSdk.getInstance(context).settings.setVerboseLogging(true)
-        AppLovinSdk.getInstance(context).initialize(initConfig) { sdkConfig ->
+        AppLovinSdk.getInstance(context).initialize(initConfig, object : AppLovinSdk.SdkInitializationListener {
+            override fun onSdkInitialized(p0: AppLovinSdkConfiguration?) {
+                isInitialized = true
+                onInitializeComplete?.invoke(true)
+            }
 
-        }
-        isInitialized = true
+        })
+        isInitializeStarted = true
 
     }
 

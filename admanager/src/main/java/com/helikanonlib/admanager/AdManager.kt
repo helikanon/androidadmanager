@@ -80,7 +80,9 @@ class AdManager {
         if (!showAds) return
 
         adPlatforms.forEach forEach@{ platform ->
-            platform.platformInstance.initialize(activity, testMode)
+            platform.platformInstance.initialize(activity, { it ->
+
+            }, testMode)
 
             if (testMode) {
                 platform.platformInstance.enableTestMode(activity.applicationContext, deviceId)
@@ -88,16 +90,40 @@ class AdManager {
         }
     }
 
-    fun initializePlatforms(context: Context) {
+    private var allInitializeCompleteCallbackCalled = false
+    fun initializePlatforms(context: Context, onAllInitializeComplete: () -> Unit, onPlatformInitializeComplete: (platform: AdPlatformModel) -> Unit) {
         if (!showAds) return
+        allInitializeCompleteCallbackCalled = false
 
         adPlatforms.forEach forEach@{ platform ->
-            platform.platformInstance.initialize(context, testMode)
+            platform.platformInstance.initialize(context, { it ->
+                onPlatformInitializeComplete.invoke(platform)
+
+                if (!allInitializeCompleteCallbackCalled) {
+                    if (isAllPlatformsSdksInitialized(context)) {
+                        allInitializeCompleteCallbackCalled = true
+                        onAllInitializeComplete.invoke()
+                    }
+                }
+
+            }, testMode)
 
             if (testMode) {
                 platform.platformInstance.enableTestMode(context, deviceId)
             }
         }
+    }
+
+    fun isAllPlatformsSdksInitialized(context: Context): Boolean {
+        val isInitialized = adPlatforms.all {
+            it.platformInstance.isInitialized
+        }
+
+        return isInitialized
+    }
+
+    fun isPlatformSdkInitialized(context: Context, platform: AdPlatformModel): Boolean {
+        return platform.platformInstance.isInitialized
     }
 
     fun start(activity: Activity) {
@@ -1266,7 +1292,7 @@ class AdManager {
     }
 
     fun applovinCreativeDebugger(activity: Activity) {
-        AppLovinSdk.getInstance( activity ).showCreativeDebugger()
+        AppLovinSdk.getInstance(activity).showCreativeDebugger()
 
     }
 }
