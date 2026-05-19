@@ -53,7 +53,7 @@ class AppOpenAdManager(
         showOrderStr = showOrderStr.lowercase()
 
         if (showOrderStr.contains("applovin") && applovinPlacementId.isNotEmpty()) {
-            applovinAppOpenAd = MaxAppOpenAd(applovinPlacementId, application.applicationContext)
+            applovinAppOpenAd = MaxAppOpenAd(applovinPlacementId)
         }
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)

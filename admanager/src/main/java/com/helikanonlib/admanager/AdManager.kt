@@ -91,13 +91,13 @@ class AdManager {
     }
 
     private var allInitializeCompleteCallbackCalled = false
-    fun initializePlatforms(context: Context, onAllInitializeComplete: () -> Unit, onPlatformInitializeComplete: (platform: AdPlatformModel) -> Unit) {
+    fun initializePlatforms(context: Context, onAllInitializeComplete: () -> Unit, onPlatformInitializeComplete: (platform: AdPlatformTypeEnum) -> Unit) {
         if (!showAds) return
         allInitializeCompleteCallbackCalled = false
 
         adPlatforms.forEach forEach@{ platform ->
             platform.platformInstance.initialize(context, { it ->
-                onPlatformInitializeComplete.invoke(platform)
+                onPlatformInitializeComplete.invoke(platform.platformInstance.platform)
 
                 if (!allInitializeCompleteCallbackCalled) {
                     if (isAllPlatformsSdksInitialized(context)) {
