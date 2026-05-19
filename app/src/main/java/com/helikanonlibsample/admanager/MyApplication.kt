@@ -227,7 +227,7 @@ class MyApplication : Application() {
             }
         }
 
-        adManager.initializePlatforms(applicationContext)
+        adManager.initializePlatforms(applicationContext, {}, { it -> })
 
         // OR
         /*
