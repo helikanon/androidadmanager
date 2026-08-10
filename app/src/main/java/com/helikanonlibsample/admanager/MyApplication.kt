@@ -8,10 +8,12 @@ import com.helikanonlib.admanager.adplatforms.*
 
 class MyApplication : Application() {
 
+    private lateinit var appOpenLifecycleController: AppOpenLifecycleController
+
 
     companion object {
         lateinit var adManager: AdManager
-        var AppOpenAdManager: AppOpenAdManager? = null
+        var appOpenAdManager: AppOpenAdManager? = null
     }
 
 
@@ -20,10 +22,10 @@ class MyApplication : Application() {
 
         initAdManager()
 
-        AppOpenAdManager = AppOpenAdManager(
+        appOpenAdManager = AppOpenAdManager(
             this,
             mutableMapOf(
-                AdPlatformTypeEnum.ADMOB to "ca-app-pub-3940256099942544/3419835294",
+                AdPlatformTypeEnum.ADMOB to "ca-app-pub-3940256099942544/9257395921",
                 AdPlatformTypeEnum.APPLOVIN to "dd9249369deec4ec",
             ),
             "applovin,admob",
@@ -51,13 +53,17 @@ class MyApplication : Application() {
             }
         )
 
-        AppOpenAdManager?.excludedActivities?.add(JavaSampleActivity::class.java.simpleName)
-        AppOpenAdManager?.minElapsedSecondsToNextShow = 10
+        appOpenAdManager?.excludedActivities?.add(JavaSampleActivity::class.java.simpleName)
+        appOpenAdManager?.minElapsedSecondsToNextShow = 10
+
+        appOpenLifecycleController = AppOpenLifecycleController(this) {
+            appOpenAdManager
+        }.also { it.register() }
 
         adManager.initializePlatforms(
             applicationContext,
             onAllInitializeComplete = {
-                AppOpenAdManager?.load()
+                appOpenAdManager?.load()
             },
             onPlatformInitializeComplete = {}
         )
@@ -98,10 +104,10 @@ class MyApplication : Application() {
                                 interstitial = "ca-app-pub-3940256099942544/1033173712",
                                 rewarded = "ca-app-pub-3940256099942544/5224354917",
                                 banner = "ca-app-pub-3940256099942544/6300978111",
-                                mrec = "ca-app-pub-3940256099942544/6300978112",
+                                mrec = "ca-app-pub-3940256099942544/9214589741",
                                 native = "ca-app-pub-3940256099942544/2247696110",
-                                appOpenAd = "ca-app-pub-3940256099942544/3419835294",
-                                nativeMedium = ""
+                                appOpenAd = "ca-app-pub-3940256099942544/9257395921",
+                                nativeMedium = "ca-app-pub-3940256099942544/1044960115"
                             )
                         )
                         /*placementGroups.add(

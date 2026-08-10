@@ -37,13 +37,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onStart() {
-        super.onStart()
-
-        // App-open lifecycle is owned by the host app, not by the library.
-        MyApplication.AppOpenAdManager?.onStart(this)
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -129,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnLoadAppOpenAd.setOnClickListener {
-            MyApplication.AppOpenAdManager?.show("admob,applovin", this, null)
+            MyApplication.appOpenAdManager?.show(this)
 
             //MyApplication.admobAppOpenAdManager?.disable()
         }

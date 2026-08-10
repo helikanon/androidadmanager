@@ -79,14 +79,17 @@ class AppOpenAdManager(
         adOpenPlacementId = "ca-app-pub-3940256099942544/3419835294"
     }*/
 
-    /**
-     * Entry point for an app-owned lifecycle event. The library intentionally does not
-     * register any lifecycle observer or activity callback.
-     */
+    /** Shows immediately using the configured platform order. */
     @JvmOverloads
-    fun onStart(activity: Activity, listener: AdPlatformShowListener? = null) {
-        if (!isEnabled || !isShowingEnabled || isActivityExcluded(activity) || !hasShowIntervalElapsed()) return
+    fun show(activity: Activity, listener: AdPlatformShowListener? = null) {
         show(showOrderStr, activity, listener)
+    }
+
+    /** Shows only when the minimum interval has elapsed and the activity is not excluded. */
+    @JvmOverloads
+    fun showIntervalElapsed(activity: Activity, listener: AdPlatformShowListener? = null) {
+        if (!isEnabled || !isShowingEnabled || isActivityExcluded(activity) || !hasShowIntervalElapsed()) return
+        show(activity, listener)
     }
 
     fun isActivityExcluded(activity: Activity): Boolean {

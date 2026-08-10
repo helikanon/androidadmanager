@@ -72,9 +72,10 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             group.interstitial = "ca-app-pub-3940256099942544/1033173712"
             group.banner = "ca-app-pub-3940256099942544/6300978111"
             group.rewarded = "ca-app-pub-3940256099942544/5224354917"
-            group.mrec = "ca-app-pub-3940256099942544/6300978111"
+            group.mrec = "ca-app-pub-3940256099942544/9214589741"
             group.native = "ca-app-pub-3940256099942544/2247696110"
-            group.appOpenAd = "ca-app-pub-3940256099942544/3419835294"
+            group.nativeMedium = "ca-app-pub-3940256099942544/1044960115"
+            group.appOpenAd = "ca-app-pub-3940256099942544/9257395921"
         }
 
     }

@@ -70,6 +70,7 @@ dependencies {
 
 
     implementation("androidx.recyclerview:recyclerview:1.4.0")
+    implementation("androidx.lifecycle:lifecycle-process:2.10.0")
     implementation("com.google.android.gms:play-services-ads:25.4.0")
     implementation(project(":admanager"))
 

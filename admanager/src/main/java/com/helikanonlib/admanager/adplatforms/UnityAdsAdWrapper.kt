@@ -5,10 +5,17 @@ import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.helikanonlib.admanager.*
+import com.helikanonlib.admanager.AdErrorMode
+import com.helikanonlib.admanager.AdFormatEnum
+import com.helikanonlib.admanager.AdPlatformLoadListener
+import com.helikanonlib.admanager.AdPlatformShowListener
+import com.helikanonlib.admanager.AdPlatformTypeEnum
+import com.helikanonlib.admanager.AdPlatformWrapper
 import com.unity3d.ads.IUnityAdsInitializationListener
 import com.unity3d.ads.IUnityAdsLoadListener
 import com.unity3d.ads.IUnityAdsShowListener
+import com.unity3d.ads.InitializationConfiguration
+import com.unity3d.ads.InitializationListener
 import com.unity3d.ads.UnityAds
 import com.unity3d.services.banners.BannerErrorInfo
 import com.unity3d.services.banners.BannerView
@@ -48,17 +55,19 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             }
         })*/
-        UnityAds.initialize(context, appId, testMode, object : IUnityAdsInitializationListener {
-            override fun onInitializationComplete() {
+        val config = InitializationConfiguration.Builder(appId)
+            .withTestMode(testMode)
+            .build()
+
+        val listener: InitializationListener = InitializationListener { error ->
+            if (error == null) {
                 isInitialized = true
                 onInitializeComplete?.invoke(true)
-            }
-
-            override fun onInitializationFailed(error: UnityAds.UnityAdsInitializationError?, message: String?) {
+            } else {
                 onInitializeComplete?.invoke(false)
             }
-
-        })
+        }
+        UnityAds.initialize(config, listener)
 
         isInitializeStarted = true
     }
