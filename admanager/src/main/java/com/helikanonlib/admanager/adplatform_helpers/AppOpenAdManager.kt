@@ -2,6 +2,12 @@ package com.helikanonlib.admanager
 
 import android.app.Activity
 import android.app.Application
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import android.util.Log
+import androidx.annotation.CheckResult
+import androidx.annotation.MainThread
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.MaxAdListener
 import com.applovin.mediation.MaxError
@@ -14,432 +20,529 @@ import com.google.android.gms.ads.appopen.AppOpenAd
 import java.util.Date
 import java.util.Locale
 
+enum class AppOpenAdShowResult {
+    SHOW_REQUESTED,
+    QUEUED_ON_MAIN_THREAD,
+    DISABLED,
+    SHOWING_PAUSED,
+    ALREADY_SHOWING,
+    INVALID_ACTIVITY,
+    ACTIVITY_EXCLUDED,
+    INTERVAL_NOT_ELAPSED,
+    AD_NOT_READY,
+    NO_CONFIGURED_PLATFORM,
+    REQUEST_FAILED
+}
+
 class AppOpenAdManager(
-    val application: Application,
-    // var admobAppOpenPlacementId: String = "ca-app-pub-3940256099942544/3419835294",
-    var placements: MutableMap<AdPlatformTypeEnum, String> = mutableMapOf(),
-    var showOrderStr: String = "admob",
+    private val application: Application,
+    placements: Map<AdPlatformTypeEnum, String> = emptyMap(),
+    showOrderStr: String = "admob",
     var globalShowListener: AdPlatformShowListener? = null,
-    var globalLoadListener: AdPlatformLoadListener? = null,
+    var globalLoadListener: AdPlatformLoadListener? = null
+) {
+    val placements: Map<AdPlatformTypeEnum, String> = placements.toMap()
+    val showOrderStr: String = normalizeShowOrder(showOrderStr).joinToString(",")
 
-    ) {
-    //var platform = AdPlatformTypeEnum.ADMOB
+    private val defaultShowOrder = normalizeShowOrder(this.showOrderStr)
+    private val admobPlacementId = this.placements[AdPlatformTypeEnum.ADMOB].orEmpty()
+    private val applovinPlacementId = this.placements[AdPlatformTypeEnum.APPLOVIN].orEmpty()
+    private val applovinAppOpenAd: MaxAppOpenAd? = applovinPlacementId
+        .takeIf(String::isNotBlank)
+        ?.let(::MaxAppOpenAd)
 
-    var admobPlacementId = ""
+    private val mainHandler = Handler(Looper.getMainLooper())
     private var admobAppOpenAd: AppOpenAd? = null
-    private var admobLoadTime: Long = 0
+    private var admobLoadElapsedRealtime = 0L
+    private var applovinLoadElapsedRealtime = 0L
 
-    var applovinPlacementId = ""
-    private var applovinAppOpenAd: MaxAppOpenAd? = null
-    private var applovinLoadTime: Long = 0
-
-
-    // private val adOpenPlacementId = "ca-app-pub-3940256099942544/3419835294"
-    @Volatile
     private var isShowing = false
     private var isAdmobLoading = false
     private var isApplovinLoading = false
+    private var admobLoadGeneration = 0
+    private var applovinLoadGeneration = 0
     private val pendingAdmobLoadListeners = mutableListOf<AdPlatformLoadListener>()
     private val pendingApplovinLoadListeners = mutableListOf<AdPlatformLoadListener>()
 
+    private var lastShowElapsedRealtime: Long? = null
     var lastShowDate: Date? = null
+        private set
+
     var minElapsedSecondsToNextShow = 10
-    /** When false, neither loading nor showing is allowed. */
+
     var isEnabled = true
+        private set
 
-    /**
-     * Backwards-compatible alias. Prefer [isEnabled], [enable] and [disable].
-     */
-    @Deprecated("Use isEnabled instead", ReplaceWith("isEnabled"))
-    var isEnable: Boolean
-        get() = isEnabled
-        set(value) {
-            isEnabled = value
-        }
-
-    /** Temporarily controls showing without preventing ads from loading. */
     var isShowingEnabled = true
         private set
 
     var excludedActivities = arrayListOf<String>()
 
-
-    init {
-        admobPlacementId = placements[AdPlatformTypeEnum.ADMOB].orEmpty()
-        applovinPlacementId = placements[AdPlatformTypeEnum.APPLOVIN].orEmpty()
-        showOrderStr = normalizeShowOrder(showOrderStr).joinToString(",")
-
-        if ("applovin" in normalizeShowOrder(showOrderStr) && applovinPlacementId.isNotEmpty()) {
-            applovinAppOpenAd = MaxAppOpenAd(applovinPlacementId)
-        }
-
+    /** Shows immediately using the configured platform order. */
+    @CheckResult
+    @JvmOverloads
+    fun show(activity: Activity, listener: AdPlatformShowListener? = null): AppOpenAdShowResult {
+        return show(defaultShowOrder, activity, listener, checkIntervalAndExclusion = false)
     }
 
-    /*fun enableTestMode() {
-        adOpenPlacementId = "ca-app-pub-3940256099942544/3419835294"
-    }*/
-
-    /** Shows immediately using the configured platform order. */
+    /** Shows immediately using a one-off platform order. */
+    @CheckResult
     @JvmOverloads
-    fun show(activity: Activity, listener: AdPlatformShowListener? = null) {
-        show(showOrderStr, activity, listener)
+    fun show(showOrder: String, activity: Activity, listener: AdPlatformShowListener? = null): AppOpenAdShowResult {
+        return show(normalizeShowOrder(showOrder), activity, listener, checkIntervalAndExclusion = false)
     }
 
     /** Shows only when the minimum interval has elapsed and the activity is not excluded. */
+    @CheckResult
     @JvmOverloads
-    fun showIntervalElapsed(activity: Activity, listener: AdPlatformShowListener? = null) {
-        if (!isEnabled || !isShowingEnabled || isActivityExcluded(activity) || !hasShowIntervalElapsed()) return
-        show(activity, listener)
+    fun showIntervalElapsed(activity: Activity, listener: AdPlatformShowListener? = null): AppOpenAdShowResult {
+        return show(defaultShowOrder, activity, listener, checkIntervalAndExclusion = true)
+    }
+
+    private fun show(
+        showOrder: List<String>,
+        activity: Activity,
+        listener: AdPlatformShowListener?,
+        checkIntervalAndExclusion: Boolean
+    ): AppOpenAdShowResult {
+        if (!isMainThread()) {
+            mainHandler.post { show(showOrder, activity, listener, checkIntervalAndExclusion) }
+            return AppOpenAdShowResult.QUEUED_ON_MAIN_THREAD
+        }
+
+        if (!isEnabled) return AppOpenAdShowResult.DISABLED
+        if (!isShowingEnabled) return AppOpenAdShowResult.SHOWING_PAUSED
+        if (activity.isFinishing || activity.isDestroyed) return AppOpenAdShowResult.INVALID_ACTIVITY
+        if (isShowing) return AppOpenAdShowResult.ALREADY_SHOWING
+
+        if (checkIntervalAndExclusion) {
+            if (isActivityExcluded(activity)) return AppOpenAdShowResult.ACTIVITY_EXCLUDED
+            if (!hasShowIntervalElapsed()) return AppOpenAdShowResult.INTERVAL_NOT_ELAPSED
+        }
+
+        val configuredOrder = showOrder.filter(::isPlatformConfigured)
+        if (configuredOrder.isEmpty()) {
+            notifyShowError(listener, "No app open placement is configured for the show order", null)
+            return AppOpenAdShowResult.NO_CONFIGURED_PLATFORM
+        }
+
+        val selectedPlatform = configuredOrder.firstOrNull { platformName ->
+            when (platformName) {
+                ADMOB -> isAdmobAdLoaded()
+                APPLOVIN -> isApplovinAdLoaded()
+                else -> false
+            }
+        }
+
+        if (selectedPlatform == null) {
+            load(configuredOrder, null)
+            notifyShowError(listener, "App open ad is not ready; a load was requested", null)
+            return AppOpenAdShowResult.AD_NOT_READY
+        }
+
+        isShowing = true
+        val forwardingListener = createShowListener(listener, configuredOrder)
+        val requested = when (selectedPlatform) {
+            ADMOB -> requestAdmobShow(activity, forwardingListener)
+            APPLOVIN -> requestApplovinShow(forwardingListener)
+            else -> false
+        }
+
+        if (requested != true) {
+            isShowing = false
+            return AppOpenAdShowResult.REQUEST_FAILED
+        }
+        return AppOpenAdShowResult.SHOW_REQUESTED
     }
 
     fun isActivityExcluded(activity: Activity): Boolean {
         return activity.javaClass.simpleName in excludedActivities || activity.javaClass.name in excludedActivities
     }
 
-    fun hasShowIntervalElapsed(nowMillis: Long = System.currentTimeMillis()): Boolean {
-        return AppOpenAdPolicy.hasShowIntervalElapsed(lastShowDate?.time, minElapsedSecondsToNextShow, nowMillis)
+    fun hasShowIntervalElapsed(nowElapsedRealtime: Long = SystemClock.elapsedRealtime()): Boolean {
+        return AppOpenAdPolicy.hasShowIntervalElapsed(
+            lastShowElapsedRealtime,
+            minElapsedSecondsToNextShow,
+            nowElapsedRealtime
+        )
     }
 
     @JvmOverloads
     fun load(listener: AdPlatformLoadListener? = null) {
-        if (!isEnabled) return
-
-        val _listener = object : AdPlatformLoadListener() {
-            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
-                super.onLoaded(adPlatformEnum)
-
-                globalLoadListener?.onLoaded(adPlatformEnum)
-                listener?.onLoaded(adPlatformEnum)
-            }
-
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                super.onError(errorMode, errorMessage, adPlatformEnum)
-
-                globalLoadListener?.onError(errorMode, errorMessage, adPlatformEnum)
-                listener?.onError(errorMode, errorMessage, adPlatformEnum)
-            }
-
-        }
-
-        val showOrder = normalizeShowOrder(showOrderStr)
-        var didStartLoad = false
-        if ("admob" in showOrder && admobPlacementId.isNotEmpty()) {
-            didStartLoad = true
-            loadAdmob(_listener)
-        }
-
-        if ("applovin" in showOrder && applovinAppOpenAd != null && applovinPlacementId.isNotEmpty()) {
-            didStartLoad = true
-            loadApplovin(_listener)
-        }
-
-        if (!didStartLoad) {
-            _listener.onError(AdErrorMode.MANAGER, "No app open placement is configured for the show order", null)
-        }
+        runOnMain { load(defaultShowOrder, listener) }
     }
 
-    fun show(showOrder: String, activity: Activity, listener: AdPlatformShowListener? = null) {
-        if (!isEnabled || !isShowingEnabled) return
-        if (isShowing) return
-
-        val _listener = object : AdPlatformShowListener() {
-            override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
-                super.onDisplayed(adPlatformEnum)
-                isShowing = true
-                lastShowDate = Date()
-
-                globalShowListener?.onDisplayed(adPlatformEnum)
-                listener?.onDisplayed(adPlatformEnum)
-            }
-
-            override fun onClicked(adPlatformEnum: AdPlatformTypeEnum?) {
-                super.onClicked(adPlatformEnum)
-
-                globalShowListener?.onClicked(adPlatformEnum)
-                listener?.onClicked(adPlatformEnum)
-            }
-
-            override fun onClosed(adPlatformEnum: AdPlatformTypeEnum?) {
-                super.onClosed(adPlatformEnum)
-
-                isShowing = false
-                lastShowDate = Date() // kapattığında bunu güncellemeliyiz gösterdiğinde güncellememizin nedeni işimizi sağlama alalım
-                globalShowListener?.onClosed(adPlatformEnum)
-                listener?.onClosed(adPlatformEnum)
-
-                load()
-            }
-
-            override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum?) {
-                super.onRewarded(type, amount, adPlatformEnum)
-
-                globalShowListener?.onRewarded(type, amount, adPlatformEnum)
-                listener?.onRewarded(type, amount, adPlatformEnum)
-            }
-
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                super.onError(errorMode, errorMessage, adPlatformEnum)
-
-                isShowing = false
-
-                globalShowListener?.onError(errorMode, errorMessage, adPlatformEnum)
-                listener?.onError(errorMode, errorMessage, adPlatformEnum)
-
-                load()
-            }
-
+    @MainThread
+    private fun load(showOrder: List<String>, listener: AdPlatformLoadListener?) {
+        if (!isEnabled) {
+            notifyLoadError(listener, DISABLED_LOAD_MESSAGE, null)
+            return
         }
 
-        var isShowed = false
-        val showOrderArr = normalizeShowOrder(showOrder)
-
-        for (i in 0 until showOrderArr.size) {
-            val platformName = showOrderArr[i]
-            if (platformName == "admob" && isAdmobAdLoaded()) {
-                isShowed = true
-                isShowing = true
-                showAdmob(activity, _listener)
-                break
-            } else if (platformName == "applovin" && isApplovinAdLoaded()) {
-                isShowed = true
-                isShowing = true
-                showApplovin(activity, _listener)
-                break
-            }
+        val configuredOrder = showOrder.filter(::isPlatformConfigured)
+        if (configuredOrder.isEmpty()) {
+            notifyLoadError(listener, "No app open placement is configured for the show order", null)
+            return
         }
 
-        if (!isShowed) {
-            load()
-            globalShowListener?.onError(AdErrorMode.MANAGER, "adopen >> noads loaded to show", null)
-            listener?.onError(AdErrorMode.MANAGER, "adopen >> noads loaded to show", null)
-        }
+        val forwardingListener = createLoadListener(listener)
+        if (ADMOB in configuredOrder) enqueueAdmobLoad(forwardingListener)
+        if (APPLOVIN in configuredOrder) enqueueApplovinLoad(forwardingListener)
     }
 
     fun disable() {
-        isEnabled = false
+        runOnMain {
+            if (!isEnabled) return@runOnMain
+            isEnabled = false
+            admobLoadGeneration++
+            applovinLoadGeneration++
+            cancelPendingLoads()
+        }
     }
 
     fun enable() {
-        isEnabled = true
+        runOnMain { isEnabled = true }
     }
 
     /** Prevents show calls while still allowing preloading. */
     fun pauseShowing() {
-        isShowingEnabled = false
+        runOnMain { isShowingEnabled = false }
     }
 
     /** Re-enables show calls. This does not show an ad automatically. */
     fun resumeShowing() {
-        isShowingEnabled = true
+        runOnMain { isShowingEnabled = true }
     }
 
-
-    // APPLOVIN
-    fun loadApplovin(listener: AdPlatformLoadListener?) {
-        val platform = AdPlatformTypeEnum.APPLOVIN
-
-        if (!isEnabled) return
-        if (applovinPlacementId.isBlank() || applovinAppOpenAd == null) {
-            listener?.onError(AdErrorMode.MANAGER, "APPLOVIN app open placement is not configured", platform)
-            return
-        }
-
-        if (isApplovinAdLoaded()) {
-            listener?.onLoaded(platform)
-            return
-        }
-        listener?.let(pendingApplovinLoadListeners::add)
-        if (isApplovinLoading) return
-        isApplovinLoading = true
-        applovinAppOpenAd?.setListener(object : MaxAdListener {
-            override fun onAdLoaded(ad: MaxAd) {
-                isApplovinLoading = false
-                if (!isEnabled) {
-                    applovinLoadTime = 0
-                    pendingApplovinLoadListeners.clear()
-                    return
-                }
-                applovinLoadTime = Date().time
-                pendingApplovinLoadListeners.toList().also(pendingApplovinLoadListeners::removeAll)
-                    .forEach { it.onLoaded(platform) }
-            }
-
-            override fun onAdDisplayed(ad: MaxAd) {
-
-            }
-
-            override fun onAdHidden(ad: MaxAd) {
-
-            }
-
-            override fun onAdClicked(ad: MaxAd) {
-                // Load listeners do not expose click events.
-            }
-
-            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
-                isApplovinLoading = false
-                if (!isEnabled) {
-                    pendingApplovinLoadListeners.clear()
-                    return
-                }
-                pendingApplovinLoadListeners.toList().also(pendingApplovinLoadListeners::removeAll)
-                    .forEach { it.onError(AdErrorMode.PLATFORM, error.message, platform) }
-            }
-
-            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
-
-            }
-
-        })
-        applovinAppOpenAd?.loadAd()
-    }
-
-    fun showApplovin(@Suppress("UNUSED_PARAMETER") activity: Activity, listener: AdPlatformShowListener? = null) {
-        val platform = AdPlatformTypeEnum.APPLOVIN
-
-        if (!isEnabled || !isShowingEnabled) return
-
-        if (!isApplovinAdLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} adopen >> noads loaded", platform)
-            return
-        }
-
-        applovinAppOpenAd?.setListener(object : MaxAdListener {
-            override fun onAdLoaded(ad: MaxAd) {
-            }
-
-            override fun onAdDisplayed(ad: MaxAd) {
-                listener?.onDisplayed(platform)
-            }
-
-            override fun onAdHidden(ad: MaxAd) {
-                listener?.onClosed(platform)
-            }
-
-            override fun onAdClicked(ad: MaxAd) {
-                listener?.onClicked(platform)
-            }
-
-            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
-
-            }
-
-            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
-                listener?.onError(AdErrorMode.PLATFORM, error.message, platform)
-            }
-
-        })
-        applovinAppOpenAd?.showAd()
-    }
-
-
-    private fun applovinWasLoadTimeLessThanNHoursAgo(numHours: Long): Boolean {
-        val dateDifference: Long = Date().time - this.applovinLoadTime
-        val numMilliSecondsPerHour: Long = 3600000
-        return dateDifference < (numMilliSecondsPerHour * numHours)
-    }
-
-    fun isApplovinAdLoaded(): Boolean {
-        return applovinAppOpenAd != null
-                && applovinWasLoadTimeLessThanNHoursAgo(4)
-                && applovinAppOpenAd?.isReady ?: false
-    }
-
-    // ADMOB
-    fun loadAdmob(listener: AdPlatformLoadListener?) {
-        val platform = AdPlatformTypeEnum.ADMOB
-
-        if (!isEnabled) return
-        if (admobPlacementId.isBlank()) {
-            listener?.onError(AdErrorMode.MANAGER, "ADMOB app open placement is not configured", platform)
-            return
-        }
-
+    @MainThread
+    private fun enqueueAdmobLoad(listener: AdPlatformLoadListener) {
         if (isAdmobAdLoaded()) {
-            listener?.onLoaded(platform)
+            safeListenerCall { listener.onLoaded(AdPlatformTypeEnum.ADMOB) }
             return
         }
-        listener?.let(pendingAdmobLoadListeners::add)
-        if (isAdmobLoading) return
+
+        pendingAdmobLoadListeners.add(listener)
+        if (!isAdmobLoading) startAdmobLoad()
+    }
+
+    @MainThread
+    private fun startAdmobLoad() {
+        if (!isEnabled || isAdmobLoading || pendingAdmobLoadListeners.isEmpty()) return
         isAdmobLoading = true
+        val requestGeneration = admobLoadGeneration
 
-        val request: AdRequest = AdRequest.Builder().build()
-        // AppOpenAd.load(application, admobPlacementId, request, AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT, object : AppOpenAd.AppOpenAdLoadCallback() {
-        AppOpenAd.load(application, admobPlacementId, request, object : AppOpenAd.AppOpenAdLoadCallback() {
-            override fun onAdLoaded(ad: AppOpenAd) {
-                isAdmobLoading = false
-                if (!isEnabled) {
-                    admobAppOpenAd = null
-                    admobLoadTime = 0
-                    pendingAdmobLoadListeners.clear()
-                    return
+        try {
+            AppOpenAd.load(
+                application,
+                admobPlacementId,
+                AdRequest.Builder().build(),
+                object : AppOpenAd.AppOpenAdLoadCallback() {
+                    override fun onAdLoaded(ad: AppOpenAd) {
+                        runOnMain { handleAdmobLoaded(requestGeneration, ad) }
+                    }
+
+                    override fun onAdFailedToLoad(error: LoadAdError) {
+                        runOnMain { handleAdmobLoadFailed(requestGeneration, error.message) }
+                    }
                 }
-                admobAppOpenAd = ad
-                admobLoadTime = Date().time
-
-                pendingAdmobLoadListeners.toList().also(pendingAdmobLoadListeners::removeAll)
-                    .forEach { it.onLoaded(platform) }
+            )
+        } catch (error: Exception) {
+            isAdmobLoading = false
+            drainAdmobLoadListeners().forEach {
+                safeListenerCall { it.onError(AdErrorMode.PLATFORM, error.message.orEmpty(), AdPlatformTypeEnum.ADMOB) }
             }
-
-            override fun onAdFailedToLoad(p0: LoadAdError) {
-                isAdmobLoading = false
-                admobAppOpenAd = null
-                admobLoadTime = 0
-                if (!isEnabled) {
-                    pendingAdmobLoadListeners.clear()
-                    return
-                }
-                pendingAdmobLoadListeners.toList().also(pendingAdmobLoadListeners::removeAll)
-                    .forEach { it.onError(AdErrorMode.PLATFORM, p0.message, platform) }
-            }
-        })
+        }
     }
 
-
-    fun showAdmob(activity: Activity, listener: AdPlatformShowListener? = null) {
-        val platform = AdPlatformTypeEnum.ADMOB
-
-        if (!isEnabled || !isShowingEnabled) return
-
-        if (!isAdmobAdLoaded()) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} adopen >> noads loaded", platform)
+    @MainThread
+    private fun handleAdmobLoaded(requestGeneration: Int, ad: AppOpenAd) {
+        isAdmobLoading = false
+        if (requestGeneration != admobLoadGeneration || !isEnabled) {
+            admobAppOpenAd = null
+            admobLoadElapsedRealtime = 0L
+            if (isEnabled && pendingAdmobLoadListeners.isNotEmpty()) startAdmobLoad()
             return
         }
 
-        admobAppOpenAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-
-            override fun onAdFailedToShowFullScreenContent(error: AdError) {
-                super.onAdFailedToShowFullScreenContent(error)
-                admobAppOpenAd = null
-                admobLoadTime = 0
-                listener?.onError(AdErrorMode.PLATFORM, error.message, platform)
-            }
-
-            override fun onAdShowedFullScreenContent() {
-                //lastShowDate = Date()
-                listener?.onDisplayed(platform)
-            }
-
-            override fun onAdDismissedFullScreenContent() {
-                // lastShowDate = Date() // kapattığında bunu güncellemeliyiz gösterdiğinde güncellememizin nedeni işimizi sağlama alalım
-                admobAppOpenAd = null
-
-                listener?.onClosed(platform)
-            }
-
+        admobAppOpenAd = ad
+        admobLoadElapsedRealtime = SystemClock.elapsedRealtime()
+        drainAdmobLoadListeners().forEach {
+            safeListenerCall { it.onLoaded(AdPlatformTypeEnum.ADMOB) }
         }
-        admobAppOpenAd?.show(activity)
     }
 
+    @MainThread
+    private fun handleAdmobLoadFailed(requestGeneration: Int, errorMessage: String) {
+        isAdmobLoading = false
+        admobAppOpenAd = null
+        admobLoadElapsedRealtime = 0L
+        if (requestGeneration != admobLoadGeneration || !isEnabled) {
+            if (isEnabled && pendingAdmobLoadListeners.isNotEmpty()) startAdmobLoad()
+            return
+        }
 
-    private fun admobWasLoadTimeLessThanNHoursAgo(numHours: Long): Boolean {
-        val dateDifference: Long = Date().time - this.admobLoadTime
-        val numMilliSecondsPerHour: Long = 3600000
-        return dateDifference < (numMilliSecondsPerHour * numHours)
+        drainAdmobLoadListeners().forEach {
+            safeListenerCall { it.onError(AdErrorMode.PLATFORM, errorMessage, AdPlatformTypeEnum.ADMOB) }
+        }
     }
 
-    fun isAdmobAdLoaded(): Boolean {
-        return admobAppOpenAd != null && admobWasLoadTimeLessThanNHoursAgo(4)
+    @MainThread
+    private fun enqueueApplovinLoad(listener: AdPlatformLoadListener) {
+        if (isApplovinAdLoaded()) {
+            safeListenerCall { listener.onLoaded(AdPlatformTypeEnum.APPLOVIN) }
+            return
+        }
+
+        pendingApplovinLoadListeners.add(listener)
+        if (!isApplovinLoading) startApplovinLoad()
+    }
+
+    @MainThread
+    private fun startApplovinLoad() {
+        val appOpenAd = applovinAppOpenAd ?: return
+        if (!isEnabled || isApplovinLoading || pendingApplovinLoadListeners.isEmpty()) return
+        isApplovinLoading = true
+        val requestGeneration = applovinLoadGeneration
+
+        appOpenAd.setListener(object : MaxAdListener {
+            override fun onAdLoaded(ad: MaxAd) {
+                runOnMain { handleApplovinLoaded(requestGeneration) }
+            }
+
+            override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
+                runOnMain { handleApplovinLoadFailed(requestGeneration, error.message) }
+            }
+
+            override fun onAdDisplayed(ad: MaxAd) = Unit
+            override fun onAdHidden(ad: MaxAd) = Unit
+            override fun onAdClicked(ad: MaxAd) = Unit
+            override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) = Unit
+        })
+
+        try {
+            appOpenAd.loadAd()
+        } catch (error: Exception) {
+            isApplovinLoading = false
+            drainApplovinLoadListeners().forEach {
+                safeListenerCall { it.onError(AdErrorMode.PLATFORM, error.message.orEmpty(), AdPlatformTypeEnum.APPLOVIN) }
+            }
+        }
+    }
+
+    @MainThread
+    private fun handleApplovinLoaded(requestGeneration: Int) {
+        isApplovinLoading = false
+        if (requestGeneration != applovinLoadGeneration || !isEnabled) {
+            applovinLoadElapsedRealtime = 0L
+            if (isEnabled && pendingApplovinLoadListeners.isNotEmpty()) startApplovinLoad()
+            return
+        }
+
+        applovinLoadElapsedRealtime = SystemClock.elapsedRealtime()
+        drainApplovinLoadListeners().forEach {
+            safeListenerCall { it.onLoaded(AdPlatformTypeEnum.APPLOVIN) }
+        }
+    }
+
+    @MainThread
+    private fun handleApplovinLoadFailed(requestGeneration: Int, errorMessage: String) {
+        isApplovinLoading = false
+        applovinLoadElapsedRealtime = 0L
+        if (requestGeneration != applovinLoadGeneration || !isEnabled) {
+            if (isEnabled && pendingApplovinLoadListeners.isNotEmpty()) startApplovinLoad()
+            return
+        }
+
+        drainApplovinLoadListeners().forEach {
+            safeListenerCall { it.onError(AdErrorMode.PLATFORM, errorMessage, AdPlatformTypeEnum.APPLOVIN) }
+        }
+    }
+
+    @MainThread
+    private fun requestAdmobShow(activity: Activity, listener: AdPlatformShowListener): Boolean? {
+        val ad = admobAppOpenAd ?: return null
+        return try {
+            ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdFailedToShowFullScreenContent(error: AdError) {
+                    runOnMain {
+                        admobAppOpenAd = null
+                        admobLoadElapsedRealtime = 0L
+                        listener.onError(AdErrorMode.PLATFORM, error.message, AdPlatformTypeEnum.ADMOB)
+                    }
+                }
+
+                override fun onAdShowedFullScreenContent() {
+                    runOnMain { listener.onDisplayed(AdPlatformTypeEnum.ADMOB) }
+                }
+
+                override fun onAdDismissedFullScreenContent() {
+                    runOnMain {
+                        admobAppOpenAd = null
+                        admobLoadElapsedRealtime = 0L
+                        listener.onClosed(AdPlatformTypeEnum.ADMOB)
+                    }
+                }
+            }
+            ad.show(activity)
+            true
+        } catch (error: Exception) {
+            admobAppOpenAd = null
+            admobLoadElapsedRealtime = 0L
+            listener.onError(AdErrorMode.PLATFORM, error.message.orEmpty(), AdPlatformTypeEnum.ADMOB)
+            false
+        }
+    }
+
+    @MainThread
+    private fun requestApplovinShow(listener: AdPlatformShowListener): Boolean? {
+        val appOpenAd = applovinAppOpenAd ?: return null
+        return try {
+            appOpenAd.setListener(object : MaxAdListener {
+                override fun onAdDisplayed(ad: MaxAd) {
+                    runOnMain { listener.onDisplayed(AdPlatformTypeEnum.APPLOVIN) }
+                }
+
+                override fun onAdHidden(ad: MaxAd) {
+                    runOnMain {
+                        applovinLoadElapsedRealtime = 0L
+                        listener.onClosed(AdPlatformTypeEnum.APPLOVIN)
+                    }
+                }
+
+                override fun onAdClicked(ad: MaxAd) {
+                    runOnMain { listener.onClicked(AdPlatformTypeEnum.APPLOVIN) }
+                }
+
+                override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
+                    runOnMain {
+                        applovinLoadElapsedRealtime = 0L
+                        listener.onError(AdErrorMode.PLATFORM, error.message, AdPlatformTypeEnum.APPLOVIN)
+                    }
+                }
+
+                override fun onAdLoaded(ad: MaxAd) = Unit
+                override fun onAdLoadFailed(adUnitId: String, error: MaxError) = Unit
+            })
+            appOpenAd.showAd()
+            true
+        } catch (error: Exception) {
+            applovinLoadElapsedRealtime = 0L
+            listener.onError(AdErrorMode.PLATFORM, error.message.orEmpty(), AdPlatformTypeEnum.APPLOVIN)
+            false
+        }
+    }
+
+    private fun createShowListener(
+        listener: AdPlatformShowListener?,
+        showOrder: List<String>
+    ) = object : AdPlatformShowListener() {
+        override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
+            recordShowTime()
+            safeListenerCall { globalShowListener?.onDisplayed(adPlatformEnum) }
+            safeListenerCall { listener?.onDisplayed(adPlatformEnum) }
+        }
+
+        override fun onClicked(adPlatformEnum: AdPlatformTypeEnum?) {
+            safeListenerCall { globalShowListener?.onClicked(adPlatformEnum) }
+            safeListenerCall { listener?.onClicked(adPlatformEnum) }
+        }
+
+        override fun onClosed(adPlatformEnum: AdPlatformTypeEnum?) {
+            isShowing = false
+            recordShowTime()
+            safeListenerCall { globalShowListener?.onClosed(adPlatformEnum) }
+            safeListenerCall { listener?.onClosed(adPlatformEnum) }
+            load(showOrder, null)
+        }
+
+        override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum?) {
+            safeListenerCall { globalShowListener?.onRewarded(type, amount, adPlatformEnum) }
+            safeListenerCall { listener?.onRewarded(type, amount, adPlatformEnum) }
+        }
+
+        override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+            isShowing = false
+            safeListenerCall { globalShowListener?.onError(errorMode, errorMessage, adPlatformEnum) }
+            safeListenerCall { listener?.onError(errorMode, errorMessage, adPlatformEnum) }
+            load(showOrder, null)
+        }
+    }
+
+    private fun createLoadListener(listener: AdPlatformLoadListener?) = object : AdPlatformLoadListener() {
+        override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+            safeListenerCall { globalLoadListener?.onLoaded(adPlatformEnum) }
+            safeListenerCall { listener?.onLoaded(adPlatformEnum) }
+        }
+
+        override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+            safeListenerCall { globalLoadListener?.onError(errorMode, errorMessage, adPlatformEnum) }
+            safeListenerCall { listener?.onError(errorMode, errorMessage, adPlatformEnum) }
+        }
+    }
+
+    @MainThread
+    private fun cancelPendingLoads() {
+        drainAdmobLoadListeners().forEach {
+            safeListenerCall { it.onError(AdErrorMode.MANAGER, DISABLED_LOAD_MESSAGE, AdPlatformTypeEnum.ADMOB) }
+        }
+        drainApplovinLoadListeners().forEach {
+            safeListenerCall { it.onError(AdErrorMode.MANAGER, DISABLED_LOAD_MESSAGE, AdPlatformTypeEnum.APPLOVIN) }
+        }
+    }
+
+    private fun drainAdmobLoadListeners(): List<AdPlatformLoadListener> {
+        return pendingAdmobLoadListeners.toList().also { pendingAdmobLoadListeners.clear() }
+    }
+
+    private fun drainApplovinLoadListeners(): List<AdPlatformLoadListener> {
+        return pendingApplovinLoadListeners.toList().also { pendingApplovinLoadListeners.clear() }
+    }
+
+    private fun notifyShowError(
+        listener: AdPlatformShowListener?,
+        message: String,
+        platform: AdPlatformTypeEnum?
+    ) {
+        safeListenerCall { globalShowListener?.onError(AdErrorMode.MANAGER, message, platform) }
+        safeListenerCall { listener?.onError(AdErrorMode.MANAGER, message, platform) }
+    }
+
+    private fun notifyLoadError(
+        listener: AdPlatformLoadListener?,
+        message: String,
+        platform: AdPlatformTypeEnum?
+    ) {
+        safeListenerCall { globalLoadListener?.onError(AdErrorMode.MANAGER, message, platform) }
+        safeListenerCall { listener?.onError(AdErrorMode.MANAGER, message, platform) }
+    }
+
+    private fun recordShowTime() {
+        lastShowElapsedRealtime = SystemClock.elapsedRealtime()
+        lastShowDate = Date()
+    }
+
+    private fun isAdmobAdLoaded(): Boolean {
+        return admobAppOpenAd != null && AppOpenAdPolicy.wasLoadedRecently(
+            admobLoadElapsedRealtime,
+            AD_VALIDITY_MILLIS,
+            SystemClock.elapsedRealtime()
+        )
+    }
+
+    private fun isApplovinAdLoaded(): Boolean {
+        return applovinAppOpenAd?.isReady == true && AppOpenAdPolicy.wasLoadedRecently(
+            applovinLoadElapsedRealtime,
+            AD_VALIDITY_MILLIS,
+            SystemClock.elapsedRealtime()
+        )
+    }
+
+    private fun isPlatformConfigured(platformName: String): Boolean {
+        return when (platformName) {
+            ADMOB -> admobPlacementId.isNotBlank()
+            APPLOVIN -> applovinPlacementId.isNotBlank() && applovinAppOpenAd != null
+            else -> false
+        }
     }
 
     private fun normalizeShowOrder(showOrder: String): List<String> {
@@ -449,12 +552,40 @@ class AppOpenAdManager(
             .distinct()
     }
 
+    private fun runOnMain(action: () -> Unit) {
+        if (isMainThread()) action() else mainHandler.post(action)
+    }
+
+    private fun isMainThread(): Boolean = Looper.myLooper() == Looper.getMainLooper()
+
+    private fun safeListenerCall(action: () -> Unit) {
+        try {
+            action()
+        } catch (error: Exception) {
+            Log.e(TAG, "App open listener failed", error)
+        }
+    }
+
+    private companion object {
+        const val TAG = "AppOpenAdManager"
+        const val ADMOB = "admob"
+        const val APPLOVIN = "applovin"
+        const val AD_VALIDITY_MILLIS = 4 * 60 * 60 * 1_000L
+        const val DISABLED_LOAD_MESSAGE = "App open ads are disabled; pending load was cancelled"
+    }
 }
 
 internal object AppOpenAdPolicy {
     fun hasShowIntervalElapsed(lastShowMillis: Long?, minimumSeconds: Int, nowMillis: Long): Boolean {
         if (lastShowMillis == null) return true
         val minimumIntervalMillis = minimumSeconds.coerceAtLeast(0) * 1_000L
-        return nowMillis - lastShowMillis >= minimumIntervalMillis
+        val elapsedMillis = nowMillis - lastShowMillis
+        return elapsedMillis >= minimumIntervalMillis
+    }
+
+    fun wasLoadedRecently(loadMillis: Long, validityMillis: Long, nowMillis: Long): Boolean {
+        if (loadMillis <= 0L) return false
+        val elapsedMillis = nowMillis - loadMillis
+        return elapsedMillis in 0 until validityMillis
     }
 }

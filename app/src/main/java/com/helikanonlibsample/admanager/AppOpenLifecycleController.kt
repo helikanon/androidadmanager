@@ -3,6 +3,7 @@ package com.helikanonlibsample.admanager
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -41,7 +42,10 @@ class AppOpenLifecycleController(
 
         currentActivity.get()
             ?.takeUnless { it.isFinishing || it.isDestroyed }
-            ?.let { managerProvider()?.showIntervalElapsed(it) }
+            ?.let {
+                val result = managerProvider()?.showIntervalElapsed(it)
+                Log.d(TAG, "Foreground show result: $result")
+            }
     }
 
     override fun onStop(owner: LifecycleOwner) {
@@ -64,4 +68,8 @@ class AppOpenLifecycleController(
     override fun onActivityPaused(activity: Activity) = Unit
     override fun onActivityStopped(activity: Activity) = Unit
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) = Unit
+
+    private companion object {
+        const val TAG = "AppOpenLifecycle"
+    }
 }

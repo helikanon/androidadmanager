@@ -122,7 +122,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnLoadAppOpenAd.setOnClickListener {
-            MyApplication.appOpenAdManager?.show(this)
+            val result = MyApplication.appOpenAdManager?.show(this)
+            Log.d("AppOpenAdManager", "Manual show result: $result")
 
             //MyApplication.admobAppOpenAdManager?.disable()
         }
