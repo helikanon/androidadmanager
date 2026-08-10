@@ -59,7 +59,6 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             })
         }
-
         isInitializeStarted = true
 
         if (testMode) {

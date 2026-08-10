@@ -53,7 +53,14 @@ class MyApplication : Application() {
 
         AppOpenAdManager?.excludedActivities?.add(JavaSampleActivity::class.java.simpleName)
         AppOpenAdManager?.minElapsedSecondsToNextShow = 10
-        AppOpenAdManager?.disable()
+
+        adManager.initializePlatforms(
+            applicationContext,
+            onAllInitializeComplete = {
+                AppOpenAdManager?.load()
+            },
+            onPlatformInitializeComplete = {}
+        )
     }
 
     fun initAdManager() {
@@ -226,8 +233,6 @@ class MyApplication : Application() {
 
             }
         }
-
-        adManager.initializePlatforms(applicationContext, {}, { it -> })
 
         // OR
         /*

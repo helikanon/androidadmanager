@@ -56,6 +56,9 @@ android {
 
         manifestPlaceholders["admobAppId"] = "\${admobAppId}"
     }
+    publishing {
+        singleVariant("release")
+    }
 
     buildTypes {
         release {
@@ -91,37 +94,33 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
 
-    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.2")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
-
-    //implementation "androidx.lifecycle:lifecycle-common-java8:2.3.0"
-    // kapt("androidx.lifecycle:lifecycle-compiler:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-process:2.10.0")
 
     // implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.6") // NativeTemplateStyle.java içinde bulunan @CanIgnoreReturnValue annotation için ekledik
 
     // google service
-    implementation("com.google.android.gms:play-services-ads:25.2.0")
+    implementation("com.google.android.gms:play-services-ads:25.4.0")
     implementation("com.google.android.gms:play-services-appset:16.1.0")
     implementation("com.google.android.gms:play-services-ads-identifier:18.3.0")
 
     // implementation(project(path = ":nativetemplates"))
 
     // APPLOVIN
-    implementation("com.applovin:applovin-sdk:+")
-    implementation("com.applovin.mediation:fyber-adapter:+")
-    implementation("com.applovin.mediation:google-ad-manager-adapter:+")
-    implementation("com.applovin.mediation:google-adapter:+")
-    implementation("com.applovin.mediation:vungle-adapter:+")
-    implementation("com.applovin.mediation:facebook-adapter:+")
-    implementation("com.applovin.mediation:mintegral-adapter:+")
-    implementation("com.applovin.mediation:bytedance-adapter:+"){
+    implementation("com.applovin:applovin-sdk:13.6.3")
+    implementation("com.applovin.mediation:fyber-adapter:8.4.7.0")
+    implementation("com.applovin.mediation:google-ad-manager-adapter:25.4.0.0")
+    implementation("com.applovin.mediation:google-adapter:25.4.0.0")
+    implementation("com.applovin.mediation:vungle-adapter:7.7.7.1")
+    implementation("com.applovin.mediation:facebook-adapter:6.21.0.0")
+    implementation("com.applovin.mediation:mintegral-adapter:17.1.71.0")
+    implementation("com.applovin.mediation:bytedance-adapter:8.2.0.4.0"){
         exclude(module = "tiktok-business-android-sdk-comp")
     }
-    implementation("com.applovin.mediation:unityads-adapter:+")
+    implementation("com.applovin.mediation:unityads-adapter:4.19.0.1")
 
     // inmobi begin
-    implementation("com.applovin.mediation:inmobi-adapter:+")
+    implementation("com.applovin.mediation:inmobi-adapter:11.4.0.0")
     implementation("com.squareup.picasso:picasso:2.8")
     // implementation("androidx.recyclerview:recyclerview:1.1.0") // zaten yukarıda ekli
     // inmobi end

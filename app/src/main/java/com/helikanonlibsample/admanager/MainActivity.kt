@@ -23,53 +23,9 @@ class MainActivity : AppCompatActivity() {
 
 
         Handler(Looper.getMainLooper()).postDelayed({
-            MyApplication.adManager?.showNative(this@MainActivity, AdFormatEnum.NATIVE, binding.nativeContainer)
-            MyApplication.adManager?.showNative(this@MainActivity, AdFormatEnum.NATIVE_MEDIUM, binding.nativeMediumContainer)
+            MyApplication.adManager.showNative(this@MainActivity, AdFormatEnum.NATIVE, binding.nativeContainer)
+            MyApplication.adManager.showNative(this@MainActivity, AdFormatEnum.NATIVE_MEDIUM, binding.nativeMediumContainer)
         }, 15000)
-
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            // MyApplication.admobAppOpenAdManager?.show(this@MainActivity, null)
-
-
-            /*val ap = MyApplication.adManager?.getAdPlatformByType(AdPlatformTypeEnum.ADMOB)
-            ap?.platformInstance?.loadNativeAds(this@MainActivity, 4, object : AdPlatformLoadListener() {
-                override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
-                    super.onLoaded(adPlatformEnum)
-
-                    runOnUiThread {
-
-                        val nativeAd = ap?.platformInstance?.showNative(
-                            this@MainActivity,
-                            "medium",
-                            binding.nativeContainer
-                        )
-
-                        val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                        val templateRoot = inflater.inflate(R.layout.admob_native_medium_template, null)
-                        val template = templateRoot.findViewById<TemplateView>(R.id.admanager_native_medium)
-
-                        val nativeAd = ap?.platformInstance?.showNative(
-                            this@MainActivity,
-                            0
-                        )
-                        nativeAd?.let {
-                            val styles = NativeTemplateStyle.Builder().build()
-                            template.setStyles(styles)
-                            template.setNativeAd(nativeAd)
-                            binding.nativeContainer.addView(templateRoot)
-                        }
-                    }
-                }
-
-                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                    Log.d("MyApplication.adManager", "[NATIVE] ${errorMode?.name} / $errorMessage / ${adPlatformEnum?.name}")
-                }
-            })*/
-
-            MyApplication.AppOpenAdManager?.isEnable = true
-        }, 2000)
-
 
         /*val x = MyApplication.adManager.getAdPlatformByType(AdPlatformTypeEnum.ADMOB)?.platformInstance as AdmobAdWrapper
         x.loadNativeAds(this, 3, object : AdPlatformLoadListener() {
@@ -79,6 +35,13 @@ class MainActivity : AppCompatActivity() {
             }
         })*/
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // App-open lifecycle is owned by the host app, not by the library.
+        MyApplication.AppOpenAdManager?.onStart(this)
     }
 
     override fun onResume() {

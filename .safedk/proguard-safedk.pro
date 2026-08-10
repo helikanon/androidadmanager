@@ -30,8 +30,6 @@
 -keep class com.five_corp.** { *; }
 -keep class com.bytedance.** { *; }
 -keep class com.smaato.** { *; }
--keep class com.explorestack.** { *; }
--keep class io.bidmachine.** { *; }
 -keep class com.pubmatic.** { *; }
 -keep class com.chartboost.** { *; }
 -keep class com.mobilefuse.** { *; }
@@ -48,3 +46,23 @@
 -keep public interface com.google.android.exoplayer2.** { *; }
 -keep class androidx.media3.** { *; }
 -keep interface androidx.media3.** { *; }
+-keeppackagenames com.explorestack.**
+-keepnames class com.explorestack.iab.mraid.MraidAdView
+-keepclassmembers class com.explorestack.iab.mraid.MraidAdView{
+*** closeExpanded(...);
+}
+-keepnames class com.explorestack.iab.mraid.MraidView$**
+-keepclassmembers class com.explorestack.iab.mraid.MraidView$**{
+*** onExpanded(...);
+}
+-keeppackagenames io.bidmachine.**
+-keepnames class io.bidmachine.iab.mraid.MraidAdView
+-keepclassmembers class io.bidmachine.iab.mraid.MraidAdView{
+*** closeExpanded(...);
+}
+-keepnames class io.bidmachine.iab.mraid.MraidView$**
+-keepclassmembers class io.bidmachine.iab.mraid.MraidView$**{
+*** onExpanded(...);
+*** onExpandIntention(...);
+}
+-keepnames class io.bidmachine.iab.mraid.MraidOrientationProperties
