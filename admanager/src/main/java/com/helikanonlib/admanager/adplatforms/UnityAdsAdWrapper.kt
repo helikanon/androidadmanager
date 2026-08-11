@@ -11,7 +11,6 @@ import com.helikanonlib.admanager.AdPlatformLoadListener
 import com.helikanonlib.admanager.AdPlatformShowListener
 import com.helikanonlib.admanager.AdPlatformTypeEnum
 import com.helikanonlib.admanager.AdPlatformWrapper
-import com.unity3d.ads.IUnityAdsInitializationListener
 import com.unity3d.ads.IUnityAdsLoadListener
 import com.unity3d.ads.IUnityAdsShowListener
 import com.unity3d.ads.InitializationConfiguration
@@ -30,6 +29,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override var platform = AdPlatformTypeEnum.UNITYADS
     var viewIntances: MutableMap<String, Any?> = mutableMapOf()
+    private var isTestModeEnabled = false
 
 
     override fun initialize(activity: Activity, onInitializeComplete: ((Boolean) -> Unit)?, testMode: Boolean) {
@@ -38,25 +38,9 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     override fun initialize(context: Context, onInitializeComplete: ((Boolean) -> Unit)?, testMode: Boolean) {
         if (isInitializeStarted || isInitialized) return
 
-        /*UnityAds.addListener(object : IUnityAdsListener {
-            override fun onUnityAdsReady(placementId: String?) {
-
-            }
-
-            override fun onUnityAdsStart(placementId: String?) {
-
-            }
-
-            override fun onUnityAdsFinish(placementId: String?, result: UnityAds.FinishState?) {
-
-            }
-
-            override fun onUnityAdsError(error: UnityAds.UnityAdsError?, message: String?) {
-
-            }
-        })*/
+        isTestModeEnabled = isTestModeEnabled || testMode
         val config = InitializationConfiguration.Builder(appId)
-            .withTestMode(testMode)
+            .withTestMode(isTestModeEnabled)
             .build()
 
         val listener: InitializationListener = InitializationListener { error ->
@@ -73,26 +57,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun enableTestMode(context: Context, deviceId: String?) {
-        UnityAds.initialize(context, appId, true, object : IUnityAdsInitializationListener {
-            override fun onInitializationComplete() {
-
-            }
-
-            override fun onInitializationFailed(error: UnityAds.UnityAdsInitializationError?, message: String?) {
-
-            }
-
-        })
-        /*for (group in placementGroups) {
-            group.interstitial = "ca-app-pub-3940256099942544/1033173712"
-            group.banner = "ca-app-pub-3940256099942544/6300978111"
-            group.rewarded = "ca-app-pub-3940256099942544/5224354917"
-            group.mrec = "ca-app-pub-3940256099942544/6300978111"
-            group.native = "ca-app-pub-3940256099942544/2247696110"
-            group.appOpenAd = "ca-app-pub-3940256099942544/3419835294"
-        }*/
-
-
+        isTestModeEnabled = true
     }
 
     override fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
