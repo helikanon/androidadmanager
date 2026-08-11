@@ -13,6 +13,7 @@ enum class AppOpenAdShowResult {
     QUEUED_ON_MAIN_THREAD,
     DISABLED,
     SHOWING_PAUSED,
+    FULL_SCREEN_AD_ACTIVE,
     ALREADY_SHOWING,
     INVALID_ACTIVITY,
     ACTIVITY_EXCLUDED,
@@ -29,7 +30,8 @@ class AppOpenAdManager private constructor(
     var globalLoadListener: AdPlatformLoadListener?,
     adValidityDurationMillis: Long,
     adapters: List<AppOpenAdAdapter>,
-    private val runtime: AppOpenAdRuntime
+    private val runtime: AppOpenAdRuntime,
+    private val displayState: AppOpenAdDisplayState
 ) {
     constructor(
         application: Application,
@@ -45,7 +47,8 @@ class AppOpenAdManager private constructor(
         globalLoadListener = globalLoadListener,
         adValidityDurationMillis = adValidityDurationMillis,
         adapters = createDefaultAdapters(application, placements),
-        runtime = AndroidAppOpenAdRuntime()
+        runtime = AndroidAppOpenAdRuntime(),
+        displayState = AppOpenAdDisplayGate
     )
 
     internal constructor(
@@ -54,7 +57,8 @@ class AppOpenAdManager private constructor(
         showOrderStr: String,
         globalShowListener: AdPlatformShowListener? = null,
         globalLoadListener: AdPlatformLoadListener? = null,
-        adValidityDurationMillis: Long = DEFAULT_AD_VALIDITY_DURATION_MILLIS
+        adValidityDurationMillis: Long = DEFAULT_AD_VALIDITY_DURATION_MILLIS,
+        displayState: AppOpenAdDisplayState = AppOpenAdDisplayGate
     ) : this(
         placements = emptyMap(),
         showOrderStr = showOrderStr,
@@ -62,7 +66,8 @@ class AppOpenAdManager private constructor(
         globalLoadListener = globalLoadListener,
         adValidityDurationMillis = adValidityDurationMillis,
         adapters = adapters,
-        runtime = runtime
+        runtime = runtime,
+        displayState = displayState
     )
 
     val placements: Map<AdPlatformTypeEnum, String> = placements.toMap()
@@ -128,6 +133,7 @@ class AppOpenAdManager private constructor(
 
         if (!isEnabled) return AppOpenAdShowResult.DISABLED
         if (!isShowingEnabled) return AppOpenAdShowResult.SHOWING_PAUSED
+        if (displayState.isBlocked) return AppOpenAdShowResult.FULL_SCREEN_AD_ACTIVE
         if (activity.isFinishing || activity.isDestroyed) return AppOpenAdShowResult.INVALID_ACTIVITY
         if (isShowing) return AppOpenAdShowResult.ALREADY_SHOWING
 

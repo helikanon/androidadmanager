@@ -487,9 +487,16 @@ class AdManager {
         if (!showAds) return true
 
         val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL, placementGroupIndex)
+        var displayLease: AppOpenAdDisplayGate.Lease? = null
+
+        fun releaseDisplayLease() {
+            displayLease?.release()
+            displayLease = null
+        }
 
         val _listener = object : AdPlatformShowListener() {
             override fun onClosed(adPlatformEnum: AdPlatformTypeEnum?) {
+                releaseDisplayLease()
 
                 activity.runOnUiThread {
                     removeLoadingViewFromActivity(activity)
@@ -527,6 +534,7 @@ class AdManager {
             }
 
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                releaseDisplayLease()
                 activity.runOnUiThread {
                     removeLoadingViewFromActivity(activity)
                 }
@@ -552,18 +560,32 @@ class AdManager {
             }
         }
 
+        fun showLoadedInterstitial(loadedPlatform: AdPlatformModel): Boolean {
+            displayLease = AppOpenAdDisplayGate.acquire()
+            return try {
+                loadedPlatform.platformInstance.showInterstitial(activity, shownWhere, _listener, placementGroupIndex)
+                true
+            } catch (error: Exception) {
+                releaseDisplayLease()
+                _listener.onError(
+                    AdErrorMode.PLATFORM,
+                    "${loadedPlatform.platformInstance.platform.name} interstitial show failed: ${error.message.orEmpty()}",
+                    loadedPlatform.platformInstance.platform
+                )
+                true
+            }
+        }
+
         var hasLoadedInterstitial = false
         if (platform != null) {
             if (platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
-                platform.platformInstance.showInterstitial(activity, shownWhere, _listener, placementGroupIndex)
-                hasLoadedInterstitial = true
+                hasLoadedInterstitial = showLoadedInterstitial(platform)
             }
         } else {
             run breaker@{
                 interstitialAdPlatforms.forEach forEach@{ platform ->
                     if (platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
-                        platform.platformInstance.showInterstitial(activity, shownWhere, _listener, placementGroupIndex)
-                        hasLoadedInterstitial = true
+                        hasLoadedInterstitial = showLoadedInterstitial(platform)
                         return@breaker
                         //return@forEach
                     }
@@ -573,7 +595,7 @@ class AdManager {
 
         if (!hasLoadedInterstitial) {
             // globalInterstitialShowListener?.onError(AdErrorMode.MANAGER, "there is no loaded interstitial for show. All platforms is not loaded", null)
-            _listener?.onError(AdErrorMode.MANAGER, "there is no loaded interstitial for show. All platforms is not loaded", null)
+            _listener.onError(AdErrorMode.MANAGER, "there is no loaded interstitial for show. All platforms is not loaded", null)
 
         }
 
@@ -913,8 +935,16 @@ class AdManager {
         if (!showAds) return true
 
         val rewardedAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.REWARDED, placementGroupIndex)
+        var displayLease: AppOpenAdDisplayGate.Lease? = null
+
+        fun releaseDisplayLease() {
+            displayLease?.release()
+            displayLease = null
+        }
+
         val _listener = object : AdPlatformShowListener() {
             override fun onClosed(adPlatformEnum: AdPlatformTypeEnum?) {
+                releaseDisplayLease()
                 // on close load new one for next show
                 globalRewardedShowListener?.onClosed(adPlatformEnum)
                 listener?.onClosed(adPlatformEnum)
@@ -943,6 +973,7 @@ class AdManager {
             }
 
             override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                releaseDisplayLease()
 
                 globalRewardedShowListener?.onError(errorMode, errorMessage, adPlatformEnum)
                 listener?.onError(AdErrorMode.MANAGER, errorMessage, adPlatformEnum)
@@ -954,19 +985,33 @@ class AdManager {
             }
         }
 
+        fun showLoadedRewarded(loadedPlatform: AdPlatformModel): Boolean {
+            displayLease = AppOpenAdDisplayGate.acquire()
+            return try {
+                loadedPlatform.platformInstance.showRewarded(activity, _listener, placementGroupIndex)
+                true
+            } catch (error: Exception) {
+                releaseDisplayLease()
+                _listener.onError(
+                    AdErrorMode.PLATFORM,
+                    "${loadedPlatform.platformInstance.platform.name} rewarded show failed: ${error.message.orEmpty()}",
+                    loadedPlatform.platformInstance.platform
+                )
+                true
+            }
+        }
+
         var hasLoadedRewarded = false
 
         if (platform != null) {
             if (platform.platformInstance.isRewardedLoaded(placementGroupIndex)) {
-                platform.platformInstance.showRewarded(activity, _listener, placementGroupIndex)
-                hasLoadedRewarded = true
+                hasLoadedRewarded = showLoadedRewarded(platform)
             }
         } else {
             run breaker@{
                 rewardedAdPlatforms.forEach forEach@{ platform ->
                     if (platform.platformInstance.isRewardedLoaded(placementGroupIndex)) {
-                        platform.platformInstance.showRewarded(activity, _listener, placementGroupIndex)
-                        hasLoadedRewarded = true
+                        hasLoadedRewarded = showLoadedRewarded(platform)
                         return@breaker
                     }
                 }
@@ -975,7 +1020,7 @@ class AdManager {
         }
 
         if (!hasLoadedRewarded) {
-            _listener?.onError(AdErrorMode.MANAGER, "There is no loaded rewarded. Tried in all platforms", null)
+            _listener.onError(AdErrorMode.MANAGER, "There is no loaded rewarded. Tried in all platforms", null)
 
             /*globalRewardedShowListener?.onError(AdErrorMode.MANAGER, "There is no loaded rewarded. Tried in all platforms", null)
             if (autoLoadForRewarded) {
