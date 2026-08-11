@@ -39,10 +39,14 @@ class AppOpenAdManager(
     placements: Map<AdPlatformTypeEnum, String> = emptyMap(),
     showOrderStr: String = "admob",
     var globalShowListener: AdPlatformShowListener? = null,
-    var globalLoadListener: AdPlatformLoadListener? = null
+    var globalLoadListener: AdPlatformLoadListener? = null,
+    adValidityDurationMillis: Long = DEFAULT_AD_VALIDITY_DURATION_MILLIS
 ) {
     val placements: Map<AdPlatformTypeEnum, String> = placements.toMap()
     val showOrderStr: String = normalizeShowOrder(showOrderStr).joinToString(",")
+    val adValidityDurationMillis: Long = adValidityDurationMillis.also {
+        require(it > 0L) { "adValidityDurationMillis must be greater than zero" }
+    }
 
     private val defaultShowOrder = normalizeShowOrder(this.showOrderStr)
     private val admobPlacementId = this.placements[AdPlatformTypeEnum.ADMOB].orEmpty()
@@ -524,7 +528,7 @@ class AppOpenAdManager(
     private fun isAdmobAdLoaded(): Boolean {
         return admobAppOpenAd != null && AppOpenAdPolicy.wasLoadedRecently(
             admobLoadElapsedRealtime,
-            AD_VALIDITY_MILLIS,
+            adValidityDurationMillis,
             SystemClock.elapsedRealtime()
         )
     }
@@ -532,7 +536,7 @@ class AppOpenAdManager(
     private fun isApplovinAdLoaded(): Boolean {
         return applovinAppOpenAd?.isReady == true && AppOpenAdPolicy.wasLoadedRecently(
             applovinLoadElapsedRealtime,
-            AD_VALIDITY_MILLIS,
+            adValidityDurationMillis,
             SystemClock.elapsedRealtime()
         )
     }
@@ -570,7 +574,7 @@ class AppOpenAdManager(
         const val TAG = "AppOpenAdManager"
         const val ADMOB = "admob"
         const val APPLOVIN = "applovin"
-        const val AD_VALIDITY_MILLIS = 4 * 60 * 60 * 1_000L
+        const val DEFAULT_AD_VALIDITY_DURATION_MILLIS = 4 * 60 * 60 * 1_000L
         const val DISABLED_LOAD_MESSAGE = "App open ads are disabled; pending load was cancelled"
     }
 }
