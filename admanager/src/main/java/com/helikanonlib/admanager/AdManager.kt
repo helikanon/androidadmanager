@@ -257,20 +257,18 @@ class AdManager {
 
     var isEnableShowLoadingViewForInterstitial = true
     var loadingView: AdsLoadingCustomView? = null
+
+    private fun clearLoadingView(activity: Activity? = null) {
+        val view = loadingView ?: return
+        if (activity != null && view.context !== activity) return
+
+        (view.parent as? ViewGroup)?.removeView(view)
+        loadingView = null
+    }
+
     fun initLoadingView(activity: Activity, rootView: ViewGroup? = null) {
-        if (loadingView != null) {
-            // loadingView?.findViewById<TextView>(R.id.textViewCloseAdsLoading)?.visibility = View.VISIBLE
-            // loadingView?.rootView?.visibility = View.VISIBLE
-
-            rootView?.let {
-                setLoadingLayoutParams(rootView)
-            }
-
-            if (loadingView?.parent != null) {
-                (loadingView?.parent as ViewGroup).removeView(loadingView)
-            }
-            return
-        }
+        // Never reuse a View created with another Activity context.
+        clearLoadingView()
         loadingView = AdsLoadingCustomView(activity, null)
 
         rootView?.let {
@@ -349,25 +347,14 @@ class AdManager {
             loadingView?.bringToFront()
             //loadingView?.invalidate()
         } catch (e: Exception) {
+            clearLoadingView(activity)
             e.printStackTrace()
         }
     }
 
     fun removeLoadingViewFromActivity(activity: Activity) {
         try {
-            if (loadingView == null) return
-            val activityRootView = activity.findViewById<ViewGroup>(android.R.id.content)
-                .getChildAt(0) as ViewGroup
-
-            var className = activityRootView::class.simpleName
-
-            if (className == "NestedScrollView") {
-                (activityRootView.getChildAt(0) as ViewGroup).removeView(loadingView)
-            } else {
-                activityRootView.removeView(loadingView)
-            }
-
-
+            clearLoadingView(activity)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -1380,6 +1367,7 @@ class AdManager {
 
     fun destroy(activity: Activity) {
         releaseAllFullScreenDisplayLeases()
+        clearLoadingView()
 
         adPlatforms.forEach {
             it.platformInstance.destroy(activity)
@@ -1394,6 +1382,7 @@ class AdManager {
     // TODO this fun will check. and it will remove if unnecessary
     fun onDestroyActivity(activity: Activity) {
         releaseFullScreenDisplayLeases(activity)
+        removeLoadingViewFromActivity(activity)
         //stopAutoloadInterstitialHandler()
         //stopAutoloadRewardedHandler()
         //destroyBannersAndMrecs(activity)
