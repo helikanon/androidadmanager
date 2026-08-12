@@ -51,7 +51,6 @@ class AdManager {
     var placementGroups = ArrayList<String>()
 
     // handlers
-    private var isHandlerAvailableForLoads = false
     private var handlerThread: HandlerThread? = null
     private var autoloadInterstitialHandler: Handler? = null
     private var autoloadRewardedHandler: Handler? = null
@@ -129,6 +128,7 @@ class AdManager {
     fun start(activity: Activity) {
         if (autoLoadForInterstitial) {
             placementGroups.forEachIndexed { index, pgName ->
+                // Intentionally preload only the primary placement group to avoid unused ad requests.
                 if (index > 0) return@forEachIndexed
                 loadInterstitial(activity, listener = null, platform = null, parallel = false, placementGroupIndex = getPlacementGroupIndexByName(pgName))
             }
@@ -137,6 +137,7 @@ class AdManager {
 
         if (autoLoadForRewarded) {
             placementGroups.forEachIndexed { index, pgName ->
+                // Intentionally preload only the primary placement group to avoid unused ad requests.
                 if (index > 0) return@forEachIndexed
                 loadRewarded(activity, null, null, false, getPlacementGroupIndexByName(pgName))
             }
@@ -604,24 +605,6 @@ class AdManager {
 
     var lastPostDelayedSetTimeForInterstitialLoad: Date? = null
     private fun _autoloadInterstitialByHandler(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null) {
-
-        if (!isHandlerAvailableForLoads) {
-            try {
-                activity.runOnUiThread {
-                    placementGroups.forEachIndexed { index, pgName ->
-                        if (index < 1) {
-                            loadInterstitial(activity, listener, platform, false, getPlacementGroupIndexByName(pgName))
-                        }
-                    }
-
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            return
-        }
-
         if (hasWorkingAutoloadInterstitialHandler) {
             if (lastPostDelayedSetTimeForInterstitialLoad != null) {
                 // val diffInMillies = Date().time - lastPostDelayedSetTime!!.time
@@ -643,6 +626,7 @@ class AdManager {
             try {
                 activity.runOnUiThread {
                     placementGroups.forEachIndexed { index, pgName ->
+                        // Intentionally reload only the primary placement group to avoid unused ad requests.
                         if (index < 1) {
                             loadInterstitial(activity, listener, platform, false, getPlacementGroupIndexByName(pgName))
                         }
@@ -659,20 +643,6 @@ class AdManager {
 
     var lastPostDelayedSetTimeForRewardedLoad: Date? = null
     private fun _autoloadRewardedByHandler(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null) {
-
-        if (!isHandlerAvailableForLoads) {
-            try {
-                activity.runOnUiThread {
-                    placementGroups.forEachIndexed { index, pgName ->
-                        if (index > 0) return@forEachIndexed
-                        loadRewarded(activity, listener, platform, false, getPlacementGroupIndexByName(pgName))
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            return
-        }
         if (hasWorkingAutoloadRewardedHandler) {
             if (lastPostDelayedSetTimeForRewardedLoad != null) {
                 val diffSeconds = TimeUnit.SECONDS.convert(Date().time - lastPostDelayedSetTimeForRewardedLoad!!.time, TimeUnit.MILLISECONDS)
@@ -692,6 +662,7 @@ class AdManager {
             try {
                 activity.runOnUiThread {
                     placementGroups.forEachIndexed { index, pgName ->
+                        // Intentionally reload only the primary placement group to avoid unused ad requests.
                         if (index > 0) return@forEachIndexed
                         loadRewarded(activity, listener, platform, false, getPlacementGroupIndexByName(pgName))
                     }
