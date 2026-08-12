@@ -1391,33 +1391,21 @@ class AdManager {
     // TODO this fun will check. and it will remove if unnecessary
     fun destroyBannersAndMrecs(activity: Activity) {
 
-        placementGroups.forEachIndexed { placementGroupIndex, pgName ->
-            val bannerAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.BANNER, placementGroupIndex)
-            if (bannerAdPlatforms.size > 0) {
-                run breaker@{
-                    bannerAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
-                        if (_platform.platformInstance.isBannerLoaded()) {
-                            _platform.platformInstance.destroyBanner(activity)
-                            return@breaker
-                        }
+        placementGroups.indices.forEach { placementGroupIndex ->
+            _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.BANNER, placementGroupIndex)
+                .forEach { platform ->
+                    if (platform.platformInstance.isBannerLoaded(placementGroupIndex)) {
+                        platform.platformInstance.destroyBanner(activity, placementGroupIndex)
                     }
                 }
-            }
 
-            val mrecAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.MREC, placementGroupIndex)
-            if (mrecAdPlatforms.size > 0) {
-                run breaker@{
-                    mrecAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
-                        if (_platform.platformInstance.isMrecLoaded()) {
-
-                            _platform.platformInstance.destroyMrec(activity)
-                            return@breaker
-                        }
+            _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.MREC, placementGroupIndex)
+                .forEach { platform ->
+                    if (platform.platformInstance.isMrecLoaded(placementGroupIndex)) {
+                        platform.platformInstance.destroyMrec(activity, placementGroupIndex)
                     }
                 }
-            }
         }
-
     }
 
 

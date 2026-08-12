@@ -577,23 +577,24 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun destroyBanner(activity: Activity) {
+        placementGroups.indices.forEach { destroyBanner(activity, it) }
+    }
+
+    override fun destroyBanner(activity: Activity, placementGroupIndex: Int) {
         try {
-            for (i in 0 until placementGroups.size) {
-                val pg = placementGroups[i]
+            val pg = getPlacementGroupByIndex(placementGroupIndex)
 
-                var bannerAdView: AdView? = if (viewIntances.containsKey(pg.banner)) viewIntances.get(pg.banner) as AdView? else null
-                if (_isBannerLoaded(bannerAdView)) {
-                    try {
-                        _removeBannerViewIfExists(bannerAdView)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+            val bannerAdView = viewIntances[pg.banner] as? AdView
+            if (_isBannerLoaded(bannerAdView)) {
+                try {
+                    _removeBannerViewIfExists(bannerAdView)
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-
-                bannerAdView?.destroy()
-                bannerAdView = null
-                viewIntances[pg.banner] = null
             }
+
+            bannerAdView?.destroy()
+            viewIntances[pg.banner] = null
         } catch (e: Exception) {
             Log.e("Admob", e.message ?: "")
         }
@@ -602,23 +603,24 @@ class AdmobAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun destroyMrec(activity: Activity) {
+        placementGroups.indices.forEach { destroyMrec(activity, it) }
+    }
+
+    override fun destroyMrec(activity: Activity, placementGroupIndex: Int) {
         try {
-            for (i in 0 until placementGroups.size) {
-                val pg = placementGroups[i]
+            val pg = getPlacementGroupByIndex(placementGroupIndex)
 
-                var mrecAdView: AdView? = if (viewIntances.containsKey(pg.mrec)) viewIntances.get(pg.mrec) as AdView? else null
-                if (_isBannerLoaded(mrecAdView)) {
-                    try {
-                        _removeBannerViewIfExists(mrecAdView)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+            val mrecAdView = viewIntances[pg.mrec] as? AdView
+            if (_isBannerLoaded(mrecAdView)) {
+                try {
+                    _removeBannerViewIfExists(mrecAdView)
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-
-                mrecAdView?.destroy()
-                mrecAdView = null
-                viewIntances[pg.mrec] = null
             }
+
+            mrecAdView?.destroy()
+            viewIntances[pg.mrec] = null
         } catch (e: Exception) {
             Log.e("Admob", e.message ?: "")
         }

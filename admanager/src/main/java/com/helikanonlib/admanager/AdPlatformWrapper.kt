@@ -63,6 +63,8 @@ abstract class AdPlatformWrapper(open var appId: String) {
     abstract fun destroy(activity: Activity)
     abstract fun destroyBanner(activity: Activity)
     abstract fun destroyMrec(activity: Activity)
+    open fun destroyBanner(activity: Activity, placementGroupIndex: Int) = destroyBanner(activity)
+    open fun destroyMrec(activity: Activity, placementGroupIndex: Int) = destroyMrec(activity)
 
     open fun onCreate(activity: Activity) {}
     open fun onPause(activity: Activity) {}
@@ -195,4 +197,3 @@ abstract class AdPlatformWrapper(open var appId: String) {
 
 
 }
-
