@@ -773,28 +773,13 @@ class AdManager {
     }
 
     fun hasLoadedInterstitial(platform: AdPlatformModel? = null, placementGroupIndex: Int): Boolean {
-        var hasLoaded = false
-
         val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL, placementGroupIndex)
-        run breaker@{
+        return interstitialAdPlatforms.any { candidate ->
+            val isRequestedPlatform = platform == null ||
+                candidate.platformInstance.platform == platform.platformInstance.platform
 
-            run breaker@{
-                interstitialAdPlatforms.forEach forEach@{ _platform ->
-                    if (platform != null && _platform.platformInstance.platform != platform.platformInstance.platform) {
-                        return@breaker
-                    }
-
-                    if (_platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
-                        hasLoaded = true
-                        return@breaker
-                    }
-                }
-            }
-
-
+            isRequestedPlatform && candidate.platformInstance.isInterstitialLoaded(placementGroupIndex)
         }
-
-        return hasLoaded
     }
 
     fun hasLoadedRewarded(platform: AdPlatformModel? = null, placementGroupIndex: Int = 0): Boolean {
