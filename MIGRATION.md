@@ -290,3 +290,61 @@ Yeni callback sözleşmesi aşağıdaki akışlarda uygulanır:
 6. Hata raporlama sisteminize `format`, `placementGroupIndex`, `attemptedPlatforms` ve `platformErrors` alanlarını ekleyin.
 7. Paralel yükleme kullanıyorsanız platform callback sırasına bağlı kodları kaldırın.
 8. Kotlin ve Java consumer modüllerini yeniden derleyerek eski listener imzası kalmadığını doğrulayın.
+
+## Initialization API değişikliği
+
+Platform initialization işlemi artık yalnızca bütün SDK'lar başarılı olduğunda çalışan parametresiz bir callback yerine yapılandırılmış bir sonuç döndürür.
+
+Eski kullanım:
+
+```kotlin
+adManager.initializePlatforms(
+    context,
+    onAllInitializeComplete = {
+        startAds()
+    },
+    onPlatformInitializeComplete = { platform ->
+        logInitialized(platform)
+    }
+)
+```
+
+Yeni kullanım:
+
+```kotlin
+adManager.initializePlatforms(
+    context,
+    onInitializeComplete = { result ->
+        when (result.status) {
+            AdInitializationStatus.SUCCESS -> startAds()
+            AdInitializationStatus.PARTIAL_SUCCESS -> {
+                logFailedPlatforms(result.failedPlatforms)
+                startAvailableAds()
+            }
+            AdInitializationStatus.FAILURE -> showInitializationError()
+            AdInitializationStatus.DISABLED -> continueWithoutAds()
+        }
+    },
+    onPlatformInitializeComplete = { result ->
+        logPlatformInitialization(result.platform, result.isSuccessful)
+    }
+)
+```
+
+Davranış değişiklikleri:
+
+- `showAds == false` ise terminal callback `DISABLED` sonucu ile çağrılır.
+- Hiç platform yapılandırılmamışsa terminal callback `FAILURE` sonucu ile çağrılır.
+- Bütün platformlar başarılıysa sonuç `SUCCESS` olur.
+- Bazı platformlar başarılı, bazıları başarısızsa sonuç `PARTIAL_SUCCESS` olur.
+- Bütün platformlar başarısızsa sonuç `FAILURE` olur.
+- `onPlatformInitializeComplete`, platform enum'u yerine `AdPlatformInitializationResult` alır.
+- Wrapper'ın gönderdiği `Boolean` başarı sonucu terminal sonucun hesaplanmasında kullanılır.
+- SDK callback'leri farklı thread'lerden gelse bile sonuç listesi güvenli şekilde güncellenir.
+
+`isAllPlatformsSdksInitialized(context)` ve `isPlatformSdkInitialized(context, platform)` metotlarındaki kullanılmayan `context` parametresi kaldırıldı:
+
+```kotlin
+adManager.isAllPlatformsSdksInitialized()
+adManager.isPlatformSdkInitialized(platform)
+```

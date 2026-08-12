@@ -143,23 +143,73 @@ class AdManager {
         }
     }
 
-    private var allInitializeCompleteCallbackCalled = false
-    fun initializePlatforms(context: Context, onAllInitializeComplete: () -> Unit, onPlatformInitializeComplete: (platform: AdPlatformTypeEnum) -> Unit) {
-        if (!showAds) return
-        allInitializeCompleteCallbackCalled = false
+    @JvmOverloads
+    fun initializePlatforms(
+        context: Context,
+        onInitializeComplete: (AdInitializationResult) -> Unit,
+        onPlatformInitializeComplete: (AdPlatformInitializationResult) -> Unit = {}
+    ) {
+        if (!showAds) {
+            onInitializeComplete(
+                AdInitializationResult(
+                    AdInitializationStatus.DISABLED,
+                    message = "Ad initialization is disabled because showAds is false"
+                )
+            )
+            return
+        }
 
-        adPlatforms.forEach forEach@{ platform ->
-            platform.platformInstance.initialize(context, { it ->
-                onPlatformInitializeComplete.invoke(platform.platformInstance.platform)
+        val platforms = adPlatforms.toList()
+        if (platforms.isEmpty()) {
+            onInitializeComplete(
+                AdInitializationResult(
+                    AdInitializationStatus.FAILURE,
+                    message = "No ad platform is configured"
+                )
+            )
+            return
+        }
 
-                if (!allInitializeCompleteCallbackCalled) {
-                    if (isAllPlatformsSdksInitialized(context)) {
-                        allInitializeCompleteCallbackCalled = true
-                        onAllInitializeComplete.invoke()
+        val resultLock = Any()
+        val platformResults = mutableListOf<AdPlatformInitializationResult>()
+        var completedCount = 0
+        var successCount = 0
+
+        platforms.forEach { platform ->
+            val onPlatformComplete: (Boolean) -> Unit = { isSuccessful ->
+                val platformResult = AdPlatformInitializationResult(
+                    platform.platformInstance.platform,
+                    isSuccessful
+                )
+
+                synchronized(resultLock) {
+                    completedCount++
+                    if (isSuccessful) successCount++
+                    platformResults.add(platformResult)
+                    onPlatformInitializeComplete(platformResult)
+
+                    if (completedCount == platforms.size) {
+                        val status = when (successCount) {
+                            platforms.size -> AdInitializationStatus.SUCCESS
+                            0 -> AdInitializationStatus.FAILURE
+                            else -> AdInitializationStatus.PARTIAL_SUCCESS
+                        }
+                        onInitializeComplete(
+                            AdInitializationResult(status, platformResults.toList())
+                        )
                     }
                 }
+            }
 
-            }, testMode)
+            try {
+                platform.platformInstance.initialize(
+                    context,
+                    onPlatformComplete,
+                    testMode
+                )
+            } catch (error: Exception) {
+                onPlatformComplete(false)
+            }
 
             if (testMode) {
                 platform.platformInstance.enableTestMode(context, deviceId)
@@ -167,17 +217,11 @@ class AdManager {
         }
     }
 
-    fun isAllPlatformsSdksInitialized(context: Context): Boolean {
-        val isInitialized = adPlatforms.all {
-            it.platformInstance.isInitialized
-        }
+    fun isAllPlatformsSdksInitialized(): Boolean =
+        adPlatforms.isNotEmpty() && adPlatforms.all { it.platformInstance.isInitialized }
 
-        return isInitialized
-    }
-
-    fun isPlatformSdkInitialized(context: Context, platform: AdPlatformModel): Boolean {
-        return platform.platformInstance.isInitialized
-    }
+    fun isPlatformSdkInitialized(platform: AdPlatformModel): Boolean =
+        platform.platformInstance.isInitialized
 
     fun start(activity: Activity) {
         if (autoLoadForInterstitial) {

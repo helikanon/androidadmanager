@@ -196,9 +196,14 @@ public class JavaSampleActivity extends AppCompatActivity {
             }
         });
 
-        adManager.initializePlatforms(getApplicationContext(), () -> {
+        adManager.initializePlatforms(getApplicationContext(), result -> {
+            Log.d("adManager", "Initialization status=" + result.getStatus().name());
             return null;
-        }, adPlatformModel -> {
+        }, platformResult -> {
+            Log.d(
+                    "adManager",
+                    platformResult.getPlatform().name() + " success=" + platformResult.isSuccessful()
+            );
             return null;
         });
         // adManager.initializePlatformsWithActivity(this);

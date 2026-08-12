@@ -69,10 +69,19 @@ class MyApplication : Application() {
 
         adManager.initializePlatforms(
             applicationContext,
-            onAllInitializeComplete = {
-                appOpenAdManager?.load()
+            onInitializeComplete = { result ->
+                if (result.status == AdInitializationStatus.SUCCESS ||
+                    result.status == AdInitializationStatus.PARTIAL_SUCCESS
+                ) {
+                    appOpenAdManager?.load()
+                }
             },
-            onPlatformInitializeComplete = {}
+            onPlatformInitializeComplete = { result ->
+                Log.d(
+                    "adManager",
+                    "${result.platform.name} initialization success=${result.isSuccessful}"
+                )
+            }
         )
     }
 
