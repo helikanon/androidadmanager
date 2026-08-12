@@ -350,6 +350,12 @@ class AdManager {
             if (parallel) {
                 // send true parallel when first load after init ads. Else you dont need parallel load
                 val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL, placementGroupIndex)
+                if (interstitialAdPlatforms.isEmpty()) {
+                    val errorMessage = "No interstitial ad platform is configured for placement group index $placementGroupIndex"
+                    globalInterstitialLoadListener?.onError(AdErrorMode.MANAGER, errorMessage, null)
+                    listener?.onError(AdErrorMode.MANAGER, errorMessage, null)
+                    return
+                }
                 interstitialAdPlatforms.forEach forEach@{ _platform ->
                     if (!_platform.platformInstance.isInterstitialLoaded(placementGroupIndex)) {
                         _loadInterstitial(activity, listener, platform = _platform, placementGroupIndex)
@@ -365,6 +371,12 @@ class AdManager {
 
     private fun _loadInterstitialFromFirstAvailable(activity: Activity, listener: AdPlatformLoadListener? = null, index: Int = 0, placementGroupIndex: Int) {
         val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL, placementGroupIndex)
+        if (interstitialAdPlatforms.isEmpty()) {
+            val errorMessage = "No interstitial ad platform is configured for placement group index $placementGroupIndex"
+            globalInterstitialLoadListener?.onError(AdErrorMode.MANAGER, errorMessage, null)
+            listener?.onError(AdErrorMode.MANAGER, errorMessage, null)
+            return
+        }
         if (index >= interstitialAdPlatforms.size) {
             return
         }
@@ -685,14 +697,19 @@ class AdManager {
 
             // if already banner loaded, start from this platform
             val bannerAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.BANNER, placementGroupIndex)
-            if (bannerAdPlatforms.size > 0) {
-                run breaker@{
-                    bannerAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
-
-                        if (_platform.platformInstance.isBannerLoaded(placementGroupIndex)) {
-                            startFrom = i
-                            return@breaker
-                        }
+            if (bannerAdPlatforms.isEmpty()) {
+                listener?.onError(
+                    AdErrorMode.MANAGER,
+                    "No banner ad platform is configured for placement group index $placementGroupIndex",
+                    null
+                )
+                return
+            }
+            run breaker@{
+                bannerAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
+                    if (_platform.platformInstance.isBannerLoaded(placementGroupIndex)) {
+                        startFrom = i
+                        return@breaker
                     }
                 }
             }
@@ -781,6 +798,12 @@ class AdManager {
             if (parallel) {
                 // send true parallel when first load after init ads. Else you dont need parallel load
                 val rewardedAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.REWARDED, placementGroupIndex)
+                if (rewardedAdPlatforms.isEmpty()) {
+                    val errorMessage = "No rewarded ad platform is configured for placement group index $placementGroupIndex"
+                    globalRewardedLoadListener?.onError(AdErrorMode.MANAGER, errorMessage, null)
+                    listener?.onError(AdErrorMode.MANAGER, errorMessage, null)
+                    return
+                }
                 rewardedAdPlatforms.forEach forEach@{ _platform ->
                     if (!_platform.platformInstance.isRewardedLoaded(placementGroupIndex)) {
                         _loadRewarded(activity, listener, platform = _platform, placementGroupIndex)
@@ -817,6 +840,12 @@ class AdManager {
     private fun _loadRewardedFromFirstAvailable(activity: Activity, listener: AdPlatformLoadListener? = null, index: Int = 0, placementGroupIndex: Int) {
 
         val rewardedAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.REWARDED, placementGroupIndex)
+        if (rewardedAdPlatforms.isEmpty()) {
+            val errorMessage = "No rewarded ad platform is configured for placement group index $placementGroupIndex"
+            globalRewardedLoadListener?.onError(AdErrorMode.MANAGER, errorMessage, null)
+            listener?.onError(AdErrorMode.MANAGER, errorMessage, null)
+            return
+        }
         if (index >= rewardedAdPlatforms.size) {
             return
         }
@@ -994,19 +1023,18 @@ class AdManager {
 
         if (mrecAdPlatforms.size == 0) {
             listener?.onError(AdErrorMode.MANAGER, "no networks for medium banner", null)
+            return
         }
 
         if (platform == null) {
             var startFrom = 0
 
             // if already mrec banner loaded, start from this platform
-            if (mrecAdPlatforms.size > 0) {
-                run breaker@{
-                    mrecAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
-                        if (_platform.platformInstance.isMrecLoaded(placementGroupIndex)) {
-                            startFrom = i
-                            return@breaker
-                        }
+            run breaker@{
+                mrecAdPlatforms.forEachIndexed forEachIndexed@{ i, _platform ->
+                    if (_platform.platformInstance.isMrecLoaded(placementGroupIndex)) {
+                        startFrom = i
+                        return@breaker
                     }
                 }
             }
@@ -1187,6 +1215,11 @@ class AdManager {
     private fun _loadNativeFromAllNetworks(activity: Activity, nativeAdFormat: AdFormatEnum, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int) {
         val nativeAdPlatforms = _getAdPlatformsWithSortedByAdFormat(nativeAdFormat, placementGroupIndex)
         if (nativeAdPlatforms.size == 0) {
+            listener?.onError(
+                AdErrorMode.MANAGER,
+                "No ${nativeAdFormat.name.lowercase(Locale.ENGLISH)} ad platform is configured for placement group index $placementGroupIndex",
+                null
+            )
             return
         }
 
@@ -1211,6 +1244,11 @@ class AdManager {
     fun showNative(activity: Activity, nativeAdFormat: AdFormatEnum, containerView: ViewGroup, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0): Boolean {
         val nativeAdPlatforms = _getAdPlatformsWithSortedByAdFormat(nativeAdFormat, placementGroupIndex)
         if (nativeAdPlatforms.size == 0) {
+            listener?.onError(
+                AdErrorMode.MANAGER,
+                "No ${nativeAdFormat.name.lowercase(Locale.ENGLISH)} ad platform is configured for placement group index $placementGroupIndex",
+                null
+            )
             return false
         }
 
