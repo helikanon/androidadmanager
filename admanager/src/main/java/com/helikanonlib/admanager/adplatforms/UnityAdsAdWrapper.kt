@@ -5,7 +5,6 @@ import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.helikanonlib.admanager.AdErrorMode
 import com.helikanonlib.admanager.AdFormatEnum
 import com.helikanonlib.admanager.AdPlatformLoadListener
 import com.helikanonlib.admanager.AdPlatformShowListener
@@ -66,7 +65,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             return
         }
         /*else {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> unityads interstitial load error", platform)
+            listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, placementGroupIndex, "${platform.name} interstitial >> unityads interstitial load error"))
             return
         }*/
 
@@ -84,7 +83,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onUnityAdsFailedToLoad(placementId: String?, error: UnityAds.UnityAdsLoadError?, message: String?) {
                 viewIntances.put(placementName, null)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> error code=${error?.name} / ${message}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, placementGroupIndex, "${platform.name} interstitial >> error code=${error?.name} / ${message}"))
             }
 
         })
@@ -94,7 +93,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showInterstitial(activity: Activity, shownWhere: String, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         if (!isInterstitialLoaded(placementGroupIndex)) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noadsloaded", platform)
+            listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, placementGroupIndex, "${platform.name} interstitial >> noadsloaded"))
             return
         }
 
@@ -102,7 +101,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         UnityAds.show(activity, placementName, object : IUnityAdsShowListener {
             override fun onUnityAdsShowFailure(placementId: String?, error: UnityAds.UnityAdsShowError?, message: String?) {
                 viewIntances[placementName] = null
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial [$placementId] >> ${error?.name ?: ""}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, placementGroupIndex, "${platform.name} interstitial [$placementId] >> ${error?.name ?: ""}"))
             }
 
             override fun onUnityAdsShowStart(placementId: String?) {
@@ -165,7 +164,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.BANNER, placementGroupIndex, "${platform.name} banner >> isbannerloaded"))
             }
             return
         }
@@ -192,7 +191,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onBannerFailedToLoad(bannerAdView: BannerView?, errorInfo: BannerErrorInfo?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=${errorInfo?.errorCode ?: ""} / ${errorInfo?.errorMessage ?: ""}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.BANNER, placementGroupIndex, "${platform.name} banner >> error code=${errorInfo?.errorCode ?: ""} / ${errorInfo?.errorMessage ?: ""}"))
             }
 
             override fun onBannerLeftApplication(bannerView: BannerView?) {
@@ -211,7 +210,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         }
 
         /*else {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> unityads rewarded load error", platform)
+            listener?.onPlatformError(platformError(AdFormatEnum.REWARDED, placementGroupIndex, "${platform.name} rewarded >> unityads rewarded load error"))
             return
         }*/
 
@@ -228,7 +227,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onUnityAdsFailedToLoad(placementId: String?, error: UnityAds.UnityAdsLoadError?, message: String?) {
                 viewIntances.put(placementName, null)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> error code=${error?.name} / ${message}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.REWARDED, placementGroupIndex, "${platform.name} rewarded >> error code=${error?.name} / ${message}"))
             }
 
         })
@@ -236,7 +235,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         if (!isRewardedLoaded(placementGroupIndex)) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded", platform)
+            listener?.onPlatformError(platformError(AdFormatEnum.REWARDED, placementGroupIndex, "${platform.name} rewarded >> noadsloaded"))
             return
         }
 
@@ -244,7 +243,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
         UnityAds.show(activity, placementName, object : IUnityAdsShowListener {
             override fun onUnityAdsShowFailure(placementId: String?, error: UnityAds.UnityAdsShowError?, message: String?) {
                 viewIntances[placementName] = null
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded [$placementId] >> ${error?.name ?: ""}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.REWARDED, placementGroupIndex, "${platform.name} rewarded [$placementId] >> ${error?.name ?: ""}"))
             }
 
             override fun onUnityAdsShowStart(placementId: String?) {
@@ -290,7 +289,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
-        listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> unityads mrec not supported", platform)
+        listener?.onPlatformError(platformError(AdFormatEnum.MREC, placementGroupIndex, "${platform.name} mrec >> unityads mrec not supported"))
 
 
         /*val placementName = getPlacementGroupByIndex(placementGroupIndex).mrec
@@ -307,7 +306,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ismrecloaded", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.MREC, placementGroupIndex, "${platform.name} mrec >> ismrecloaded"))
             }
             return
         }
@@ -330,7 +329,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onBannerFailedToLoad(bannerAdView: BannerView?, errorInfo: BannerErrorInfo?) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> error code=${errorInfo?.errorCode ?: ""} / ${errorInfo?.errorMessage ?: ""}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.MREC, placementGroupIndex, "${platform.name} mrec >> error code=${errorInfo?.errorCode ?: ""} / ${errorInfo?.errorMessage ?: ""}"))
             }
 
             override fun onBannerLeftApplication(bannerView: BannerView?) {
@@ -347,7 +346,7 @@ class UnityAdsAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
     }
 
     override fun loadNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, count: Int, listener: AdPlatformLoadListener?, placementGroupIndex: Int) {
-        listener?.onError(AdErrorMode.PLATFORM, "unity ads not support native ads", platform)
+        listener?.onPlatformError(platformError(nativeAdFormat, placementGroupIndex, "unity ads not support native ads"))
     }
 
     override fun showNative(activity: Activity, nativeAdFormat: AdFormatEnum, containerView: ViewGroup, listener: AdPlatformShowListener?, placementGroupIndex: Int): Boolean {

@@ -203,7 +203,7 @@ class AppOpenAdManager private constructor(
             return
         }
 
-        val forwardingListener = createLoadListener(listener)
+        val forwardingListener = createLoadListener(listener, adapters.map { it.platform })
         adapters.forEach { enqueueLoad(it, forwardingListener) }
     }
 
@@ -288,7 +288,11 @@ class AppOpenAdManager private constructor(
         }
 
         drainLoadListeners(platform).forEach {
-            safeListenerCall { it.onError(AdErrorMode.PLATFORM, message, platform) }
+            safeListenerCall {
+                it.onPlatformError(
+                    AdPlatformError(AdFormatEnum.APP_OPEN, platform, 0, message)
+                )
+            }
         }
     }
 
@@ -340,28 +344,72 @@ class AppOpenAdManager private constructor(
         message: String
     ) {
         isShowing = false
-        safeListenerCall { globalShowListener?.onError(AdErrorMode.PLATFORM, message, platform) }
-        safeListenerCall { listener?.onError(AdErrorMode.PLATFORM, message, platform) }
+        val platformError = AdPlatformError(AdFormatEnum.APP_OPEN, platform, 0, message)
+        val managerError = AdManagerError(
+            AdFormatEnum.APP_OPEN,
+            0,
+            listOf(platform),
+            listOf(platformError),
+            "App open ad show failed for ${platform.name}"
+        )
+        notifyShowListeners(listener) { it.onPlatformError(platformError) }
+        notifyShowListeners(listener) { it.onError(managerError) }
         load(showOrder, null)
     }
 
-    private fun createLoadListener(listener: AdPlatformLoadListener?) = object : AdPlatformLoadListener() {
-        override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
-            safeListenerCall { globalLoadListener?.onLoaded(adPlatformEnum) }
-            safeListenerCall { listener?.onLoaded(adPlatformEnum) }
+    private fun createLoadListener(
+        listener: AdPlatformLoadListener?,
+        attemptedPlatforms: List<AdPlatformTypeEnum>
+    ) = object : AdPlatformLoadListener() {
+        private val completedPlatforms = mutableSetOf<AdPlatformTypeEnum>()
+        private val platformErrors = mutableListOf<AdPlatformError>()
+        private var hasLoaded = false
+
+        override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum) {
+            hasLoaded = true
+            completedPlatforms.add(adPlatformEnum)
+            notifyLoadListeners(listener) { it.onLoaded(adPlatformEnum) }
         }
 
-        override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-            safeListenerCall { globalLoadListener?.onError(errorMode, errorMessage, adPlatformEnum) }
-            safeListenerCall { listener?.onError(errorMode, errorMessage, adPlatformEnum) }
+        override fun onPlatformError(error: AdPlatformError) {
+            platformErrors.add(error)
+            completedPlatforms.add(error.platform)
+            notifyLoadListeners(listener) { it.onPlatformError(error) }
+            if (completedPlatforms.size == attemptedPlatforms.size && !hasLoaded) {
+                notifyLoadListeners(listener) {
+                    it.onError(
+                        AdManagerError(
+                            AdFormatEnum.APP_OPEN,
+                            0,
+                            attemptedPlatforms,
+                            platformErrors.toList(),
+                            "No app open ad loaded from configured platforms"
+                        )
+                    )
+                }
+            }
+        }
+
+        override fun onError(error: AdManagerError) {
+            notifyLoadListeners(listener) { it.onError(error) }
         }
     }
 
     @MainThread
     private fun cancelPendingLoads() {
-        adaptersByPlatform.keys.forEach { platform ->
-            drainLoadListeners(platform).forEach {
-                safeListenerCall { it.onError(AdErrorMode.MANAGER, DISABLED_LOAD_MESSAGE, platform) }
+        val attemptedPlatforms = adaptersByPlatform.keys.toList()
+        val pendingListeners = attemptedPlatforms
+            .flatMap(::drainLoadListeners)
+            .distinct()
+        val error = AdManagerError(
+            AdFormatEnum.APP_OPEN,
+            0,
+            attemptedPlatforms,
+            message = DISABLED_LOAD_MESSAGE
+        )
+        pendingListeners.forEach {
+            safeListenerCall {
+                it.onError(error)
             }
         }
     }
@@ -383,8 +431,13 @@ class AppOpenAdManager private constructor(
         message: String,
         platform: AdPlatformTypeEnum?
     ) {
-        safeListenerCall { globalShowListener?.onError(AdErrorMode.MANAGER, message, platform) }
-        safeListenerCall { listener?.onError(AdErrorMode.MANAGER, message, platform) }
+        val error = AdManagerError(
+            AdFormatEnum.APP_OPEN,
+            0,
+            platform?.let(::listOf) ?: emptyList(),
+            message = message
+        )
+        notifyShowListeners(listener) { it.onError(error) }
     }
 
     private fun notifyLoadError(
@@ -392,8 +445,29 @@ class AppOpenAdManager private constructor(
         message: String,
         platform: AdPlatformTypeEnum?
     ) {
-        safeListenerCall { globalLoadListener?.onError(AdErrorMode.MANAGER, message, platform) }
-        safeListenerCall { listener?.onError(AdErrorMode.MANAGER, message, platform) }
+        val error = AdManagerError(
+            AdFormatEnum.APP_OPEN,
+            0,
+            platform?.let(::listOf) ?: emptyList(),
+            message = message
+        )
+        notifyLoadListeners(listener) { it.onError(error) }
+    }
+
+    private fun notifyShowListeners(
+        listener: AdPlatformShowListener?,
+        notify: (AdPlatformShowListener) -> Unit
+    ) {
+        globalShowListener?.let { safeListenerCall { notify(it) } }
+        if (listener !== globalShowListener) listener?.let { safeListenerCall { notify(it) } }
+    }
+
+    private fun notifyLoadListeners(
+        listener: AdPlatformLoadListener?,
+        notify: (AdPlatformLoadListener) -> Unit
+    ) {
+        globalLoadListener?.let { safeListenerCall { notify(it) } }
+        if (listener !== globalLoadListener) listener?.let { safeListenerCall { notify(it) } }
     }
 
     private fun recordShowTime() {

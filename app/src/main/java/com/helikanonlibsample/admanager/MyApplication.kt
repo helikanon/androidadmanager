@@ -31,23 +31,30 @@ class MyApplication : Application() {
             "applovin,admob",
 
             object : AdPlatformShowListener() {
-                override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
+                override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum) {
                     Log.e("adManager", "AppOpenAdManager >>> success display")
                 }
 
-                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
+                override fun onPlatformError(error: AdPlatformError) {
+                    Log.e("adManager", "AppOpenAdManager platform show error >>> ${error.message}")
+                }
 
-                    Log.e("adManager", "AppOpenAdManager show error >>> $errorMessage")
+                override fun onError(error: AdManagerError) {
+                    Log.e("adManager", "AppOpenAdManager show error >>> ${error.message}")
                 }
 
             },
             object : AdPlatformLoadListener() {
-                override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+                override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum) {
                     Log.e("adManager", "AppOpenAdManager >>> success load")
                 }
 
-                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                    Log.e("adManager", "AppOpenAdManager load error >>> $errorMessage")
+                override fun onPlatformError(error: AdPlatformError) {
+                    Log.e("adManager", "AppOpenAdManager platform load error >>> ${error.message}")
+                }
+
+                override fun onError(error: AdManagerError) {
+                    Log.e("adManager", "AppOpenAdManager load error >>> ${error.message}")
                 }
 
             }
@@ -200,43 +207,41 @@ class MyApplication : Application() {
 
 
         adManager.globalInterstitialLoadListener = object : AdPlatformLoadListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                if (errorMode == AdErrorMode.MANAGER) {
-                    Log.d("adManager", "[LOAD][INTERSTITIAL] AdErrorMode.MANAGER globalInterstitialLoadListener > $errorMessage")
-                } else {
-                    Log.d("adManager", "[LOAD][INTERSTITIAL] AdErrorMode.PLATFORM globalInterstitialLoadListener > $errorMessage ${adPlatformEnum?.name}")
-                }
+            override fun onPlatformError(error: AdPlatformError) {
+                Log.d("adManager", "[LOAD][INTERSTITIAL][PLATFORM] ${error.message} ${error.platform.name}")
+            }
+
+            override fun onError(error: AdManagerError) {
+                Log.d("adManager", "[LOAD][INTERSTITIAL][MANAGER] ${error.message}")
             }
         }
         adManager.globalRewardedLoadListener = object : AdPlatformLoadListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                if (errorMode == AdErrorMode.MANAGER) {
-                    Log.d("adManager", "[LOAD][REWARDED] AdErrorMode.MANAGER globalRewardedLoadListener > $errorMessage")
-                } else {
-                    Log.d("adManager", "[LOAD][REWARDED] AdErrorMode.PLATFORM globalRewardedLoadListener > $errorMessage ${adPlatformEnum?.name}")
-                }
+            override fun onPlatformError(error: AdPlatformError) {
+                Log.d("adManager", "[LOAD][REWARDED][PLATFORM] ${error.message} ${error.platform.name}")
+            }
+
+            override fun onError(error: AdManagerError) {
+                Log.d("adManager", "[LOAD][REWARDED][MANAGER] ${error.message}")
             }
         }
 
         adManager.globalInterstitialShowListener = object : AdPlatformShowListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                if (errorMode == AdErrorMode.MANAGER) {
-                    Log.d("adManager", "[SHOW][INTERSTITIAL] AdErrorMode.MANAGER globalInterstitialShowListener > $errorMessage")
-                } else {
-                    Log.d("adManager", "[SHOW][INTERSTITIAL] AdErrorMode.PLATFORM globalInterstitialShowListener > $errorMessage ${adPlatformEnum?.name}")
-                }
+            override fun onPlatformError(error: AdPlatformError) {
+                Log.d("adManager", "[SHOW][INTERSTITIAL][PLATFORM] ${error.message} ${error.platform.name}")
+            }
+
+            override fun onError(error: AdManagerError) {
+                Log.d("adManager", "[SHOW][INTERSTITIAL][MANAGER] ${error.message}")
             }
         }
 
         adManager.globalRewardedShowListener = object : AdPlatformShowListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                // AdErrorMode.MANAGER >> it means . We tried to load in all platforms but no one load interstitial
-                if (errorMode == AdErrorMode.MANAGER) {
-                    Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.MANAGER globalRewardedShowListener > $errorMessage")
-                } else {
-                    Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.PLATFORM globalRewardedShowListener > $errorMessage ${adPlatformEnum?.name}")
-                }
+            override fun onPlatformError(error: AdPlatformError) {
+                Log.d("adManager", "[SHOW][REWARDED][PLATFORM] ${error.message} ${error.platform.name}")
+            }
 
+            override fun onError(error: AdManagerError) {
+                Log.d("adManager", "[SHOW][REWARDED][MANAGER] ${error.message}")
             }
         }
 
@@ -255,11 +260,11 @@ class MyApplication : Application() {
         /*
         adManager.initializePlatforms()
         adManager.loadInterstitial(object:AdPlatformLoadListener(){
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(error: AdManagerError) {
             }
         })
         adManager.loadRewarded(object:AdPlatformLoadListener(){
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?) {
+            override fun onError(error: AdManagerError) {
             }
         })
         */

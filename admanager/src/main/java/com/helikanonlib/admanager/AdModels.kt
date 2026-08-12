@@ -3,12 +3,6 @@ package com.helikanonlib.admanager
 
 
 
-enum class AdErrorMode {
-    MANAGER,
-    PLATFORM
-}
-
-
 enum class AdPlatformTypeEnum {
     FACEBOOK,
     ADMOB,
@@ -25,7 +19,24 @@ enum class AdFormatEnum {
     MREC,
     NATIVE,
     NATIVE_MEDIUM,
+    APP_OPEN,
 }
+
+data class AdPlatformError @JvmOverloads constructor(
+    val format: AdFormatEnum,
+    val platform: AdPlatformTypeEnum,
+    val placementGroupIndex: Int,
+    val message: String,
+    val cause: Throwable? = null
+)
+
+data class AdManagerError @JvmOverloads constructor(
+    val format: AdFormatEnum,
+    val placementGroupIndex: Int,
+    val attemptedPlatforms: List<AdPlatformTypeEnum> = emptyList(),
+    val platformErrors: List<AdPlatformError> = emptyList(),
+    val message: String
+)
 
 
 data class AdPlatformModel @JvmOverloads constructor(

@@ -88,7 +88,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
                 viewIntances.put(placementName, null)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> error code=${error?.code} / ${error?.message}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, placementGroupIndex, "${platform.name} interstitial >> error code=${error?.code} / ${error?.message}"))
             }
 
             override fun onAdDisplayed(ad: MaxAd) {
@@ -116,7 +116,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showInterstitial(activity: Activity, shownWhere: String, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         if (!isInterstitialLoaded(placementGroupIndex)) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded", platform)
+            listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, placementGroupIndex, "${platform.name} interstitial >> noads loaded"))
             return
         }
 
@@ -143,12 +143,12 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
                 viewIntances[placementName] = null
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial show >> error code=${error?.code} / ${error?.message}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, placementGroupIndex, "${platform.name} interstitial show >> error code=${error?.code} / ${error?.message}"))
             }
 
             override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
                 viewIntances[placementName] = null
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial show >> error code=${error?.code} / ${error?.message}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, placementGroupIndex, "${platform.name} interstitial show >> error code=${error?.code} / ${error?.message}"))
             }
         })
 
@@ -193,7 +193,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
             override fun onAdLoadFailed(adUnitId: String, error: MaxError) {
                 viewIntances.put(placementName, null)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded load >> error code=${error?.code} / ${error?.message}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.REWARDED, placementGroupIndex, "${platform.name} rewarded load >> error code=${error?.code} / ${error?.message}"))
             }
 
 
@@ -224,7 +224,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         if (!isRewardedLoaded(placementGroupIndex)) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noadsloaded", platform)
+            listener?.onPlatformError(platformError(AdFormatEnum.REWARDED, placementGroupIndex, "${platform.name} rewarded >> noadsloaded"))
             return
         }
 
@@ -253,7 +253,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             }
 
             override fun onAdDisplayFailed(ad: MaxAd, error: MaxError) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded show >> error code=${error?.code} / ${error?.message}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.REWARDED, placementGroupIndex, "${platform.name} rewarded show >> error code=${error?.code} / ${error?.message}"))
                 viewIntances[placementName] = null
             }
 
@@ -310,7 +310,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(bannerAdView)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.BANNER, placementGroupIndex, "${platform.name} banner >> isbannerloaded"))
             }
             return
         }
@@ -356,7 +356,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                         _removeBannerViewIfExists(bannerAdView, containerView)
                     }
 
-                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=${error?.code} / ${error?.message}", platform)
+                    listener?.onPlatformError(platformError(AdFormatEnum.BANNER, placementGroupIndex, "${platform.name} banner >> error code=${error?.code} / ${error?.message}"))
                 }
             }
 
@@ -404,7 +404,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(mrecAdView)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ismrecloaded", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.MREC, placementGroupIndex, "${platform.name} mrec >> ismrecloaded"))
             }
             return
         }
@@ -442,7 +442,7 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                         _removeBannerViewIfExists(mrecAdView, containerView)
                     }
 
-                    listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> error code=${error?.code} / ${error?.message}", platform)
+                    listener?.onPlatformError(platformError(AdFormatEnum.MREC, placementGroupIndex, "${platform.name} mrec >> error code=${error?.code} / ${error?.message}"))
                 }
             }
 
@@ -518,9 +518,12 @@ class ApplovinAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onNativeAdLoadFailed(adUnitId: String, error: MaxError) {
                 super.onNativeAdLoadFailed(adUnitId, error)
 
-                listener?.onError(
-                    AdErrorMode.PLATFORM, error?.message
-                        ?: "applovin native ad load error", platform
+                listener?.onPlatformError(
+                    platformError(
+                        nativeAdFormat,
+                        placementGroupIndex,
+                        error?.message ?: "applovin native ad load error"
+                    )
                 )
             }
 

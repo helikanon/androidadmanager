@@ -11,10 +11,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.helikanonlib.admanager.AdErrorMode;
+import com.helikanonlib.admanager.AdManagerError;
 import com.helikanonlib.admanager.AdManager;
 import com.helikanonlib.admanager.AdPlacementGroupModel;
 import com.helikanonlib.admanager.AdPlatformModel;
+import com.helikanonlib.admanager.AdPlatformError;
 import com.helikanonlib.admanager.AdPlatformShowListener;
 import com.helikanonlib.admanager.AdPlatformTypeEnum;
 import com.helikanonlib.admanager.AdPlatformWrapper;
@@ -22,6 +23,7 @@ import com.helikanonlib.admanager.adplatforms.AdmobAdWrapper;
 
 
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public class JavaSampleActivity extends AppCompatActivity {
 
@@ -179,17 +181,18 @@ public class JavaSampleActivity extends AppCompatActivity {
 
         adManager.setGlobalRewardedShowListener(new AdPlatformShowListener() {
             @Override
-            public void onRewarded(@Nullable String type, @Nullable Integer amount, @Nullable AdPlatformTypeEnum adPlatformEnum) {
+            public void onRewarded(@Nullable String type, @Nullable Integer amount, @NotNull AdPlatformTypeEnum adPlatformEnum) {
                 Toast.makeText(JavaSampleActivity.this, "Rewarded", Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onError(@Nullable AdErrorMode errorMode, @Nullable String errorMessage, @Nullable AdPlatformTypeEnum adPlatformEnum) {
-                if (errorMode == AdErrorMode.MANAGER) {
-                    Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.MANAGER globalRewardedLoadListener > $errorMessage");
-                } else {
-                    Log.d("adManager", "[SHOW][REWARDED] AdErrorMode.PLATFORM globalRewardedLoadListener > " + errorMessage + " | " + adPlatformEnum.name());
-                }
+            public void onPlatformError(@NotNull AdPlatformError error) {
+                Log.d("adManager", "[SHOW][REWARDED][PLATFORM] " + error.getMessage() + " | " + error.getPlatform().name());
+            }
+
+            @Override
+            public void onError(@NotNull AdManagerError error) {
+                Log.d("adManager", "[SHOW][REWARDED][MANAGER] " + error.getMessage());
             }
         });
 

@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         /*val x = MyApplication.adManager.getAdPlatformByType(AdPlatformTypeEnum.ADMOB)?.platformInstance as AdmobAdWrapper
         x.loadNativeAds(this, 3, object : AdPlatformLoadListener() {
-            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum) {
                 super.onLoaded(adPlatformEnum)
                 x.showNative(this@MainActivity, 1, bannerContainer, "medium")
             }
@@ -43,14 +43,22 @@ class MainActivity : AppCompatActivity() {
         MyApplication.adManager.onResume(this)
 
         MyApplication.adManager.showBanner(this, binding.bannerContainer, object : AdPlatformShowListener() {
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                Log.d("MyApplication.adManager", "[BANNER] AdErrorMode.PLATFORM showBanner>> $errorMode $errorMessage ${adPlatformEnum?.name}")
+            override fun onPlatformError(error: AdPlatformError) {
+                Log.d("MyApplication.adManager", "[BANNER][PLATFORM] ${error.message} ${error.platform.name}")
+            }
+
+            override fun onError(error: AdManagerError) {
+                Log.d("MyApplication.adManager", "[BANNER][MANAGER] ${error.message}")
             }
         })
         Handler(Looper.getMainLooper()).postDelayed({
             MyApplication.adManager.showMrec(this, binding.mrecContainer, object : AdPlatformShowListener() {
-                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                    Log.d("MyApplication.adManager", "[MREC] AdErrorMode.PLATFORM showMrec>> $errorMode $errorMessage ${adPlatformEnum?.name}")
+                override fun onPlatformError(error: AdPlatformError) {
+                    Log.d("MyApplication.adManager", "[MREC][PLATFORM] ${error.message} ${error.platform.name}")
+                }
+
+                override fun onError(error: AdManagerError) {
+                    Log.d("MyApplication.adManager", "[MREC][MANAGER] ${error.message}")
                 }
             })
         }, 3000)
@@ -73,24 +81,28 @@ class MainActivity : AppCompatActivity() {
     fun initViews() {
         binding.btnShowInterstitial.setOnClickListener {
             MyApplication.adManager.showInterstitial(this, "btnShowInterstitial", object : AdPlatformShowListener() {
-                override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum?) {
+                override fun onDisplayed(adPlatformEnum: AdPlatformTypeEnum) {
                     super.onDisplayed(adPlatformEnum)
                 }
 
-                override fun onClicked(adPlatformEnum: AdPlatformTypeEnum?) {
+                override fun onClicked(adPlatformEnum: AdPlatformTypeEnum) {
                     super.onClicked(adPlatformEnum)
                 }
 
-                override fun onClosed(adPlatformEnum: AdPlatformTypeEnum?) {
+                override fun onClosed(adPlatformEnum: AdPlatformTypeEnum) {
                     super.onClosed(adPlatformEnum)
                 }
 
-                override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum?) {
+                override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum) {
                     super.onRewarded(type, amount, adPlatformEnum)
                 }
 
-                override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                    super.onError(errorMode, errorMessage, adPlatformEnum)
+                override fun onPlatformError(error: AdPlatformError) {
+                    super.onPlatformError(error)
+                }
+
+                override fun onError(error: AdManagerError) {
+                    super.onError(error)
                 }
 
             }) // if autoload mode is false it will load and show
@@ -98,7 +110,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnShowRewarded.setOnClickListener {
             MyApplication.adManager.showRewarded(this, object : AdPlatformShowListener() {
-                override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum?) {
+                override fun onRewarded(type: String?, amount: Int?, adPlatformEnum: AdPlatformTypeEnum) {
                     super.onRewarded(type, amount, adPlatformEnum)
                 }
             }) // if autoload mode is false it will load and show
@@ -143,23 +155,23 @@ class MainActivity : AppCompatActivity() {
         MyApplication.adManager.initializePlatformsWithActivity(this)
         MyApplication.adManager.start(this)
         MyApplication.adManager.loadNativeAds(this, AdFormatEnum.NATIVE, 3, object : AdPlatformLoadListener() {
-            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum) {
                 super.onLoaded(adPlatformEnum)
             }
 
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                super.onError(errorMode, errorMessage, adPlatformEnum)
+            override fun onError(error: AdManagerError) {
+                super.onError(error)
             }
 
         })
 
         MyApplication.adManager.loadNativeAds(this, AdFormatEnum.NATIVE_MEDIUM, 3, object : AdPlatformLoadListener() {
-            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+            override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum) {
                 super.onLoaded(adPlatformEnum)
             }
 
-            override fun onError(errorMode: AdErrorMode?, errorMessage: String?, adPlatformEnum: AdPlatformTypeEnum?) {
-                super.onError(errorMode, errorMessage, adPlatformEnum)
+            override fun onError(error: AdManagerError) {
+                super.onError(error)
             }
 
         })

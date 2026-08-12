@@ -29,43 +29,49 @@ class AppOpenAdManagerTest {
         val adapter = FakeAppOpenAdAdapter()
         val manager = createManager(adapter)
         var loaded = false
-        var errorMode: AdErrorMode? = null
+        var managerError: AdManagerError? = null
 
         manager.load(loadListener(
             onLoaded = { loaded = true },
-            onError = { errorMode = it }
+            onError = { managerError = it }
         ))
         manager.disable()
 
-        assertEquals(AdErrorMode.MANAGER, errorMode)
+        assertEquals(AdFormatEnum.APP_OPEN, managerError?.format)
         adapter.completeLoad()
         assertFalse(loaded)
         assertEquals(1, adapter.invalidateCallCount)
     }
 
     @Test
-    fun `load failure is forwarded with platform error mode`() {
+    fun `load failure reports platform detail before terminal manager error`() {
         val adapter = FakeAppOpenAdAdapter()
         val manager = createManager(adapter)
-        var errorMode: AdErrorMode? = null
+        var platformError: AdPlatformError? = null
+        var managerError: AdManagerError? = null
 
-        manager.load(loadListener(onError = { errorMode = it }))
+        manager.load(loadListener(
+            onPlatformError = { platformError = it },
+            onError = { managerError = it }
+        ))
         adapter.failLoad("network")
 
-        assertEquals(AdErrorMode.PLATFORM, errorMode)
+        assertEquals(AdPlatformTypeEnum.ADMOB, platformError?.platform)
+        assertEquals("network", platformError?.message)
+        assertEquals(listOf(platformError), managerError?.platformErrors)
     }
 
     @Test
     fun `disabled manager does not start adapter load`() {
         val adapter = FakeAppOpenAdAdapter()
         val manager = createManager(adapter)
-        var errorMode: AdErrorMode? = null
+        var managerError: AdManagerError? = null
 
         manager.disable()
-        manager.load(loadListener(onError = { errorMode = it }))
+        manager.load(loadListener(onError = { managerError = it }))
 
         assertEquals(0, adapter.loadCallCount)
-        assertEquals(AdErrorMode.MANAGER, errorMode)
+        assertEquals(AdFormatEnum.APP_OPEN, managerError?.format)
     }
 
     private fun createManager(adapter: FakeAppOpenAdAdapter): AppOpenAdManager {
@@ -78,18 +84,19 @@ class AppOpenAdManagerTest {
 
     private fun loadListener(
         onLoaded: () -> Unit = {},
-        onError: (AdErrorMode?) -> Unit = {}
+        onPlatformError: (AdPlatformError) -> Unit = {},
+        onError: (AdManagerError) -> Unit = {}
     ) = object : AdPlatformLoadListener() {
-        override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum?) {
+        override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum) {
             onLoaded()
         }
 
-        override fun onError(
-            errorMode: AdErrorMode?,
-            errorMessage: String?,
-            adPlatformEnum: AdPlatformTypeEnum?
-        ) {
-            onError(errorMode)
+        override fun onPlatformError(error: AdPlatformError) {
+            onPlatformError(error)
+        }
+
+        override fun onError(error: AdManagerError) {
+            onError(error)
         }
     }
 }

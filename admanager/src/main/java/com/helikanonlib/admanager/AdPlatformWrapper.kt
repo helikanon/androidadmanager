@@ -19,6 +19,13 @@ abstract class AdPlatformWrapper(open var appId: String) {
         return placementGroups.get(placementGroupIndex)
     }
 
+    protected fun platformError(
+        format: AdFormatEnum,
+        placementGroupIndex: Int,
+        message: String,
+        cause: Throwable? = null
+    ) = AdPlatformError(format, platform, placementGroupIndex, message, cause)
+
     /*var interstitialPlacementId: String? = null
     var bannerPlacementId: String? = null
     var rewardedPlacementId: String? = null
@@ -188,5 +195,4 @@ abstract class AdPlatformWrapper(open var appId: String) {
 
 
 }
-
 

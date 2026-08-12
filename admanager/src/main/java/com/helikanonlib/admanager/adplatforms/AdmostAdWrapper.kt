@@ -67,7 +67,7 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 super.onFail(errorCode)
 
                 viewIntances.put(placementName, null)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> error code=${errorCode} / ${errorCode}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, 0, "${platform.name} interstitial >> error code=${errorCode} / ${errorCode}"))
             }
         })
         interstitial.refreshAd(false)
@@ -77,7 +77,7 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showInterstitial(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         if (!isInterstitialLoaded(placementGroupIndex)) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial >> noads loaded", platform)
+            listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, 0, "${platform.name} interstitial >> noads loaded"))
             return
         }
 
@@ -89,7 +89,7 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 super.onFail(errorCode)
 
                 viewIntances[placementName] = null
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} interstitial show >> error code=${errorCode} / ${errorCode}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.INTERSTITIAL, 0, "${platform.name} interstitial show >> error code=${errorCode} / ${errorCode}"))
             }
 
             override fun onDismiss(message: String?) {
@@ -166,7 +166,7 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(bannerAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> isbannerloaded", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.BANNER, 0, "${platform.name} banner >> isbannerloaded"))
             }
             return
         }
@@ -187,7 +187,7 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onFail(errorCode: Int) {
                 super.onFail(errorCode)
                 viewIntances[placementName] = null
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} banner >> error code=${errorCode} / ${errorCode}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.BANNER, 0, "${platform.name} banner >> error code=${errorCode} / ${errorCode}"))
             }
 
             override fun onClick(network: String?) {
@@ -227,7 +227,7 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 super.onFail(errorCode)
 
                 viewIntances.put(placementName, null)
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> error code=${errorCode} / ${errorCode}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.REWARDED, 0, "${platform.name} rewarded >> error code=${errorCode} / ${errorCode}"))
             }
         })
         rewarded.refreshAd(false)
@@ -237,7 +237,7 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
 
     override fun showRewarded(activity: Activity, listener: AdPlatformShowListener?, placementGroupIndex: Int) {
         if (!isRewardedLoaded(placementGroupIndex)) {
-            listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded >> noads loaded", platform)
+            listener?.onPlatformError(platformError(AdFormatEnum.REWARDED, 0, "${platform.name} rewarded >> noads loaded"))
             return
         }
 
@@ -249,7 +249,7 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 super.onFail(errorCode)
 
                 viewIntances[placementName] = null
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} rewarded show >> error code=${errorCode} / ${errorCode}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.REWARDED, 0, "${platform.name} rewarded show >> error code=${errorCode} / ${errorCode}"))
             }
 
             override fun onDismiss(message: String?) {
@@ -326,7 +326,7 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
                 containerView.addView(mrecAdView, lp)
                 listener?.onDisplayed(platform)
             } catch (e: Exception) {
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> ismrecloaded", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.MREC, 0, "${platform.name} mrec >> ismrecloaded"))
             }
             return
         }
@@ -347,7 +347,7 @@ class AdmostAdWrapper(override var appId: String) : AdPlatformWrapper(appId) {
             override fun onFail(errorCode: Int) {
                 super.onFail(errorCode)
                 viewIntances[placementName] = null
-                listener?.onError(AdErrorMode.PLATFORM, "${platform.name} mrec >> error code=${errorCode} / ${errorCode}", platform)
+                listener?.onPlatformError(platformError(AdFormatEnum.MREC, 0, "${platform.name} mrec >> error code=${errorCode} / ${errorCode}"))
             }
 
             override fun onClick(network: String?) {
