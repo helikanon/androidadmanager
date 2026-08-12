@@ -72,22 +72,12 @@ class AdManager {
     private var handlerThread: HandlerThread? = null
     private var autoloadInterstitialHandler: Handler? = null
     private var autoloadRewardedHandler: Handler? = null
-    private var displayLeaseHandler: Handler? = null
     private var hasWorkingAutoloadInterstitialHandler = false
     private var hasWorkingAutoloadRewardedHandler = false
-    var fullScreenDisplayLeaseTimeoutMillis: Long = 2 * 60 * 1_000L
 
-    private val displayLeaseRegistry = FullScreenAdLeaseRegistry<Activity>(
-        DisplayLeaseTimeoutScheduler { delayMillis, action ->
-            val handler = displayLeaseHandler
-            val timeoutRunnable = Runnable(action)
-            val scheduled = handler?.postDelayed(timeoutRunnable, delayMillis) == true
-            if (!scheduled) action()
-            DisplayLeaseTimeoutCancellation {
-                handler?.removeCallbacks(timeoutRunnable)
-            }
-        }
-    )
+    // Keep leases reachable outside SDK callbacks so Activity/manager destruction can unblock App Open ads.
+    private val displayLeaseLock = Any()
+    private val displayLeasesByActivity = IdentityHashMap<Activity, MutableSet<AppOpenAdDisplayGate.Lease>>()
 
     var lastShowDateByAdFormat = mutableMapOf<AdFormatEnum, Date>()
 
@@ -104,8 +94,39 @@ class AdManager {
             hasWorkingAutoloadRewardedHandler = false
             autoloadInterstitialHandler = Handler(handlerThread!!.looper)
             autoloadRewardedHandler = Handler(handlerThread!!.looper)
-            displayLeaseHandler = Handler(handlerThread!!.looper)
         }
+    }
+
+    private fun acquireFullScreenDisplayLease(activity: Activity): AppOpenAdDisplayGate.Lease {
+        return synchronized(displayLeaseLock) {
+            AppOpenAdDisplayGate.acquire().also { lease ->
+                displayLeasesByActivity.getOrPut(activity, ::mutableSetOf).add(lease)
+            }
+        }
+    }
+
+    private fun releaseFullScreenDisplayLease(activity: Activity, lease: AppOpenAdDisplayGate.Lease) {
+        synchronized(displayLeaseLock) {
+            displayLeasesByActivity[activity]?.let { activityLeases ->
+                activityLeases.remove(lease)
+                if (activityLeases.isEmpty()) displayLeasesByActivity.remove(activity)
+            }
+        }
+        lease.release()
+    }
+
+    private fun releaseFullScreenDisplayLeases(activity: Activity) {
+        val leases = synchronized(displayLeaseLock) {
+            displayLeasesByActivity.remove(activity)?.toList().orEmpty()
+        }
+        leases.forEach { it.release() }
+    }
+
+    private fun releaseAllFullScreenDisplayLeases() {
+        val leases = synchronized(displayLeaseLock) {
+            displayLeasesByActivity.values.flatten().also { displayLeasesByActivity.clear() }
+        }
+        leases.forEach { it.release() }
     }
 
     fun initializePlatformsWithActivity(activity: Activity) {
@@ -576,10 +597,10 @@ class AdManager {
         if (!showAds) return true
 
         val interstitialAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.INTERSTITIAL, placementGroupIndex)
-        var displayLease: ReleasableDisplayLease? = null
+        var displayLease: AppOpenAdDisplayGate.Lease? = null
 
         fun releaseDisplayLease() {
-            displayLease?.release()
+            displayLease?.let { releaseFullScreenDisplayLease(activity, it) }
             displayLease = null
         }
 
@@ -654,7 +675,7 @@ class AdManager {
         }
 
         fun showLoadedInterstitial(loadedPlatform: AdPlatformModel): Boolean {
-            displayLease = displayLeaseRegistry.acquire(activity, fullScreenDisplayLeaseTimeoutMillis)
+            displayLease = acquireFullScreenDisplayLease(activity)
             return try {
                 loadedPlatform.platformInstance.showInterstitial(activity, shownWhere, _listener, placementGroupIndex)
                 true
@@ -1087,10 +1108,10 @@ class AdManager {
         if (!showAds) return true
 
         val rewardedAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.REWARDED, placementGroupIndex)
-        var displayLease: ReleasableDisplayLease? = null
+        var displayLease: AppOpenAdDisplayGate.Lease? = null
 
         fun releaseDisplayLease() {
-            displayLease?.release()
+            displayLease?.let { releaseFullScreenDisplayLease(activity, it) }
             displayLease = null
         }
 
@@ -1139,7 +1160,7 @@ class AdManager {
         }
 
         fun showLoadedRewarded(loadedPlatform: AdPlatformModel): Boolean {
-            displayLease = displayLeaseRegistry.acquire(activity, fullScreenDisplayLeaseTimeoutMillis)
+            displayLease = acquireFullScreenDisplayLease(activity)
             return try {
                 loadedPlatform.platformInstance.showRewarded(activity, _listener, placementGroupIndex)
                 true
@@ -1314,7 +1335,7 @@ class AdManager {
     }
 
     fun destroy(activity: Activity) {
-        displayLeaseRegistry.releaseAll()
+        releaseAllFullScreenDisplayLeases()
 
         adPlatforms.forEach {
             it.platformInstance.destroy(activity)
@@ -1322,15 +1343,13 @@ class AdManager {
 
         stopAutoloadInterstitialHandler()
         stopAutoloadRewardedHandler()
-        displayLeaseHandler?.removeCallbacksAndMessages(null)
-        displayLeaseHandler = null
         handlerThread?.quit()
         handlerThread = null
     }
 
     // TODO this fun will check. and it will remove if unnecessary
     fun onDestroyActivity(activity: Activity) {
-        displayLeaseRegistry.release(activity)
+        releaseFullScreenDisplayLeases(activity)
         //stopAutoloadInterstitialHandler()
         //stopAutoloadRewardedHandler()
         //destroyBannersAndMrecs(activity)
