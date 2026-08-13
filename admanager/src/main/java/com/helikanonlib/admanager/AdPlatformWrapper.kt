@@ -13,10 +13,11 @@ abstract class AdPlatformWrapper(open var appId: String) {
     var isInitialized: Boolean = false
     var placementGroups: java.util.ArrayList<AdPlacementGroupModel> = java.util.ArrayList()
     protected fun getPlacementGroupByIndex(placementGroupIndex: Int): AdPlacementGroupModel {
-        /*if (index >= placementGroups.size) {
-            return null
-        }*/
-        return placementGroups.get(placementGroupIndex)
+        require(placementGroupIndex in placementGroups.indices) {
+            "Invalid placement group index $placementGroupIndex for $platform. " +
+                "Configured groups: ${placementGroups.map { it.groupName }}"
+        }
+        return placementGroups[placementGroupIndex]
     }
 
     protected fun platformError(

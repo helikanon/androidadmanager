@@ -368,11 +368,37 @@ class AdManager {
 
 
     fun getPlacementGroupIndexByName(pgName: String): Int {
-        return placementGroups.indexOf(pgName)
+        val placementGroupIndex = placementGroups.indexOf(pgName)
+        require(placementGroupIndex >= 0) {
+            "Unknown placement group '$pgName'. Configured groups: $placementGroups"
+        }
+        return placementGroupIndex
     }
 
     fun getPlacementGroupNameByIndex(pgIndex: Int): String {
+        require(pgIndex in placementGroups.indices) {
+            "Invalid placement group index $pgIndex. Configured groups: $placementGroups"
+        }
         return placementGroups[pgIndex]
+    }
+
+    private fun validatePlacementGroup(placementGroupIndex: Int): String {
+        val placementGroupName = getPlacementGroupNameByIndex(placementGroupIndex)
+
+        adPlatforms.forEach { platform ->
+            val platformPlacementGroups = platform.platformInstance.placementGroups
+            val platformName = platform.platformInstance.platform.name
+
+            require(placementGroupIndex in platformPlacementGroups.indices) {
+                "Placement group '$placementGroupName' at index $placementGroupIndex is not configured for $platformName"
+            }
+            require(platformPlacementGroups[placementGroupIndex].groupName == placementGroupName) {
+                "Placement group mismatch for $platformName at index $placementGroupIndex: " +
+                    "expected '$placementGroupName', found '${platformPlacementGroups[placementGroupIndex].groupName}'"
+            }
+        }
+
+        return placementGroupName
     }
 
     /**
@@ -381,6 +407,7 @@ class AdManager {
      * adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,facebook,admob,mopub")
      */
     fun setAdPlatformSortByAdFormatStr(placementGroupIndex: Int, adFormatName: String, adPlatformsStr: String) {
+        val placementGroupName = getPlacementGroupNameByIndex(placementGroupIndex)
         try {
             val _afPlatformsArr = adPlatformsStr.splitIgnoreEmpty(",").map {
                 if (!it.isNullOrEmpty()) {
@@ -390,7 +417,7 @@ class AdManager {
                 }
             }
             adPlatformSortByAdFormat.put(
-                adFormatName.uppercase(Locale.ENGLISH) + "__" + getPlacementGroupNameByIndex(placementGroupIndex), _afPlatformsArr
+                adFormatName.uppercase(Locale.ENGLISH) + "__" + placementGroupName, _afPlatformsArr
             )
         } catch (e: Exception) {
             Log.e("AdManager", "setAdPlatformSortByAdFormatStr >> ${e.message}")
@@ -400,7 +427,8 @@ class AdManager {
 
     private fun _getAdPlatformsWithSortedByAdFormat(adFormatEnum: AdFormatEnum, placementGroupIndex: Int): MutableList<AdPlatformModel> {
         val filteredAdPlatforms = mutableListOf<AdPlatformModel>()
-        val adFormatSort = adPlatformSortByAdFormat[adFormatEnum.name.uppercase(Locale.ENGLISH) + "__" + getPlacementGroupNameByIndex(placementGroupIndex)]
+        val placementGroupName = validatePlacementGroup(placementGroupIndex)
+        val adFormatSort = adPlatformSortByAdFormat[adFormatEnum.name.uppercase(Locale.ENGLISH) + "__" + placementGroupName]
 
         if (adFormatSort != null) {
             adFormatSort.forEach { adPlatformType ->
@@ -429,6 +457,7 @@ class AdManager {
 
     @JvmOverloads
     fun loadInterstitial(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null, parallel: Boolean = false, placementGroupIndex: Int = 0) {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return
 
         if (platform == null) {
@@ -563,6 +592,7 @@ class AdManager {
      */
     @JvmOverloads
     fun loadAndShowInterstitial(activity: Activity, shownWhere: String = DEFAULT_INTERSTITIAL_SHOWN_WHERE_NAME, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
+        validatePlacementGroup(placementGroupIndex)
 
         activity.runOnUiThread {
             addLoadingViewToActivity(activity)
@@ -585,6 +615,7 @@ class AdManager {
         activity: Activity, shownWhere: String = DEFAULT_INTERSTITIAL_SHOWN_WHERE_NAME, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
         placementGroupIndex: Int = 0, loadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = true
     ) {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return
 
         var isAvailableToShow = true
@@ -607,6 +638,7 @@ class AdManager {
         activity: Activity, shownWhere: String = DEFAULT_INTERSTITIAL_SHOWN_WHERE_NAME, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
         placementGroupIndex: Int = 0, loadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = true
     ) {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return
 
         if (autoLoadForInterstitial) {
@@ -832,6 +864,7 @@ class AdManager {
 
     @JvmOverloads
     fun showBanner(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return
 
 
@@ -964,6 +997,7 @@ class AdManager {
 
     @JvmOverloads
     fun loadRewarded(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null, parallel: Boolean = false, placementGroupIndex: Int = 0) {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return
 
         if (platform == null) {
@@ -1098,6 +1132,7 @@ class AdManager {
 
     @JvmOverloads
     fun loadAndShowRewarded(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
+        validatePlacementGroup(placementGroupIndex)
         /*
         call _showRewarded(listener, platform) in onLoaded and onError because of
         we wants call listener?.onError by _showRewarded
@@ -1119,6 +1154,7 @@ class AdManager {
         activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
         placementGroupIndex: Int = 0, loadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = true
     ) {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return
 
         if (autoLoadForRewarded) {
@@ -1136,6 +1172,7 @@ class AdManager {
     }
 
     fun _showRewarded(activity: Activity, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int): Boolean {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return true
 
         val rewardedAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.REWARDED, placementGroupIndex)
@@ -1245,6 +1282,7 @@ class AdManager {
 
     @JvmOverloads
     fun showMrec(activity: Activity, containerView: RelativeLayout, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null, placementGroupIndex: Int = 0) {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return
         val mrecAdPlatforms = _getAdPlatformsWithSortedByAdFormat(AdFormatEnum.MREC, placementGroupIndex)
 
@@ -1446,6 +1484,7 @@ class AdManager {
 
     @JvmOverloads
     fun loadSmallNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0) {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return
 
         _loadNativeFromAllNetworks(activity, AdFormatEnum.NATIVE, count, listener, placementGroupIndex)
@@ -1453,6 +1492,7 @@ class AdManager {
 
     @JvmOverloads
     fun loadMediumNativeAds(activity: Activity, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0) {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return
 
         _loadNativeFromAllNetworks(activity, AdFormatEnum.NATIVE_MEDIUM, count, listener, placementGroupIndex)
@@ -1460,6 +1500,7 @@ class AdManager {
 
     @JvmOverloads
     fun loadNativeAds(activity: Activity, nativeAdFormat: AdFormatEnum, count: Int, listener: AdPlatformLoadListener? = null, placementGroupIndex: Int = 0) {
+        validatePlacementGroup(placementGroupIndex)
         if (!showAds) return
 
         _loadNativeFromAllNetworks(activity, nativeAdFormat, count, listener, placementGroupIndex)
