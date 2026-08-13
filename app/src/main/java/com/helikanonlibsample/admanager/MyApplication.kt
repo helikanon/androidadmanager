@@ -138,7 +138,7 @@ class MyApplication : Application() {
                             )
                         )*/
                     },
-                    true, true, true, true
+                    true, true, true, true, true
                 ),
                 AdPlatformModel(
                     UnityAdsAdWrapper("4428087").apply {
@@ -188,7 +188,7 @@ class MyApplication : Application() {
                             )
                         )
                     },
-                    true, true, true, true
+                    true, true, true, true, true
                 )
             )
         }

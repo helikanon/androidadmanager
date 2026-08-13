@@ -52,6 +52,11 @@ data class AdInitializationResult(
         get() = platformResults.filterNot { it.isSuccessful }.map { it.platform }
 }
 
+data class AdPlatformOrderResult(
+    val isSuccessful: Boolean,
+    val message: String? = null
+)
+
 data class AdPlatformError @JvmOverloads constructor(
     val format: AdFormatEnum,
     val platform: AdPlatformTypeEnum,

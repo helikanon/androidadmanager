@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.os.Handler
 import android.os.HandlerThread
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -428,27 +427,78 @@ class AdManager {
         return placementGroupName
     }
 
-    /**
-     * example :
-     * adManager.setAdPlatformSortByAdFormatStr("interstitial", "ironsource,mopub,admob,facebook")
-     * adManager.setAdPlatformSortByAdFormatStr("banner", "ironsource,facebook,admob,mopub")
-     */
-    fun setAdPlatformSortByAdFormatStr(placementGroupIndex: Int, adFormatName: String, adPlatformsStr: String) {
-        val placementGroupName = getPlacementGroupNameByIndex(placementGroupIndex)
-        try {
-            val _afPlatformsArr = adPlatformsStr.splitIgnoreEmpty(",").map {
-                if (!it.isNullOrEmpty()) {
-                    AdPlatformTypeEnum.valueOf(it.trim().uppercase(Locale.ENGLISH))
-                } else {
-                    AdPlatformTypeEnum.valueOf(it.trim().uppercase(Locale.ENGLISH))
-                }
-            }
-            adPlatformSortByAdFormat.put(
-                adFormatName.uppercase(Locale.ENGLISH) + "__" + placementGroupName, _afPlatformsArr
-            )
-        } catch (e: Exception) {
-            Log.e("AdManager", "setAdPlatformSortByAdFormatStr >> ${e.message}")
+    fun setAdPlatformOrder(
+        placementGroupIndex: Int,
+        adFormat: AdFormatEnum,
+        vararg platforms: AdPlatformTypeEnum
+    ): AdPlatformOrderResult {
+        val supportedFormats = setOf(
+            AdFormatEnum.INTERSTITIAL,
+            AdFormatEnum.BANNER,
+            AdFormatEnum.REWARDED,
+            AdFormatEnum.MREC,
+            AdFormatEnum.NATIVE,
+            AdFormatEnum.NATIVE_MEDIUM
+        )
+        if (adFormat !in supportedFormats) {
+            return AdPlatformOrderResult(false, "Platform order is not supported for ${adFormat.name}")
         }
+        if (platforms.isEmpty()) {
+            return AdPlatformOrderResult(false, "Platform order cannot be empty")
+        }
+        if (platforms.distinct().size != platforms.size) {
+            return AdPlatformOrderResult(false, "Platform order contains duplicate platforms: ${platforms.toList()}")
+        }
+
+        val placementGroupName = try {
+            validatePlacementGroup(placementGroupIndex)
+        } catch (error: IllegalArgumentException) {
+            return AdPlatformOrderResult(false, error.message)
+        }
+
+        platforms.forEach { platformType ->
+            val platform = getAdPlatformByType(platformType)
+                ?: return AdPlatformOrderResult(false, "$platformType is not configured in AdManager")
+
+            if (!platform.isEnabledFor(adFormat)) {
+                return AdPlatformOrderResult(false, "$platformType is not enabled for ${adFormat.name}")
+            }
+        }
+
+        adPlatformSortByAdFormat[adFormat.name + "__" + placementGroupName] = platforms.toList()
+        return AdPlatformOrderResult(true)
+    }
+
+    fun setAdPlatformSortByAdFormatStr(
+        placementGroupIndex: Int,
+        adFormatName: String,
+        adPlatformsStr: String
+    ): AdPlatformOrderResult {
+        val adFormat = AdFormatEnum.entries.firstOrNull {
+            it.name.equals(adFormatName.trim(), ignoreCase = true)
+        } ?: return AdPlatformOrderResult(false, "Unknown ad format '$adFormatName'")
+
+        val platformNames = adPlatformsStr.split(',').map { it.trim() }
+        if (platformNames.isEmpty() || platformNames.any { it.isEmpty() }) {
+            return AdPlatformOrderResult(false, "Platform order contains an empty platform name")
+        }
+
+        val platforms = platformNames.map { platformName ->
+            AdPlatformTypeEnum.entries.firstOrNull {
+                it.name.equals(platformName, ignoreCase = true)
+            } ?: return AdPlatformOrderResult(false, "Unknown ad platform '$platformName'")
+        }
+
+        return setAdPlatformOrder(placementGroupIndex, adFormat, *platforms.toTypedArray())
+    }
+
+    private fun AdPlatformModel.isEnabledFor(adFormat: AdFormatEnum): Boolean = when (adFormat) {
+        AdFormatEnum.INTERSTITIAL -> showInterstitial
+        AdFormatEnum.BANNER -> showBanner
+        AdFormatEnum.REWARDED -> showRewarded
+        AdFormatEnum.MREC -> showMrec
+        AdFormatEnum.NATIVE, AdFormatEnum.NATIVE_MEDIUM -> showNative
+        AdFormatEnum.APP_OPEN -> false
     }
 
 
