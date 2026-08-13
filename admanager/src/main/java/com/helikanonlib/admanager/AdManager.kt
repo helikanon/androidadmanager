@@ -642,8 +642,11 @@ class AdManager {
     fun showInterstitialForTimeStrategy(
         activity: Activity, shownWhere: String = DEFAULT_INTERSTITIAL_SHOWN_WHERE_NAME, listener: AdPlatformShowListener? = null, platform: AdPlatformModel? = null,
         placementGroupIndex: Int = 0, loadAndShowIfNotExistsAdsOnAutoloadMode: Boolean = true
-    ) {
-        if (!showAds) return notifyShowDisabled(AdFormatEnum.INTERSTITIAL, placementGroupIndex, globalInterstitialShowListener, listener)
+    ): AdShowRequestResult {
+        if (!showAds) {
+            notifyShowDisabled(AdFormatEnum.INTERSTITIAL, placementGroupIndex, globalInterstitialShowListener, listener)
+            return AdShowRequestResult.DISABLED
+        }
         validatePlacementGroup(placementGroupIndex)
 
         var isAvailableToShow = true
@@ -658,7 +661,10 @@ class AdManager {
 
         if (isAvailableToShow) {
             showInterstitial(activity, shownWhere, listener, platform, placementGroupIndex, loadAndShowIfNotExistsAdsOnAutoloadMode)
+            return AdShowRequestResult.SHOW_REQUESTED
         }
+
+        return AdShowRequestResult.THROTTLED
     }
 
     @JvmOverloads

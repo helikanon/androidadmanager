@@ -29,6 +29,12 @@ enum class AdInitializationStatus {
     DISABLED
 }
 
+enum class AdShowRequestResult {
+    SHOW_REQUESTED,
+    THROTTLED,
+    DISABLED
+}
+
 data class AdPlatformInitializationResult(
     val platform: AdPlatformTypeEnum,
     val isSuccessful: Boolean
