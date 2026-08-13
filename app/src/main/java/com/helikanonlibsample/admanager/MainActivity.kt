@@ -153,7 +153,6 @@ class MainActivity : AppCompatActivity() {
      */
     fun initAds() {
         MyApplication.adManager.initializePlatformsWithActivity(this)
-        MyApplication.adManager.start(this)
         MyApplication.adManager.loadNativeAds(this, AdFormatEnum.NATIVE, 3, object : AdPlatformLoadListener() {
             override fun onLoaded(adPlatformEnum: AdPlatformTypeEnum) {
                 super.onLoaded(adPlatformEnum)

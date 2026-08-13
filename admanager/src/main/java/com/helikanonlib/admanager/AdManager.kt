@@ -265,25 +265,6 @@ class AdManager {
     fun isPlatformSdkInitialized(platform: AdPlatformModel): Boolean =
         platform.platformInstance.isInitialized
 
-    fun start(activity: Activity) {
-        if (autoLoadForInterstitial) {
-            placementGroups.forEachIndexed { index, pgName ->
-                // Intentionally preload only the primary placement group to avoid unused ad requests.
-                if (index > 0) return@forEachIndexed
-                loadInterstitial(activity, listener = null, platform = null, parallel = false, placementGroupIndex = getPlacementGroupIndexByName(pgName))
-            }
-
-        }
-
-        if (autoLoadForRewarded) {
-            placementGroups.forEachIndexed { index, pgName ->
-                // Intentionally preload only the primary placement group to avoid unused ad requests.
-                if (index > 0) return@forEachIndexed
-                loadRewarded(activity, null, null, false, getPlacementGroupIndexByName(pgName))
-            }
-        }
-    }
-
     fun enableTestMode(activity: Activity, deviceId: String) {
 
         this.testMode = true

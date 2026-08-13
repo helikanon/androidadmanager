@@ -262,7 +262,6 @@ class MyApplication : Application() {
             adManager.enableTestMode("47088e48-5195-4757-90b2-0da94116befd") // send device id, it is necessary for test facebook audience networks ad
         }
 
-        adManager.start()
          */
 
         // OR
