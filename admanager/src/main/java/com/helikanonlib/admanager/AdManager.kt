@@ -34,12 +34,28 @@ class AdManager {
     var autoLoadForInterstitial: Boolean = false
     var autoLoadForRewarded: Boolean = true
     var autoLoadDelay: Long = 10
+        set(value) {
+            require(value >= 0) { "autoLoadDelay cannot be negative" }
+            field = value
+        }
     var randomInterval: Int = 40
+        set(value) {
+            require(value >= 0) { "randomInterval cannot be negative" }
+            field = value
+        }
     var interstitialMinElapsedSecondsToNextShow: Int = 40
+        set(value) {
+            require(value >= 0) { "interstitialMinElapsedSecondsToNextShow cannot be negative" }
+            field = value
+        }
     var rewardedMinElapsedSecondsToNextShow: Int = 40
+        set(value) {
+            require(value >= 0) { "rewardedMinElapsedSecondsToNextShow cannot be negative" }
+            field = value
+        }
     var isEnabledLoadAndShowIfNotExistsAdsOnAutoloadMode = false
 
-    var adPlatforms: MutableList<AdPlatformModel> = mutableListOf<AdPlatformModel>()
+    private val adPlatforms = mutableListOf<AdPlatformModel>()
 
     var globalInterstitialShowListener: AdPlatformShowListener? = null
     var globalRewardedShowListener: AdPlatformShowListener? = null
@@ -91,8 +107,8 @@ class AdManager {
         notifyShowListeners(globalListener, localListener) { it.onError(error) }
     }
 
-    var adPlatformSortByAdFormat: MutableMap<String, List<AdPlatformTypeEnum>> = mutableMapOf()
-    var placementGroups = ArrayList<String>()
+    private val adPlatformSortByAdFormat = mutableMapOf<String, List<AdPlatformTypeEnum>>()
+    private val placementGroups = mutableListOf<String>()
 
     // handlers
     private var handlerThread: HandlerThread? = null
@@ -105,7 +121,7 @@ class AdManager {
     private val displayLeaseLock = Any()
     private val displayLeasesByActivity = IdentityHashMap<Activity, MutableSet<AppOpenAdDisplayGate.Lease>>()
 
-    var lastShowDateByAdFormat = mutableMapOf<AdFormatEnum, Date>()
+    private val lastShowDateByAdFormat = mutableMapOf<AdFormatEnum, Date>()
 
     constructor() {
         initHandlers()
@@ -282,7 +298,7 @@ class AdManager {
 
 
     var isEnableShowLoadingViewForInterstitial = true
-    var loadingView: AdsLoadingCustomView? = null
+    private var loadingView: AdsLoadingCustomView? = null
 
     private fun clearLoadingView(activity: Activity? = null) {
         val view = loadingView ?: return
@@ -386,7 +402,23 @@ class AdManager {
         }
     }
 
-    fun addAdPlatform(adPlatform: AdPlatformModel) = apply { this.adPlatforms.add(adPlatform) }
+    fun setPlacementGroups(placementGroups: List<String>) = apply {
+        require(placementGroups.isNotEmpty()) { "At least one placement group must be configured" }
+        require(placementGroups.none { it.isBlank() }) { "Placement group names cannot be blank" }
+        require(placementGroups.distinct().size == placementGroups.size) {
+            "Placement group names must be unique: $placementGroups"
+        }
+
+        this.placementGroups.clear()
+        this.placementGroups.addAll(placementGroups)
+    }
+
+    fun setAdPlatforms(adPlatforms: List<AdPlatformModel>) = apply {
+        this.adPlatforms.clear()
+        this.adPlatforms.addAll(adPlatforms)
+    }
+
+    fun addAdPlatform(adPlatform: AdPlatformModel) = apply { adPlatforms.add(adPlatform) }
     fun getAdPlatformByType(platformType: AdPlatformTypeEnum): AdPlatformModel? {
         val filteredPlatforms = adPlatforms.filter { it -> it.platformInstance.platform == platformType }
         return if (filteredPlatforms.size > 0) filteredPlatforms[0] else null
@@ -877,7 +909,7 @@ class AdManager {
         return hasLoadedInterstitial
     }
 
-    var lastPostDelayedSetTimeForInterstitialLoad: Date? = null
+    private var lastPostDelayedSetTimeForInterstitialLoad: Date? = null
     private fun _autoloadInterstitialByHandler(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null) {
         if (hasWorkingAutoloadInterstitialHandler) {
             if (lastPostDelayedSetTimeForInterstitialLoad != null) {
@@ -915,7 +947,7 @@ class AdManager {
     }
 
 
-    var lastPostDelayedSetTimeForRewardedLoad: Date? = null
+    private var lastPostDelayedSetTimeForRewardedLoad: Date? = null
     private fun _autoloadRewardedByHandler(activity: Activity, listener: AdPlatformLoadListener? = null, platform: AdPlatformModel? = null) {
         if (hasWorkingAutoloadRewardedHandler) {
             if (lastPostDelayedSetTimeForRewardedLoad != null) {
@@ -1479,7 +1511,7 @@ class AdManager {
         }, placementGroupIndex)
     }
 
-    fun saveLastShowDate(adFormatEnum: AdFormatEnum) {
+    private fun saveLastShowDate(adFormatEnum: AdFormatEnum) {
         lastShowDateByAdFormat.put(adFormatEnum, Date())
     }
 
@@ -1649,7 +1681,7 @@ class AdManager {
 
     }
 
-    var lastShowedAdNetworkForNativeAds: MutableMap<String, AdPlatformModel> = mutableMapOf()
+    private val lastShowedAdNetworkForNativeAds = mutableMapOf<String, AdPlatformModel>()
 
     fun showNative(activity: Activity, nativeAdFormat: AdFormatEnum, containerView: ViewGroup, listener: AdPlatformShowListener? = null, placementGroupIndex: Int = 0): Boolean {
         if (!showAds) {

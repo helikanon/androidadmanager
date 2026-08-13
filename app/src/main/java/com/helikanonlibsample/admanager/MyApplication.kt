@@ -101,8 +101,8 @@ class MyApplication : Application() {
 
             testMode = BuildConfig.DEBUG
             deviceId = "47088e48-5195-4757-90b2-0da94116befd" // necessary if testmode enabled
-            placementGroups = arrayListOf("default")
-            adPlatforms = mutableListOf<AdPlatformModel>(
+            setPlacementGroups(listOf("default"))
+            setAdPlatforms(listOf(
                 /*AdPlatformModel(
                     FacebookAdWrapper("your_app_id").apply {
                         interstitialPlacementId = "YOUR_PLACEMENT_ID"
@@ -190,7 +190,7 @@ class MyApplication : Application() {
                     },
                     true, true, true, true, true
                 )
-            )
+            ))
         }
 
 

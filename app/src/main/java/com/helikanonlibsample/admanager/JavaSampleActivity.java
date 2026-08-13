@@ -177,6 +177,7 @@ public class JavaSampleActivity extends AppCompatActivity {
         adManager.setShowAds(true);
         adManager.setTestMode(BuildConfig.DEBUG);
         adManager.setDeviceId("47088e48-5195-4757-90b2-0da94116befd"); // necessary if test mode enabled
+        adManager.setPlacementGroups(java.util.Collections.singletonList("default"));
         adManager.addAdPlatform(new AdPlatformModel(admobAdWrapper, true, false, true, true));
 
         adManager.setGlobalRewardedShowListener(new AdPlatformShowListener() {
