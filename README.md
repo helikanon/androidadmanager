@@ -772,6 +772,7 @@ val appOpenAdManager = AppOpenAdManager(
 )
 
 appOpenAdManager.minElapsedSecondsToNextShow = 30
+appOpenAdManager.minElapsedSecondsAfterFullScreenAd = 30
 appOpenAdManager.excludedActivities.add(PaymentActivity::class.java.simpleName)
 ```
 
@@ -798,7 +799,9 @@ Interval ve excluded activity kontrolleriyle gösterim:
 val result = appOpenAdManager.showIntervalElapsed(activity)
 ```
 
-`show(activity)` interval ve excluded activity kontrolü yapmaz. Uygulama foreground olduğunda otomatik gösterim için `showIntervalElapsed(activity)` kullanın.
+`show(activity)`, App Open'ın kendi gösterim intervalini ve excluded activity kontrolünü uygulamaz; fullscreen reklam sonrası cooldown kontrolü yine uygulanır. Uygulama foreground olduğunda otomatik gösterim için `showIntervalElapsed(activity)` kullanın.
+
+Her iki gösterim metodu da interstitial veya rewarded reklamın üzerinde çalışan Google Mobile Ads ve desteklenen mediation SDK'larının fullscreen Activity'lerini güvenlik amacıyla reddeder. Bu durumda sonuç `FULL_SCREEN_AD_ACTIVE` olur. Reklam kapandıktan sonra `minElapsedSecondsAfterFullScreenAd` (varsayılan 5 saniye) dolana kadar App Open gösterilmez ve `FULL_SCREEN_AD_INTERVAL_NOT_ELAPSED` döner.
 
 `AppOpenAdShowResult` değerleri:
 
@@ -809,6 +812,7 @@ val result = appOpenAdManager.showIntervalElapsed(activity)
 | `DISABLED` | App Open manager devre dışı. |
 | `SHOWING_PAUSED` | Yalnızca gösterimler duraklatılmış. |
 | `FULL_SCREEN_AD_ACTIVE` | Interstitial veya Rewarded gibi başka bir fullscreen reklam aktif. |
+| `FULL_SCREEN_AD_INTERVAL_NOT_ELAPSED` | Son Interstitial veya Rewarded kapanışından sonraki minimum süre dolmadı. |
 | `ALREADY_SHOWING` | App Open reklamı zaten gösteriliyor. |
 | `INVALID_ACTIVITY` | Activity finishing veya destroyed. |
 | `ACTIVITY_EXCLUDED` | Activity exclude listesinde. |

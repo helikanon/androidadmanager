@@ -52,6 +52,16 @@ class AppOpenAdPolicyTest {
     }
 
     @Test
+    fun `full screen cooldown is blocked before exact boundary`() {
+        assertFalse(AppOpenAdPolicy.hasShowIntervalElapsed(1_000L, 30, 30_999L))
+    }
+
+    @Test
+    fun `full screen cooldown is allowed at exact boundary`() {
+        assertTrue(AppOpenAdPolicy.hasShowIntervalElapsed(1_000L, 30, 31_000L))
+    }
+
+    @Test
     fun `recently loaded ad is valid before expiration`() {
         assertTrue(AppOpenAdPolicy.wasLoadedRecently(1_000L, 10_000L, 10_999L))
     }

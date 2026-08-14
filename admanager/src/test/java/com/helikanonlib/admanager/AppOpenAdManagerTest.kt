@@ -74,6 +74,21 @@ class AppOpenAdManagerTest {
         assertEquals(AdFormatEnum.APP_OPEN, managerError?.format)
     }
 
+    @Test
+    fun `full screen cooldown uses the configured duration`() {
+        val adapter = FakeAppOpenAdAdapter()
+        val manager = AppOpenAdManager(
+            adapters = listOf(adapter),
+            runtime = FakeAppOpenAdRuntime(),
+            showOrderStr = "admob",
+            displayState = FakeAppOpenAdDisplayState(lastFullScreenAdClosedElapsedRealtime = 1_000L)
+        )
+        manager.minElapsedSecondsAfterFullScreenAd = 30
+
+        assertFalse(manager.hasFullScreenAdIntervalElapsed(nowElapsedRealtime = 30_999L))
+        assertTrue(manager.hasFullScreenAdIntervalElapsed(nowElapsedRealtime = 31_000L))
+    }
+
     private fun createManager(adapter: FakeAppOpenAdAdapter): AppOpenAdManager {
         return AppOpenAdManager(
             adapters = listOf(adapter),
@@ -106,6 +121,11 @@ private class FakeAppOpenAdRuntime : AppOpenAdRuntime {
     override fun post(action: () -> Unit) = action()
     override fun elapsedRealtime() = 1_000L
 }
+
+private class FakeAppOpenAdDisplayState(
+    override val isBlocked: Boolean = false,
+    override val lastFullScreenAdClosedElapsedRealtime: Long? = null
+) : AppOpenAdDisplayState
 
 private class FakeAppOpenAdAdapter : AppOpenAdAdapter {
     override val platform = AdPlatformTypeEnum.ADMOB

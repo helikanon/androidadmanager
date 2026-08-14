@@ -14,6 +14,7 @@ enum class AppOpenAdShowResult {
     DISABLED,
     SHOWING_PAUSED,
     FULL_SCREEN_AD_ACTIVE,
+    FULL_SCREEN_AD_INTERVAL_NOT_ELAPSED,
     ALREADY_SHOWING,
     INVALID_ACTIVITY,
     ACTIVITY_EXCLUDED,
@@ -94,6 +95,8 @@ class AppOpenAdManager private constructor(
 
     var minElapsedSecondsToNextShow = 10
 
+    var minElapsedSecondsAfterFullScreenAd = 5
+
     var isEnabled = true
         private set
 
@@ -134,6 +137,9 @@ class AppOpenAdManager private constructor(
         if (!isEnabled) return AppOpenAdShowResult.DISABLED
         if (!isShowingEnabled) return AppOpenAdShowResult.SHOWING_PAUSED
         if (displayState.isBlocked) return AppOpenAdShowResult.FULL_SCREEN_AD_ACTIVE
+        if (!hasFullScreenAdIntervalElapsed()) {
+            return AppOpenAdShowResult.FULL_SCREEN_AD_INTERVAL_NOT_ELAPSED
+        }
         if (AppOpenAdPolicy.isFullScreenAdActivity(activity.javaClass.name)) {
             return AppOpenAdShowResult.FULL_SCREEN_AD_ACTIVE
         }
@@ -184,6 +190,14 @@ class AppOpenAdManager private constructor(
         return AppOpenAdPolicy.hasShowIntervalElapsed(
             lastShowElapsedRealtime,
             minElapsedSecondsToNextShow,
+            nowElapsedRealtime
+        )
+    }
+
+    fun hasFullScreenAdIntervalElapsed(nowElapsedRealtime: Long = runtime.elapsedRealtime()): Boolean {
+        return AppOpenAdPolicy.hasShowIntervalElapsed(
+            displayState.lastFullScreenAdClosedElapsedRealtime,
+            minElapsedSecondsAfterFullScreenAd,
             nowElapsedRealtime
         )
     }

@@ -62,6 +62,8 @@ class MyApplication : Application() {
 
         appOpenAdManager?.excludedActivities?.add(JavaSampleActivity::class.java.simpleName)
         appOpenAdManager?.minElapsedSecondsToNextShow = 10
+        // Interstitial veya Rewarded kapandıktan sonra App Open göstermeden önce beklenecek süre.
+        appOpenAdManager?.minElapsedSecondsAfterFullScreenAd = 30
 
         appOpenLifecycleController = AppOpenLifecycleController(this) {
             appOpenAdManager

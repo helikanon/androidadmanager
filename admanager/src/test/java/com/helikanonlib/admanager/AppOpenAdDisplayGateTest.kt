@@ -29,4 +29,11 @@ class AppOpenAdDisplayGateTest {
 
         assertFalse(AppOpenAdDisplayGate.isBlocked)
     }
+
+    @Test
+    fun `gate records when a full screen ad closes`() {
+        AppOpenAdDisplayGate.recordFullScreenAdClosed(nowElapsedRealtime = 12_345L)
+
+        assertTrue(AppOpenAdDisplayGate.lastFullScreenAdClosedElapsedRealtime == 12_345L)
+    }
 }

@@ -769,6 +769,7 @@ class AdManager {
 
         val _listener = object : AdPlatformShowListener() {
             override fun onClosed(adPlatformEnum: AdPlatformTypeEnum) {
+                AppOpenAdDisplayGate.recordFullScreenAdClosed()
                 releaseDisplayLease()
 
                 activity.runOnUiThread {
@@ -1295,6 +1296,7 @@ class AdManager {
 
         val _listener = object : AdPlatformShowListener() {
             override fun onClosed(adPlatformEnum: AdPlatformTypeEnum) {
+                AppOpenAdDisplayGate.recordFullScreenAdClosed()
                 releaseDisplayLease()
                 // on close load new one for next show
                 notifyShowListeners(globalRewardedShowListener, listener) { it.onClosed(adPlatformEnum) }
