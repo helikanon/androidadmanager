@@ -134,6 +134,9 @@ class AppOpenAdManager private constructor(
         if (!isEnabled) return AppOpenAdShowResult.DISABLED
         if (!isShowingEnabled) return AppOpenAdShowResult.SHOWING_PAUSED
         if (displayState.isBlocked) return AppOpenAdShowResult.FULL_SCREEN_AD_ACTIVE
+        if (AppOpenAdPolicy.isFullScreenAdActivity(activity.javaClass.name)) {
+            return AppOpenAdShowResult.FULL_SCREEN_AD_ACTIVE
+        }
         if (activity.isFinishing || activity.isDestroyed) return AppOpenAdShowResult.INVALID_ACTIVITY
         if (isShowing) return AppOpenAdShowResult.ALREADY_SHOWING
 
@@ -520,6 +523,28 @@ class AppOpenAdManager private constructor(
 }
 
 internal object AppOpenAdPolicy {
+    private val fullScreenAdActivityNames = setOf(
+        "com.google.android.gms.ads.AdActivity",
+        "com.applovin.sdk.AppLovinWebViewActivity",
+        "com.facebook.ads.AudienceNetworkActivity"
+    )
+
+    private val fullScreenAdActivityPackagePrefixes = listOf(
+        "com.applovin.adview.",
+        "com.bytedance.sdk.openadsdk.activity.",
+        "com.fyber.inneractive.sdk.activities.",
+        "com.inmobi.ads.rendering.",
+        "com.mbridge.msdk.",
+        "com.unity3d.ads.adplayer.",
+        "com.unity3d.services.ads.adunit.",
+        "com.vungle.ads.internal.ui."
+    )
+
+    fun isFullScreenAdActivity(activityClassName: String): Boolean {
+        return activityClassName in fullScreenAdActivityNames ||
+            fullScreenAdActivityPackagePrefixes.any(activityClassName::startsWith)
+    }
+
     fun hasShowIntervalElapsed(lastShowMillis: Long?, minimumSeconds: Int, nowMillis: Long): Boolean {
         if (lastShowMillis == null) return true
         val minimumIntervalMillis = minimumSeconds.coerceAtLeast(0) * 1_000L

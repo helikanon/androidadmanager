@@ -7,6 +7,31 @@ import org.junit.Test
 class AppOpenAdPolicyTest {
 
     @Test
+    fun `full screen ad activities are blocked from showing app open ads`() {
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.google.android.gms.ads.AdActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.applovin.adview.AppLovinFullscreenActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.applovin.adview.AppLovinFullscreenImmersiveActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.applovin.sdk.AppLovinWebViewActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.facebook.ads.AudienceNetworkActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.bytedance.sdk.openadsdk.activity.single.TTAdActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.fyber.inneractive.sdk.activities.InneractiveFullscreenAdActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.inmobi.ads.rendering.InMobiAdActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.mbridge.msdk.activity.MBCommonActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.unity3d.ads.adplayer.FullScreenWebViewDisplay"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.unity3d.services.ads.adunit.AdUnitActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.unity3d.services.ads.adunit.AdUnitTransparentActivity"))
+        assertTrue(AppOpenAdPolicy.isFullScreenAdActivity("com.vungle.ads.internal.ui.VungleActivity"))
+    }
+
+    @Test
+    fun `application activities are not mistaken for full screen ad activities`() {
+        assertFalse(AppOpenAdPolicy.isFullScreenAdActivity("com.example.MainActivity"))
+        assertFalse(AppOpenAdPolicy.isFullScreenAdActivity("com.example.AdActivity"))
+        assertFalse(AppOpenAdPolicy.isFullScreenAdActivity("com.google.android.gms.ads.settings.AdsSettingsActivity"))
+        assertFalse(AppOpenAdPolicy.isFullScreenAdActivity("com.applovin.mediation.MaxDebuggerActivity"))
+    }
+
+    @Test
     fun `first show is immediately allowed`() {
         assertTrue(AppOpenAdPolicy.hasShowIntervalElapsed(null, 10, 1_000L))
     }
